@@ -23,7 +23,7 @@ const ENV_TAURI_APP_PATH: &str = "TAURI_APP_PATH";
 // path to the frontend app directory
 const ENV_TAURI_FRONTEND_PATH: &str = "TAURI_FRONTEND_PATH";
 
-static APP_DIR: OnceLock<PathBuf> = OnceLock::new();
+static FRONTEND_DIR: OnceLock<PathBuf> = OnceLock::new();
 static TAURI_DIR: OnceLock<PathBuf> = OnceLock::new();
 
 pub fn walk_builder(path: &Path) -> WalkBuilder {
@@ -121,7 +121,7 @@ pub fn resolve() {
       ConfigFormat::Toml.into_file_name()
     )
   })).expect("tauri dir already resolved");
-  APP_DIR
+  FRONTEND_DIR
     .set(resolve_frontend_dir().unwrap_or_else(|| tauri_dir().parent().unwrap().to_path_buf()))
     .expect("app dir already resolved");
 }
@@ -151,7 +151,7 @@ pub fn resolve_frontend_dir() -> Option<PathBuf> {
 }
 
 pub fn frontend_dir() -> &'static PathBuf {
-  APP_DIR
+  FRONTEND_DIR
     .get()
     .expect("app paths not initialized, this is a Tauri CLI bug")
 }
