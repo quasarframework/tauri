@@ -29,7 +29,7 @@ use tauri_utils::config::{parse::is_configuration_file, DeepLinkProtocol, Update
 use super::{AppSettings, DevProcess, ExitReason, Interface};
 use crate::{
   helpers::{
-    app_paths::{app_dir, tauri_dir},
+    app_paths::{frontend_dir, tauri_dir},
     config::{nsis_settings, reload as reload_config, wix_settings, BundleResources, Config},
   },
   ConfigValue,
@@ -518,7 +518,7 @@ impl Rust {
 
     let process = Arc::new(Mutex::new(child));
     let (tx, rx) = sync_channel(1);
-    let app_path = app_dir();
+    let app_path = frontend_dir();
 
     let watch_folders = get_watch_folders()?;
 

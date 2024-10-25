@@ -122,7 +122,7 @@ pub fn resolve() {
     )
   })).expect("tauri dir already resolved");
   APP_DIR
-    .set(resolve_app_dir().unwrap_or_else(|| tauri_dir().parent().unwrap().to_path_buf()))
+    .set(resolve_frontend_dir().unwrap_or_else(|| tauri_dir().parent().unwrap().to_path_buf()))
     .expect("app dir already resolved");
 }
 
@@ -132,7 +132,7 @@ pub fn tauri_dir() -> &'static PathBuf {
     .expect("app paths not initialized, this is a Tauri CLI bug")
 }
 
-pub fn resolve_app_dir() -> Option<PathBuf> {
+pub fn resolve_frontend_dir() -> Option<PathBuf> {
   let app_dir =
     env_tauri_frontend_path().unwrap_or_else(|| current_dir().expect("failed to read cwd"));
 
@@ -150,7 +150,7 @@ pub fn resolve_app_dir() -> Option<PathBuf> {
   .map(|p| p.parent().unwrap().to_path_buf())
 }
 
-pub fn app_dir() -> &'static PathBuf {
+pub fn frontend_dir() -> &'static PathBuf {
   APP_DIR
     .get()
     .expect("app paths not initialized, this is a Tauri CLI bug")

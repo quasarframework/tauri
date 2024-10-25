@@ -258,7 +258,7 @@ pub struct Options {
 pub fn command(options: Options) -> Result<()> {
   let Options { interactive } = options;
 
-  let app_dir = crate::helpers::app_paths::resolve_app_dir();
+  let app_dir = crate::helpers::app_paths::resolve_frontend_dir();
   let tauri_dir = crate::helpers::app_paths::resolve_tauri_dir();
 
   if tauri_dir.is_some() {

@@ -4,7 +4,7 @@
 
 use crate::{
   helpers::{
-    app_paths::{app_dir, tauri_dir},
+    app_paths::{frontend_dir, tauri_dir},
     npm::PackageManager,
   },
   interface::rust::manifest::{read_manifest, serialize_manifest},
@@ -17,7 +17,7 @@ use anyhow::Context;
 use toml_edit::{DocumentMut, Item, Table, TableLike, Value};
 
 pub fn run() -> Result<()> {
-  let app_dir = app_dir();
+  let app_dir = frontend_dir();
   let tauri_dir = tauri_dir();
 
   let manifest_path = tauri_dir.join("Cargo.toml");
