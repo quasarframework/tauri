@@ -90,7 +90,7 @@ fn env_tauri_frontend_path() -> Option<PathBuf> {
 }
 
 pub fn resolve_tauri_dir() -> Option<PathBuf> {
-  let src_dir = env_tauri_frontend_path().or_else(|| current_dir().ok())?;
+  let src_dir = env_tauri_app_path().or_else(|| current_dir().ok())?;
 
   if src_dir.join(ConfigFormat::Json.into_file_name()).exists()
     || src_dir.join(ConfigFormat::Json5.into_file_name()).exists()
@@ -113,7 +113,7 @@ pub fn resolve_tauri_dir() -> Option<PathBuf> {
 
 pub fn resolve() {
   TAURI_DIR.set(resolve_tauri_dir().unwrap_or_else(|| {
-    let env_var_name = env_tauri_frontend_path().is_some().then(|| format!("`{ENV_TAURI_FRONTEND_PATH}`"));
+    let env_var_name = env_tauri_app_path().is_some().then(|| format!("`{ENV_TAURI_APP_PATH}`"));
     panic!("Couldn't recognize the {} folder as a Tauri project. It must contain a `{}`, `{}` or `{}` file in any subfolder.",
       env_var_name.as_deref().unwrap_or("current"),
       ConfigFormat::Json.into_file_name(),
@@ -133,7 +133,8 @@ pub fn tauri_dir() -> &'static PathBuf {
 }
 
 pub fn resolve_app_dir() -> Option<PathBuf> {
-  let app_dir = env_tauri_app_path().unwrap_or_else(|| current_dir().expect("failed to read cwd"));
+  let app_dir =
+    env_tauri_frontend_path().unwrap_or_else(|| current_dir().expect("failed to read cwd"));
 
   if app_dir.join("package.json").exists() {
     return Some(app_dir);
