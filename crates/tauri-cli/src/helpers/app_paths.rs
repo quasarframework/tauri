@@ -133,14 +133,14 @@ pub fn tauri_dir() -> &'static PathBuf {
 }
 
 pub fn resolve_frontend_dir() -> Option<PathBuf> {
-  let app_dir =
+  let frontend_dir =
     env_tauri_frontend_path().unwrap_or_else(|| current_dir().expect("failed to read cwd"));
 
-  if app_dir.join("package.json").exists() {
-    return Some(app_dir);
+  if frontend_dir.join("package.json").exists() {
+    return Some(frontend_dir);
   }
 
-  lookup(&app_dir, |path| {
+  lookup(&frontend_dir, |path| {
     if let Some(file_name) = path.file_name() {
       file_name == OsStr::new("package.json")
     } else {

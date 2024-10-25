@@ -15,11 +15,11 @@ mod manifest;
 
 pub fn run() -> Result<()> {
   let tauri_dir = tauri_dir();
-  let app_dir = frontend_dir();
+  let frontend_dir = frontend_dir();
 
   let mut migrated = config::migrate(tauri_dir).context("Could not migrate config")?;
   manifest::migrate(tauri_dir).context("Could not migrate manifest")?;
-  let plugins = frontend::migrate(app_dir)?;
+  let plugins = frontend::migrate(frontend_dir)?;
 
   migrated.plugins.extend(plugins);
 

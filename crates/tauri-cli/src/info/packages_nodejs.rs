@@ -76,8 +76,8 @@ pub fn npm_latest_version(pm: &PackageManager, name: &str) -> crate::Result<Opti
   }
 }
 
-pub fn package_manager(app_dir: &PathBuf) -> PackageManager {
-  let found = PackageManager::from_project(app_dir);
+pub fn package_manager(frontend_dir: &PathBuf) -> PackageManager {
+  let found = PackageManager::from_project(frontend_dir);
 
   if found.is_empty() {
     println!(
@@ -110,18 +110,18 @@ pub fn package_manager(app_dir: &PathBuf) -> PackageManager {
 }
 
 pub fn items(
-  app_dir: Option<&PathBuf>,
+  frontend_dir: Option<&PathBuf>,
   package_manager: PackageManager,
   metadata: &VersionMetadata,
 ) -> Vec<SectionItem> {
   let mut items = Vec::new();
-  if let Some(app_dir) = app_dir {
+  if let Some(frontend_dir) = frontend_dir {
     for (package, version) in [
       ("@tauri-apps/api", None),
       ("@tauri-apps/cli", Some(metadata.js_cli.version.clone())),
     ] {
-      let app_dir = app_dir.clone();
-      let item = nodejs_section_item(package.into(), version, app_dir, package_manager);
+      let frontend_dir = frontend_dir.clone();
+      let item = nodejs_section_item(package.into(), version, frontend_dir, package_manager);
       items.push(item);
     }
   }
@@ -132,13 +132,13 @@ pub fn items(
 pub fn nodejs_section_item(
   package: String,
   version: Option<String>,
-  app_dir: PathBuf,
+  frontend_dir: PathBuf,
   package_manager: PackageManager,
 ) -> SectionItem {
   SectionItem::new().action(move || {
     let version = version.clone().unwrap_or_else(|| {
       package_manager
-        .current_package_version(&package, &app_dir)
+        .current_package_version(&package, &frontend_dir)
         .unwrap_or_default()
         .unwrap_or_default()
     });

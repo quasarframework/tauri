@@ -56,7 +56,7 @@ pub fn run(options: Options) -> Result<()> {
   let mut plugins = crate::helpers::plugins::known_plugins();
   let metadata = plugins.remove(plugin).unwrap_or_default();
 
-  let app_dir = resolve_frontend_dir();
+  let frontend_dir = resolve_frontend_dir();
   let tauri_dir = tauri_dir();
 
   let target_str = metadata
@@ -81,7 +81,7 @@ pub fn run(options: Options) -> Result<()> {
   })?;
 
   if !metadata.rust_only {
-    if let Some(manager) = app_dir
+    if let Some(manager) = frontend_dir
       .map(PackageManager::from_project)
       .and_then(|managers| managers.into_iter().next())
     {
