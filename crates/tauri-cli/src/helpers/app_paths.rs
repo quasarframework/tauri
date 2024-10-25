@@ -18,9 +18,9 @@ use tauri_utils::{
 };
 
 const TAURI_GITIGNORE: &[u8] = include_bytes!("../../tauri.gitignore");
-// path to the Tauri app (Rust crate) directory, usually <cwd>/src-tauri
+// path to the Tauri app (Rust crate) directory, usually `<project>/src-tauri/`
 const ENV_TAURI_APP_PATH: &str = "TAURI_APP_PATH";
-// path to the frontend app directory
+// path to the frontend app directory, usually `<project>/`
 const ENV_TAURI_FRONTEND_PATH: &str = "TAURI_FRONTEND_PATH";
 
 static FRONTEND_DIR: OnceLock<PathBuf> = OnceLock::new();
