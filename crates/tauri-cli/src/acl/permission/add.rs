@@ -187,7 +187,8 @@ pub fn command(options: Options) -> Result<()> {
       capabilities.push((
         TomlOrJson::Json(serde_json::json!({
           "identifier": identifier,
-          "platforms": expected_platforms
+          "platforms": expected_platforms,
+          "windows": ["main"]
         })),
         capability_path,
       ));
