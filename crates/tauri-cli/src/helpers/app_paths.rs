@@ -17,8 +17,6 @@ use tauri_utils::{
   platform::Target,
 };
 
-use dunce;
-
 const TAURI_GITIGNORE: &[u8] = include_bytes!("../../tauri.gitignore");
 // path to the Tauri app (Rust crate) directory, usually `<project>/src-tauri/`
 const ENV_TAURI_APP_PATH: &str = "TAURI_APP_PATH";
