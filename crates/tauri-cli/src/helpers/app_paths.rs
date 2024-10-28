@@ -17,6 +17,8 @@ use tauri_utils::{
   platform::Target,
 };
 
+use dunce;
+
 const TAURI_GITIGNORE: &[u8] = include_bytes!("../../tauri.gitignore");
 // path to the Tauri app (Rust crate) directory, usually `<project>/src-tauri/`
 const ENV_TAURI_APP_PATH: &str = "TAURI_APP_PATH";
@@ -79,6 +81,7 @@ fn env_tauri_app_path() -> Option<PathBuf> {
     .ok()?
     .canonicalize()
     .ok()
+    .map(|p| dunce::simplified(&p).to_path_buf())
 }
 
 fn env_tauri_frontend_path() -> Option<PathBuf> {
@@ -87,6 +90,7 @@ fn env_tauri_frontend_path() -> Option<PathBuf> {
     .ok()?
     .canonicalize()
     .ok()
+    .map(|p| dunce::simplified(&p).to_path_buf())
 }
 
 pub fn resolve_tauri_dir() -> Option<PathBuf> {
