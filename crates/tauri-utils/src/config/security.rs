@@ -409,76 +409,64 @@ impl HeaderAddition for Builder {
     self = match headers {
       Some(headers) => {
         // Add the header Access-Control-Allow-Credentials, if we find a value for it
-        self = match &headers.access_control_allow_credentials {
-          Some(value) => self.header("Access-Control-Allow-Credentials", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.access_control_allow_credentials {
+          self = self.header("Access-Control-Allow-Credentials", value.to_string());
         };
 
         // Add the header Access-Control-Allow-Headers, if we find a value for it
-        self = match &headers.access_control_allow_headers {
-          Some(value) => self.header("Access-Control-Allow-Headers", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.access_control_allow_headers {
+          self = self.header("Access-Control-Allow-Headers", value.to_string());
         };
 
         // Add the header Access-Control-Allow-Methods, if we find a value for it
-        self = match &headers.access_control_allow_methods {
-          Some(value) => self.header("Access-Control-Allow-Methods", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.access_control_allow_methods {
+          self = self.header("Access-Control-Allow-Methods", value.to_string());
         };
 
         // Add the header Access-Control-Expose-Headers, if we find a value for it
-        self = match &headers.access_control_expose_headers {
-          Some(value) => self.header("Access-Control-Expose-Headers", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.access_control_expose_headers {
+          self = self.header("Access-Control-Expose-Headers", value.to_string());
         };
 
         // Add the header Access-Control-Max-Age, if we find a value for it
-        self = match &headers.access_control_max_age {
-          Some(value) => self.header("Access-Control-Max-Age", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.access_control_max_age {
+          self = self.header("Access-Control-Max-Age", value.to_string());
         };
 
         // Add the header Cross-Origin-Embedder-Policy, if we find a value for it
-        self = match &headers.cross_origin_embedder_policy {
-          Some(value) => self.header("Cross-Origin-Embedder-Policy", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.cross_origin_embedder_policy {
+          self = self.header("Cross-Origin-Embedder-Policy", value.to_string());
         };
 
         // Add the header Cross-Origin-Opener-Policy, if we find a value for it
-        self = match &headers.cross_origin_opener_policy {
-          Some(value) => self.header("Cross-Origin-Opener-Policy", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.cross_origin_opener_policy {
+          self = self.header("Cross-Origin-Opener-Policy", value.to_string());
         };
 
         // Add the header Cross-Origin-Resource-Policy, if we find a value for it
-        self = match &headers.cross_origin_resource_policy {
-          Some(value) => self.header("Cross-Origin-Resource-Policy", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.cross_origin_resource_policy {
+          self = self.header("Cross-Origin-Resource-Policy", value.to_string());
         };
 
         // Add the header Permission-Policy, if we find a value for it
-        self = match &headers.permissions_policy {
-          Some(value) => self.header("Permission-Policy", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.permissions_policy {
+          self = self.header("Permission-Policy", value.to_string());
         };
 
         // Add the header Timing-Allow-Origin, if we find a value for it
-        self = match &headers.timing_allow_origin {
-          Some(value) => self.header("Timing-Allow-Origin", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.timing_allow_origin {
+          self = self.header("Timing-Allow-Origin", value.to_string());
         };
 
         // Add the header X-Content-Type-Options, if we find a value for it
-        self = match &headers.x_content_type_options {
-          Some(value) => self.header("X-Content-Type-Options", value.to_string()),
-          None => self,
+        if let Some(value) match &headers.x_content_type_options {
+          self = self.header("X-Content-Type-Options", value.to_string());
         };
 
         // Add the header Tauri-Custom-Header, if we find a value for it
-        self = match &headers.tauri_custom_header {
+        if let Some(value) match &headers.tauri_custom_header {
           // Keep in mind to correctly set the Access-Control-Expose-Headers
-          Some(value) => self.header("Tauri-Custom-Header", value.to_string()),
-          None => self,
+          self = self.header("Tauri-Custom-Header", value.to_string());
         };
         self
       }
