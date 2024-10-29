@@ -93,15 +93,15 @@ impl<'de> Deserialize<'de> for PermissionEntry {
 ///   "windows": [
 ///     "main"
 ///   ],
-///  "permissions": [
-///   "core:default",
-///   "dialog:open",
-///   {
-///     "identifier": "fs:allow-write-text-file",
-///     "allow": [{ "path": "$HOME/test.txt" }]
-///   },
-///  ],
-///  "platforms": ["macOS","windows"]
+///   "permissions": [
+///     "core:default",
+///     "dialog:open",
+///     {
+///       "identifier": "fs:allow-write-text-file",
+///       "allow": [{ "path": "$HOME/test.txt" }]
+///     },
+///   ],
+///   "platforms": ["macOS","windows"]
 /// }
 /// ```
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -175,13 +175,14 @@ pub struct Capability {
   ///
   /// ```json
   /// [
-  ///  "core:default",
-  ///  "shell:allow-open",
-  ///  "dialog:open",
-  ///  {
-  ///    "identifier": "fs:allow-write-text-file",
-  ///    "allow": [{ "path": "$HOME/test.txt" }]
-  ///  }
+  ///   "core:default",
+  ///   "shell:allow-open",
+  ///   "dialog:open",
+  ///   {
+  ///     "identifier": "fs:allow-write-text-file",
+  ///     "allow": [{ "path": "$HOME/test.txt" }]
+  ///   }
+  /// ]
   /// ```
   #[cfg_attr(feature = "schema", schemars(schema_with = "unique_permission"))]
   pub permissions: Vec<PermissionEntry>,
