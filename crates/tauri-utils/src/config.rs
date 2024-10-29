@@ -2011,7 +2011,6 @@ impl HeaderAddition for Builder {
   }
 }
 
-/// ## Header Config
 /// A struct, where the keys are some specific http header names.
 /// If the values to those keys are defined, then they will be send as part of a response message.
 /// This does not include error messages and ipc messages
