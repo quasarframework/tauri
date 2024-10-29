@@ -1,18 +1,6 @@
 ---
-"@tauri-apps/api": 'minor:feat'
 "tauri-utils": 'minor:feat'
-"tauri-macos-sign": 'minor:feat'
-"tauri-bundler": 'minor:feat'
-"tauri-runtime": 'minor:feat'
-"tauri-runtime-wry": 'minor:feat'
-"tauri-codegen": 'minor:feat'
-"tauri-macros": 'minor:feat'
-"tauri-plugin": 'minor:feat'
-"tauri-build": 'minor:feat'
 "tauri": 'minor:feat'
-"@tauri-apps/cli": 'minor:feat'
-"tauri-cli": 'minor:feat'
-"tauri-driver": 'minor:feat'
 ---
 # Feature
 Adds a new configuration option for the tauri configuration file.This being `headers` in the app>security. Headers defined the are added to every http response from tauri to the web view. This doesn't include IPC messages and error responses. The header names are limited to:
