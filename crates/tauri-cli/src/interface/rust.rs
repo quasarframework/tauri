@@ -29,7 +29,7 @@ use tauri_utils::config::{parse::is_configuration_file, DeepLinkProtocol, Update
 use super::{AppSettings, DevProcess, ExitReason, Interface};
 use crate::{
   helpers::{
-    app_paths::{app_dir, tauri_dir},
+    app_paths::{frontend_dir, tauri_dir},
     config::{nsis_settings, reload as reload_config, wix_settings, BundleResources, Config},
   },
   ConfigValue,
@@ -518,7 +518,7 @@ impl Rust {
 
     let process = Arc::new(Mutex::new(child));
     let (tx, rx) = sync_channel(1);
-    let app_path = app_dir();
+    let frontend_path = frontend_dir();
 
     let watch_folders = get_watch_folders()?;
 
@@ -572,7 +572,11 @@ impl Rust {
 
             log::info!(
               "File {} changed. Rebuilding application...",
-              display_path(event_path.strip_prefix(app_path).unwrap_or(&event_path))
+              display_path(
+                event_path
+                  .strip_prefix(frontend_path)
+                  .unwrap_or(&event_path)
+              )
             );
 
             let mut p = process.lock().unwrap();
@@ -906,7 +910,9 @@ impl AppSettings for RustAppSettings {
       }
     }
 
-    let mut binaries_paths = std::fs::read_dir(tauri_dir().join("src/bin"))
+    let tauri_dir = tauri_dir();
+
+    let mut binaries_paths = std::fs::read_dir(tauri_dir.join("src/bin"))
       .map(|dir| {
         dir
           .into_iter()
@@ -929,11 +935,11 @@ impl AppSettings for RustAppSettings {
     if !binaries_paths
       .iter()
       .any(|(_name, path)| path == Path::new("src/main.rs"))
-      && tauri_dir().join("src/main.rs").exists()
+      && tauri_dir.join("src/main.rs").exists()
     {
       binaries_paths.push((
         self.cargo_package_settings.name.clone(),
-        tauri_dir().join("src/main.rs"),
+        tauri_dir.join("src/main.rs"),
       ));
     }
 
@@ -998,8 +1004,9 @@ impl AppSettings for RustAppSettings {
 
 impl RustAppSettings {
   pub fn new(config: &Config, manifest: Manifest, target: Option<String>) -> crate::Result<Self> {
+    let tauri_dir = tauri_dir();
     let cargo_settings =
-      CargoSettings::load(tauri_dir()).with_context(|| "failed to load cargo settings")?;
+      CargoSettings::load(tauri_dir).with_context(|| "failed to load cargo settings")?;
     let cargo_package_settings = match &cargo_settings.package {
       Some(package_info) => package_info.clone(),
       None => {
@@ -1073,7 +1080,7 @@ impl RustAppSettings {
       default_run: cargo_package_settings.default_run.clone(),
     };
 
-    let cargo_config = CargoConfig::load(tauri_dir())?;
+    let cargo_config = CargoConfig::load(tauri_dir)?;
 
     let target_triple = target.unwrap_or_else(|| {
       cargo_config
