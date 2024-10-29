@@ -23,6 +23,7 @@
 //! [ignore unknown fields when destructuring]: https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html#ignoring-remaining-parts-of-a-value-with-
 //! [Struct Update Syntax]: https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax
 
+use http::response::Builder;
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
 use semver::Version;
@@ -31,9 +32,9 @@ use serde::{
   Deserialize, Serialize, Serializer,
 };
 use serde_json::Value as JsonValue;
+use serde_untagged::UntaggedEnumVisitor;
 use serde_with::skip_serializing_none;
 use url::Url;
-use http::response::Builder;
 
 use std::{
   collections::HashMap,
@@ -1773,50 +1774,6 @@ pub struct AssetProtocolConfig {
   pub enable: bool,
 }
 
-/// A capability entry which can be either an inlined capability or a reference to a capability defined on its own file.
-#[derive(Debug, Clone, PartialEq, Serialize)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[serde(untagged)]
-pub enum CapabilityEntry {
-  /// An inlined capability.
-  Inlined(Capability),
-  /// Reference to a capability identifier.
-  Reference(String),
-}
-
-impl<'de> Deserialize<'de> for CapabilityEntry {
-  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-  where
-    D: Deserializer<'de>,
-  {
-    UntaggedEnumVisitor::new()
-      .string(|string| Ok(Self::Reference(string.to_owned())))
-      .map(|map| map.deserialize::<Capability>().map(Self::Inlined))
-      .deserialize(deserializer)
-  }
-}
-
-/// The application pattern.
-#[skip_serializing_none]
-#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase", tag = "use", content = "options")]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-pub enum PatternKind {
-  /// Brownfield pattern.
-  Brownfield,
-  /// Isolation pattern. Recommended for security purposes.
-  Isolation {
-    /// The dir containing the index.html file that contains the secure isolation application.
-    dir: PathBuf,
-  },
-}
-
-impl Default for PatternKind {
-  fn default() -> Self {
-    Self::Brownfield
-  }
-}
-
 /// definition of a header source
 ///
 /// The header value to a header name
@@ -1936,77 +1893,76 @@ impl From<HashMap<String, String>> for HeaderSource {
 /// Must add headers defined in the tauri configuration file to http responses
 pub trait HeaderAddition {
   /// adds all headers defined on the config file, given the current HeaderConfig
-  fn add_configured_headers(self, headers: Option<&HeaderConfig>) -> Builder;
+  fn add_configured_headers(self, headers: Option<&HeaderConfig>) -> http::response::Builder;
 }
 
 impl HeaderAddition for Builder {
   /// Add the headers defined in the tauri configuration file to http responses
   ///
   /// this is a utility function, which is used in the same way as the `.header(..)` of the rust http library
-  fn add_configured_headers(mut self, headers: Option<&HeaderConfig>) -> Builder {
+  fn add_configured_headers(mut self, headers: Option<&HeaderConfig>) -> http::response::Builder {
     if let Some(headers) = headers {
+      // Add the header Access-Control-Allow-Credentials, if we find a value for it
+      if let Some(value) = &headers.access_control_allow_credentials {
+        self = self.header("Access-Control-Allow-Credentials", value.to_string());
+      };
 
-        // Add the header Access-Control-Allow-Credentials, if we find a value for it
-        if let Some(value) match &headers.access_control_allow_credentials {
-          self = self.header("Access-Control-Allow-Credentials", value.to_string());
-        };
+      // Add the header Access-Control-Allow-Headers, if we find a value for it
+      if let Some(value) = &headers.access_control_allow_headers {
+        self = self.header("Access-Control-Allow-Headers", value.to_string());
+      };
 
-        // Add the header Access-Control-Allow-Headers, if we find a value for it
-        if let Some(value) match &headers.access_control_allow_headers {
-          self = self.header("Access-Control-Allow-Headers", value.to_string());
-        };
+      // Add the header Access-Control-Allow-Methods, if we find a value for it
+      if let Some(value) = &headers.access_control_allow_methods {
+        self = self.header("Access-Control-Allow-Methods", value.to_string());
+      };
 
-        // Add the header Access-Control-Allow-Methods, if we find a value for it
-        if let Some(value) match &headers.access_control_allow_methods {
-          self = self.header("Access-Control-Allow-Methods", value.to_string());
-        };
+      // Add the header Access-Control-Expose-Headers, if we find a value for it
+      if let Some(value) = &headers.access_control_expose_headers {
+        self = self.header("Access-Control-Expose-Headers", value.to_string());
+      };
 
-        // Add the header Access-Control-Expose-Headers, if we find a value for it
-        if let Some(value) match &headers.access_control_expose_headers {
-          self = self.header("Access-Control-Expose-Headers", value.to_string());
-        };
+      // Add the header Access-Control-Max-Age, if we find a value for it
+      if let Some(value) = &headers.access_control_max_age {
+        self = self.header("Access-Control-Max-Age", value.to_string());
+      };
 
-        // Add the header Access-Control-Max-Age, if we find a value for it
-        if let Some(value) match &headers.access_control_max_age {
-          self = self.header("Access-Control-Max-Age", value.to_string());
-        };
+      // Add the header Cross-Origin-Embedder-Policy, if we find a value for it
+      if let Some(value) = &headers.cross_origin_embedder_policy {
+        self = self.header("Cross-Origin-Embedder-Policy", value.to_string());
+      };
 
-        // Add the header Cross-Origin-Embedder-Policy, if we find a value for it
-        if let Some(value) match &headers.cross_origin_embedder_policy {
-          self = self.header("Cross-Origin-Embedder-Policy", value.to_string());
-        };
+      // Add the header Cross-Origin-Opener-Policy, if we find a value for it
+      if let Some(value) = &headers.cross_origin_opener_policy {
+        self = self.header("Cross-Origin-Opener-Policy", value.to_string());
+      };
 
-        // Add the header Cross-Origin-Opener-Policy, if we find a value for it
-        if let Some(value) match &headers.cross_origin_opener_policy {
-          self = self.header("Cross-Origin-Opener-Policy", value.to_string());
-        };
+      // Add the header Cross-Origin-Resource-Policy, if we find a value for it
+      if let Some(value) = &headers.cross_origin_resource_policy {
+        self = self.header("Cross-Origin-Resource-Policy", value.to_string());
+      };
 
-        // Add the header Cross-Origin-Resource-Policy, if we find a value for it
-        if let Some(value) match &headers.cross_origin_resource_policy {
-          self = self.header("Cross-Origin-Resource-Policy", value.to_string());
-        };
+      // Add the header Permission-Policy, if we find a value for it
+      if let Some(value) = &headers.permissions_policy {
+        self = self.header("Permission-Policy", value.to_string());
+      };
 
-        // Add the header Permission-Policy, if we find a value for it
-        if let Some(value) match &headers.permissions_policy {
-          self = self.header("Permission-Policy", value.to_string());
-        };
+      // Add the header Timing-Allow-Origin, if we find a value for it
+      if let Some(value) = &headers.timing_allow_origin {
+        self = self.header("Timing-Allow-Origin", value.to_string());
+      };
 
-        // Add the header Timing-Allow-Origin, if we find a value for it
-        if let Some(value) match &headers.timing_allow_origin {
-          self = self.header("Timing-Allow-Origin", value.to_string());
-        };
+      // Add the header X-Content-Type-Options, if we find a value for it
+      if let Some(value) = &headers.x_content_type_options {
+        self = self.header("X-Content-Type-Options", value.to_string());
+      };
 
-        // Add the header X-Content-Type-Options, if we find a value for it
-        if let Some(value) match &headers.x_content_type_options {
-          self = self.header("X-Content-Type-Options", value.to_string());
-        };
-
-        // Add the header Tauri-Custom-Header, if we find a value for it
-        if let Some(value) match &headers.tauri_custom_header {
-          // Keep in mind to correctly set the Access-Control-Expose-Headers
-          self = self.header("Tauri-Custom-Header", value.to_string());
-        };
-      }
+      // Add the header Tauri-Custom-Header, if we find a value for it
+      if let Some(value) = &headers.tauri_custom_header {
+        // Keep in mind to correctly set the Access-Control-Expose-Headers
+        self = self.header("Tauri-Custom-Header", value.to_string());
+      };
+    }
     self
   }
 }
@@ -2222,6 +2178,50 @@ pub struct SecurityConfig {
   /// This doesn't include IPC Messages and error responses
   #[serde(default)]
   pub headers: Option<HeaderConfig>,
+}
+
+/// A capability entry which can be either an inlined capability or a reference to a capability defined on its own file.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(untagged)]
+pub enum CapabilityEntry {
+  /// An inlined capability.
+  Inlined(Capability),
+  /// Reference to a capability identifier.
+  Reference(String),
+}
+
+impl<'de> Deserialize<'de> for CapabilityEntry {
+  fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+  where
+    D: Deserializer<'de>,
+  {
+    UntaggedEnumVisitor::new()
+      .string(|string| Ok(Self::Reference(string.to_owned())))
+      .map(|map| map.deserialize::<Capability>().map(Self::Inlined))
+      .deserialize(deserializer)
+  }
+}
+
+/// The application pattern.
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase", tag = "use", content = "options")]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+pub enum PatternKind {
+  /// Brownfield pattern.
+  Brownfield,
+  /// Isolation pattern. Recommended for security purposes.
+  Isolation {
+    /// The dir containing the index.html file that contains the secure isolation application.
+    dir: PathBuf,
+  },
+}
+
+impl Default for PatternKind {
+  fn default() -> Self {
+    Self::Brownfield
+  }
 }
 
 /// The App configuration object.
@@ -3131,7 +3131,6 @@ mod build {
     }
   }
 
-
   impl ToTokens for HeaderSource {
     fn to_tokens(&self, tokens: &mut TokenStream) {
       let prefix = quote! { ::tauri::utils::config::HeaderSource };
@@ -3140,18 +3139,13 @@ mod build {
         Self::Inline(s) => {
           let line = s.as_str();
           quote!(#prefix::Inline(#line.into()))
-        },
-        Self::List(l )=> {
+        }
+        Self::List(l) => {
           let list = vec_lit(l, str_lit);
           quote!(#prefix::List(#list))
-        },
+        }
         Self::Map(m) => {
-          let map = map_lit(
-            quote! { ::std::collections::HashMap },
-            m,
-            str_lit,
-            str_lit,
-          );
+          let map = map_lit(quote! { ::std::collections::HashMap }, m, str_lit, str_lit);
           quote!(#prefix::Map(#map))
         }
       })
@@ -3160,15 +3154,15 @@ mod build {
 
   impl ToTokens for HeaderConfig {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-
-      let access_control_allow_credentials = opt_lit(self.access_control_allow_credentials.as_ref());
+      let access_control_allow_credentials =
+        opt_lit(self.access_control_allow_credentials.as_ref());
       let access_control_allow_headers = opt_lit(self.access_control_allow_headers.as_ref());
       let access_control_allow_methods = opt_lit(self.access_control_allow_methods.as_ref());
       let access_control_expose_headers = opt_lit(self.access_control_expose_headers.as_ref());
       let access_control_max_age = opt_lit(self.access_control_max_age.as_ref());
       let cross_origin_embedder_policy = opt_lit(self.cross_origin_embedder_policy.as_ref());
       let cross_origin_opener_policy = opt_lit(self.cross_origin_opener_policy.as_ref());
-      let cross_origin_resource_policy= opt_lit(self.cross_origin_resource_policy.as_ref());
+      let cross_origin_resource_policy = opt_lit(self.cross_origin_resource_policy.as_ref());
       let permissions_policy = opt_lit(self.permissions_policy.as_ref());
       let timing_allow_origin = opt_lit(self.timing_allow_origin.as_ref());
       let x_content_type_options = opt_lit(self.x_content_type_options.as_ref());
@@ -3190,7 +3184,6 @@ mod build {
         x_content_type_options,
         tauri_custom_header
       );
-
     }
   }
 
