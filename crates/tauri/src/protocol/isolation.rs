@@ -5,7 +5,10 @@
 use crate::Assets;
 use http::header::CONTENT_TYPE;
 use serialize_to_javascript::Template;
-use tauri_utils::{assets::EmbeddedAssets, config::{Csp, HeaderAddition}};
+use tauri_utils::{
+  assets::EmbeddedAssets,
+  config::{Csp, HeaderAddition},
+};
 
 use std::sync::Arc;
 
