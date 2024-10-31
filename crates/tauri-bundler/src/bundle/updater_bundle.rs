@@ -25,7 +25,6 @@ use std::{
 
 use anyhow::Context;
 use zip::write::SimpleFileOptions;
-use std::process::Command;
 
 // Build update
 pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
@@ -43,7 +42,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
   #[cfg(target_os = "macos")]
   return bundle_update_macos(bundles);
   #[cfg(target_os = "linux")]
-  return bundle_update_linux(settings, bundles);
+  return bundle_update_linux(bundles);
 
   #[cfg(not(any(target_os = "macos", target_os = "linux")))]
   {
@@ -91,12 +90,12 @@ fn bundle_update_macos(bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
 // Right now in linux we hot replace the bin and request a restart
 // No assets are replaced
 #[cfg(target_os = "linux")]
-fn bundle_update_linux(settings: &Settings, bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
+fn bundle_update_linux(bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
     use std::ffi::OsStr;
 
-    let mut update_artifacts = Vec::new();
+    let mut archived_paths = Vec::new();
 
-    // Handle AppImage updates
+    // Handle AppImage bundles
     if let Some(source_path) = bundles
         .iter()
         .filter(|bundle| bundle.package_type == crate::PackageType::AppImage)
@@ -111,16 +110,16 @@ fn bundle_update_linux(settings: &Settings, bundles: &[Bundle]) -> crate::Result
         let appimage_archived = format!("{}.tar.gz", source_path.display());
         let appimage_archived_path = PathBuf::from(&appimage_archived);
 
-        // Create our gzip file
+        // Create our gzip file for AppImage
         create_tar(source_path, &appimage_archived_path)
-            .with_context(|| "Failed to tar.gz update directory")?;
+            .with_context(|| "Failed to tar.gz AppImage update directory")?;
 
         log::info!(action = "Bundling"; "{} ({})", appimage_archived, display_path(&appimage_archived_path));
 
-        update_artifacts.push(appimage_archived_path);
+        archived_paths.push(appimage_archived_path);
     }
 
-    // Handle Deb package updates
+    // Handle Debian packages
     if let Some(source_path) = bundles
         .iter()
         .filter(|bundle| bundle.package_type == crate::PackageType::Deb)
@@ -131,58 +130,24 @@ fn bundle_update_linux(settings: &Settings, bundles: &[Bundle]) -> crate::Result
                 .find(|path| path.extension() == Some(OsStr::new("deb")))
         })
     {
-        // For .deb packages, we don't need to archive them as they're already packaged
-        // We just need to sign them for the updater
-        
-        // Generate signature for the .deb package
-        let signature_path = sign_debian_package(source_path, settings)
-            .with_context(|| "Failed to sign Debian package")?;
+        // add .tar.gz to our path
+        let deb_archived = format!("{}.tar.gz", source_path.display());
+        let deb_archived_path = PathBuf::from(&deb_archived);
 
-        log::info!(action = "Signing"; "{} ({})", source_path.display(), display_path(&signature_path));
+        // Create our gzip file for Deb
+        create_tar(source_path, &deb_archived_path)
+            .with_context(|| "Failed to tar.gz Debian package update directory")?;
 
-        update_artifacts.push(source_path.to_path_buf());
-        update_artifacts.push(signature_path);
+        log::info!(action = "Bundling"; "{} ({})", deb_archived, display_path(&deb_archived_path));
+
+        archived_paths.push(deb_archived_path);
     }
 
-    if update_artifacts.is_empty() {
+    if archived_paths.is_empty() {
         Err(crate::Error::UnableToFindProject)
     } else {
-        Ok(update_artifacts)
+        Ok(archived_paths)
     }
-}
-
-#[cfg(target_os = "linux")]
-fn sign_debian_package(package_path: &Path, settings: &Settings) -> crate::Result<PathBuf> {
-    use base64::{engine::general_purpose::STANDARD, Engine};
-    use std::io::Read;
-
-    // Read the package file
-    let mut package_contents = Vec::new();
-    File::open(package_path)?.read_to_end(&mut package_contents)?;
-
-    // Get the private key from settings
-    let private_key = settings
-        .private_key()
-        .ok_or_else(|| anyhow::anyhow!("Private key not found in settings"))?;
-
-    // Create signature using minisign
-    let secret_key = minisign::SecretKey::from_base64(private_key)
-        .map_err(|e| anyhow::anyhow!("Invalid private key: {}", e))?;
-    
-    let signature = minisign::sign(
-        &secret_key,
-        &package_contents,
-        None,
-        None,
-        false,
-    ).map_err(|e| anyhow::anyhow!("Failed to create signature: {}", e))?;
-
-    // Create signature file
-    let signature_path = package_path.with_extension("sig");
-    let mut signature_file = File::create(&signature_path)?;
-    signature_file.write_all(STANDARD.encode(signature.to_string()).as_bytes())?;
-
-    Ok(signature_path)
 }
 
 // Create simple update-win_<arch>.zip
