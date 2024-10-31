@@ -226,7 +226,7 @@ fn sign_updaters(
     .filter(|bundle| {
       matches!(
         bundle.package_type,
-        PackageType::Updater | PackageType::Nsis | PackageType::WindowsMsi | PackageType::AppImage
+        PackageType::Updater | PackageType::Nsis | PackageType::WindowsMsi | PackageType::AppImage | PackageType::Deb
       )
     })
     .collect();
