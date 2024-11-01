@@ -91,63 +91,63 @@ fn bundle_update_macos(bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
 // No assets are replaced
 #[cfg(target_os = "linux")]
 fn bundle_update_linux(bundles: &[Bundle]) -> crate::Result<Vec<PathBuf>> {
-    use std::ffi::OsStr;
+  use std::ffi::OsStr;
 
-    let mut archived_paths = Vec::new();
+  let mut archived_paths = Vec::new();
 
-    // Handle AppImage bundles
-    if let Some(source_path) = bundles
+  // Handle AppImage bundles
+  if let Some(source_path) = bundles
+    .iter()
+    .filter(|bundle| bundle.package_type == crate::PackageType::AppImage)
+    .find_map(|bundle| {
+      bundle
+        .bundle_paths
         .iter()
-        .filter(|bundle| bundle.package_type == crate::PackageType::AppImage)
-        .find_map(|bundle| {
-            bundle
-                .bundle_paths
-                .iter()
-                .find(|path| path.extension() == Some(OsStr::new("AppImage")))
-        })
-    {
-        // add .tar.gz to our path
-        let appimage_archived = format!("{}.tar.gz", source_path.display());
-        let appimage_archived_path = PathBuf::from(&appimage_archived);
+        .find(|path| path.extension() == Some(OsStr::new("AppImage")))
+    })
+  {
+    // add .tar.gz to our path
+    let appimage_archived = format!("{}.tar.gz", source_path.display());
+    let appimage_archived_path = PathBuf::from(&appimage_archived);
 
-        // Create our gzip file for AppImage
-        create_tar(source_path, &appimage_archived_path)
-            .with_context(|| "Failed to tar.gz AppImage update directory")?;
+    // Create our gzip file for AppImage
+    create_tar(source_path, &appimage_archived_path)
+      .with_context(|| "Failed to tar.gz AppImage update directory")?;
 
-        log::info!(action = "Bundling"; "{} ({})", appimage_archived, display_path(&appimage_archived_path));
+    log::info!(action = "Bundling"; "{} ({})", appimage_archived, display_path(&appimage_archived_path));
 
-        archived_paths.push(appimage_archived_path);
-    }
+    archived_paths.push(appimage_archived_path);
+  }
 
-    // Handle Debian packages
-    if let Some(source_path) = bundles
+  // Handle Debian packages
+  if let Some(source_path) = bundles
+    .iter()
+    .filter(|bundle| bundle.package_type == crate::PackageType::Deb)
+    .find_map(|bundle| {
+      bundle
+        .bundle_paths
         .iter()
-        .filter(|bundle| bundle.package_type == crate::PackageType::Deb)
-        .find_map(|bundle| {
-            bundle
-                .bundle_paths
-                .iter()
-                .find(|path| path.extension() == Some(OsStr::new("deb")))
-        })
-    {
-        // add .tar.gz to our path
-        let deb_archived = format!("{}.tar.gz", source_path.display());
-        let deb_archived_path = PathBuf::from(&deb_archived);
+        .find(|path| path.extension() == Some(OsStr::new("deb")))
+    })
+  {
+    // add .tar.gz to our path
+    let deb_archived = format!("{}.tar.gz", source_path.display());
+    let deb_archived_path = PathBuf::from(&deb_archived);
 
-        // Create our gzip file for Deb
-        create_tar(source_path, &deb_archived_path)
-            .with_context(|| "Failed to tar.gz Debian package update directory")?;
+    // Create our gzip file for Deb
+    create_tar(source_path, &deb_archived_path)
+      .with_context(|| "Failed to tar.gz Debian package update directory")?;
 
-        log::info!(action = "Bundling"; "{} ({})", deb_archived, display_path(&deb_archived_path));
+    log::info!(action = "Bundling"; "{} ({})", deb_archived, display_path(&deb_archived_path));
 
-        archived_paths.push(deb_archived_path);
-    }
+    archived_paths.push(deb_archived_path);
+  }
 
-    if archived_paths.is_empty() {
-        Err(crate::Error::UnableToFindProject)
-    } else {
-        Ok(archived_paths)
-    }
+  if archived_paths.is_empty() {
+    Err(crate::Error::UnableToFindProject)
+  } else {
+    Ok(archived_paths)
+  }
 }
 
 // Create simple update-win_<arch>.zip
