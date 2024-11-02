@@ -246,6 +246,12 @@ pub enum RunEvent {
     /// Indicates whether the NSApplication object found any visible windows in your application.
     has_visible_windows: bool,
   },
+  /// Emitted when the NSApplicationDelegate's applicationShouldTerminate gets called
+  #[cfg(target_os = "macos")]
+  DockExitRequested {
+    /// Event API
+    api: ExitRequestApi,
+  }
 }
 
 impl From<EventLoopMessage> for RunEvent {
@@ -2235,6 +2241,10 @@ fn on_event_loop_event<R: Runtime>(
       has_visible_windows,
     } => RunEvent::Reopen {
       has_visible_windows,
+    },
+    #[cfg(target_os = "macos")]
+    RuntimeRunEvent::DockExitRequested { tx } => RunEvent::DockExitRequested {
+      api: ExitRequestApi(tx)
     },
     _ => unimplemented!(),
   };
