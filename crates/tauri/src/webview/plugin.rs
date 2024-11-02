@@ -50,6 +50,7 @@ mod desktop_commands {
     zoom_hotkeys_enabled: bool,
   }
 
+  #[cfg(feature = "unstable")]
   impl<R: Runtime> crate::webview::WebviewBuilder<R> {
     fn from_webview_config(label: String, config: WebviewConfig) -> Self {
       let mut builder = Self::new(label, config.url);
