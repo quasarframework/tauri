@@ -51,7 +51,7 @@ mod desktop_commands {
   }
 
   impl<R: Runtime> crate::webview::WebviewBuilder<R> {
-    fn from_webview_config(label: String, config: &WebviewConfig) -> Self {
+    fn from_webview_config(label: String, config: WebviewConfig) -> Self {
       let mut builder = Self::new(label, config.url);
       builder.webview_attributes.user_agent = config.user_agent;
       builder.webview_attributes.drag_drop_handler_enabled =
@@ -112,12 +112,17 @@ mod desktop_commands {
       .get_window(&window_label)
       .ok_or(crate::Error::WindowNotFound)?;
 
-    let builder = crate::webview::WebviewBuilder::from_webview_config(label, &options);
+    let x = options.x;
+    let y = options.y;
+    let width = options.width;
+    let height = options.height;
+
+    let builder = crate::webview::WebviewBuilder::from_webview_config(label, options);
 
     window.add_child(
       builder,
-      tauri_runtime::dpi::LogicalPosition::new(options.x, options.y),
-      tauri_runtime::dpi::LogicalSize::new(options.width, options.height),
+      tauri_runtime::dpi::LogicalPosition::new(x, y),
+      tauri_runtime::dpi::LogicalSize::new(width, height),
     )?;
 
     Ok(())
