@@ -51,7 +51,7 @@ mod desktop_commands {
   }
 
   impl<R: Runtime> crate::webview::WebviewBuilder<R> {
-    fn from_webview_config(label: String, conifg: &WebviewConfig) -> Self {
+    fn from_webview_config(label: String, config: &WebviewConfig) -> Self {
       let mut builder = Self::new(label, config.url);
       builder.webview_attributes.user_agent = config.user_agent;
       builder.webview_attributes.drag_drop_handler_enabled =
