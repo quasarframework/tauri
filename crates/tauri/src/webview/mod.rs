@@ -754,6 +754,13 @@ fn main() {
     self
   }
 
+  /// Whether the webview should be focused or not.
+  #[must_use]
+  pub fn focused(mut self, focus: bool) -> Self {
+    self.webview_attributes.focus = focus;
+    self
+  }
+
   /// Sets the webview to automatically grow and shrink its size and position when the parent window resizes.
   #[must_use]
   pub fn auto_resize(mut self) -> Self {
