@@ -50,9 +50,8 @@ mod desktop_commands {
     zoom_hotkeys_enabled: bool,
   }
 
-  #[cfg(feature = "unstable")]
-  impl<R: Runtime> From<&WebviewConfig> for crate::webview::WebviewBuilder<R> {
-    fn from(config: &WebviewConfig) -> Self {
+  impl<R: Runtime> crate::webview::WebviewBuilder<R> {
+    fn from_webview_config(label: String, conifg: &WebviewConfig) -> Self {
       let mut builder = Self::new(label, config.url);
       builder.webview_attributes.user_agent = config.user_agent;
       builder.webview_attributes.drag_drop_handler_enabled =
@@ -113,7 +112,7 @@ mod desktop_commands {
       .get_window(&window_label)
       .ok_or(crate::Error::WindowNotFound)?;
 
-    let builder = crate::webview::WebviewBuilder::from(&options);
+    let builder = crate::webview::WebviewBuilder::from_webview_config(label, &options);
 
     window.add_child(
       builder,
