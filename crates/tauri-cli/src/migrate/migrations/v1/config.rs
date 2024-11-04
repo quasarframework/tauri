@@ -79,24 +79,34 @@ fn migrate_config(config: &mut Value) -> Result<MigratedConfig> {
       .clone();
 
     if let Some(tauri_config) = config.get_mut("tauri").and_then(|c| c.as_object_mut()) {
-      // useHttpsScheme
-      if let Some(windows) = tauri_config
-        .get_mut("windows")
-        .and_then(|w| w.as_array_mut())
-      {
-        for window in windows {
-          if let Some(window) = window.as_object_mut() {
-            window.insert("useHttpsScheme".to_string(), true.into());
-          }
-        }
-      }
-
       // allowlist
       if let Some(allowlist) = tauri_config.remove("allowlist") {
         let allowlist = process_allowlist(tauri_config, allowlist)?;
         let permissions = allowlist_to_permissions(allowlist);
         migrated.plugins = plugins_from_permissions(&permissions);
         migrated.permissions = permissions;
+      }
+
+      // dangerousUseHttpScheme/useHttpsScheme
+      let dangerouse_use_http = tauri_config
+        .get("security")
+        .and_then(|w| w.as_object())
+        .and_then(|w| {
+          w.get("dangerousUseHttpScheme")
+            .or_else(|| w.get("dangerous-use-http-scheme"))
+        })
+        .and_then(|v| v.as_bool())
+        .unwrap_or_default();
+
+      if let Some(windows) = tauri_config
+        .get_mut("windows")
+        .and_then(|w| w.as_array_mut())
+      {
+        for window in windows {
+          if let Some(window) = window.as_object_mut() {
+            window.insert("useHttpsScheme".to_string(), (!dangerouse_use_http).into());
+          }
+        }
       }
 
       // security
@@ -815,9 +825,7 @@ mod test {
         "security": {
           "csp": "default-src 'self' tauri:"
         },
-        "windows": [{
-          "label": "asd",
-        }]
+        "windows": [{}]
       }
     });
 
@@ -955,6 +963,28 @@ mod test {
     assert_eq!(
       migrated["plugins"]["updater"]["pubkey"],
       original["tauri"]["updater"]["pubkey"]
+    );
+  }
+
+  #[test]
+  fn migrate_dangerous_use_http_scheme() {
+    let original = serde_json::json!({
+      "tauri": {
+        "windows": [{}],
+        "security": {
+          "dangerousUseHttpScheme": true,
+        }
+      }
+    });
+
+    let migrated = migrate(&original);
+    assert_eq!(
+      !migrated["app"]["windows"][0]["useHttpsScheme"]
+        .as_bool()
+        .unwrap(),
+      original["tauri"]["security"]["dangerousUseHttpScheme"]
+        .as_bool()
+        .unwrap()
     );
   }
 
