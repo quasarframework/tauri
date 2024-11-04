@@ -531,7 +531,7 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[must_use]
   #[deprecated(
     since = "1.2.0",
-    note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
+    note = "The window is automatically focused by default. This function Will be removed in 3.0.0. Use `focused` instead."
   )]
   pub fn focus(mut self) -> Self {
     self.window_builder = self.window_builder.focused(true);

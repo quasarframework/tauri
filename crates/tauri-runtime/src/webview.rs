@@ -204,6 +204,7 @@ pub struct WebviewAttributes {
   pub window_effects: Option<WindowEffectsConfig>,
   pub incognito: bool,
   pub transparent: bool,
+  pub focus: bool,
   pub bounds: Option<Rect>,
   pub auto_resize: bool,
   pub proxy_url: Option<Url>,
@@ -214,8 +215,12 @@ pub struct WebviewAttributes {
 
 impl From<&WindowConfig> for WebviewAttributes {
   fn from(config: &WindowConfig) -> Self {
-    let mut builder = Self::new(config.url.clone());
-    builder = builder.incognito(config.incognito);
+    let mut builder = Self::new(config.url.clone())
+      .incognito(config.incognito)
+      .focused(config.focus)
+      .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
+      .use_https_scheme(config.use_https_scheme)
+      .browser_extensions_enabled(config.browser_extensions_enabled);
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -236,9 +241,6 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(url) = &config.proxy_url {
       builder = builder.proxy_url(url.to_owned());
     }
-    builder = builder.zoom_hotkeys_enabled(config.zoom_hotkeys_enabled);
-    builder = builder.use_https_scheme(config.use_https_scheme);
-    builder = builder.browser_extensions_enabled(config.browser_extensions_enabled);
     builder
   }
 }
@@ -258,6 +260,7 @@ impl WebviewAttributes {
       window_effects: None,
       incognito: false,
       transparent: false,
+      focus: true,
       bounds: None,
       auto_resize: false,
       proxy_url: None,
@@ -338,6 +341,13 @@ impl WebviewAttributes {
   #[must_use]
   pub fn transparent(mut self, transparent: bool) -> Self {
     self.transparent = transparent;
+    self
+  }
+
+  /// Whether the webview should be focused or not.
+  #[must_use]
+  pub fn focused(mut self, focus: bool) -> Self {
+    self.focus = focus;
     self
   }
 

@@ -602,7 +602,31 @@ impl<R: Runtime> AppManager<R> {
       } => self.emit_filter(event, payload, |t| match t {
         EventTarget::Window { label }
         | EventTarget::Webview { label }
-        | EventTarget::WebviewWindow { label } => label == &target_label,
+        | EventTarget::WebviewWindow { label }
+        | EventTarget::AnyLabel { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::Window {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::Window { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::Webview {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::Webview { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::WebviewWindow {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::WebviewWindow { label } => {
+          label == &target_label
+        }
         _ => false,
       }),
 

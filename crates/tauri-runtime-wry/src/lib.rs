@@ -791,6 +791,7 @@ impl WindowBuilder for WindowBuilderWrapper {
       window = window
         .title(config.title.to_string())
         .inner_size(config.width, config.height)
+        .focused(config.focus)
         .visible(config.visible)
         .resizable(config.resizable)
         .fullscreen(config.fullscreen)
@@ -4019,7 +4020,7 @@ fn create_webview<T: UserEvent>(
 
   let mut webview_builder = WebViewBuilder::with_web_context(&mut web_context.inner)
     .with_id(&label)
-    .with_focused(window.is_focused())
+    .with_focused(webview_attributes.focus)
     .with_url(&url)
     .with_transparent(webview_attributes.transparent)
     .with_accept_first_mouse(webview_attributes.accept_first_mouse)

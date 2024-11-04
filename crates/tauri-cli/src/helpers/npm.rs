@@ -70,7 +70,11 @@ impl PackageManager {
     }
   }
 
-  pub fn install<P: AsRef<Path>>(&self, dependencies: &[String], app_dir: P) -> crate::Result<()> {
+  pub fn install<P: AsRef<Path>>(
+    &self,
+    dependencies: &[String],
+    frontend_dir: P,
+  ) -> crate::Result<()> {
     let dependencies_str = if dependencies.len() > 1 {
       "dependencies"
     } else {
@@ -89,7 +93,7 @@ impl PackageManager {
       .cross_command()
       .arg("add")
       .args(dependencies)
-      .current_dir(app_dir)
+      .current_dir(frontend_dir)
       .status()
       .with_context(|| format!("failed to run {self}"))?;
 
@@ -100,7 +104,11 @@ impl PackageManager {
     Ok(())
   }
 
-  pub fn remove<P: AsRef<Path>>(&self, dependencies: &[String], app_dir: P) -> crate::Result<()> {
+  pub fn remove<P: AsRef<Path>>(
+    &self,
+    dependencies: &[String],
+    frontend_dir: P,
+  ) -> crate::Result<()> {
     let dependencies_str = if dependencies.len() > 1 {
       "dependencies"
     } else {
@@ -123,7 +131,7 @@ impl PackageManager {
         "remove"
       })
       .args(dependencies)
-      .current_dir(app_dir)
+      .current_dir(frontend_dir)
       .status()
       .with_context(|| format!("failed to run {self}"))?;
 
@@ -137,7 +145,7 @@ impl PackageManager {
   pub fn current_package_version<P: AsRef<Path>>(
     &self,
     name: &str,
-    app_dir: P,
+    frontend_dir: P,
   ) -> crate::Result<Option<String>> {
     let (output, regex) = match self {
       PackageManager::Yarn => (
@@ -145,7 +153,7 @@ impl PackageManager {
           .args(["list", "--pattern"])
           .arg(name)
           .args(["--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),
@@ -154,7 +162,7 @@ impl PackageManager {
           .arg("info")
           .arg(name)
           .arg("--json")
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         Some(regex::Regex::new("\"Version\":\"([\\da-zA-Z\\-\\.]+)\"").unwrap()),
       ),
@@ -163,7 +171,7 @@ impl PackageManager {
           .arg("list")
           .arg(name)
           .args(["--parseable", "--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),
@@ -173,7 +181,7 @@ impl PackageManager {
           .arg("list")
           .arg(name)
           .args(["version", "--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),

@@ -685,6 +685,12 @@ interface WebviewOptions {
    */
   transparent?: boolean
   /**
+   * Whether the webview should have focus or not
+   *
+   * @since 2.1.0
+   */
+  focus?: boolean
+  /**
    * Whether the drag and drop is enabled or not on the webview. By default it is enabled.
    *
    * Disabling it is required to use HTML5 drag and drop on the frontend on Windows.
