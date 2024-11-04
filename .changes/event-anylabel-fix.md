@@ -2,4 +2,4 @@
 "tauri": "patch:bug"
 ---
 
-Handle AnyLabel targets correctly in the event system
+Fix listeners created with `EventTarget::AnyLabel` never receiving events.
