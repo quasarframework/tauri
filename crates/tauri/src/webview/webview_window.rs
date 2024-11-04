@@ -901,7 +901,7 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   ///
   /// ## Note
   ///
-  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and is therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
   ///
   /// ## Warning
   ///
