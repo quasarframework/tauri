@@ -79,6 +79,18 @@ fn migrate_config(config: &mut Value) -> Result<MigratedConfig> {
       .clone();
 
     if let Some(tauri_config) = config.get_mut("tauri").and_then(|c| c.as_object_mut()) {
+      // useHttpsScheme
+      if let Some(windows) = tauri_config
+        .get_mut("windows")
+        .and_then(|w| w.as_array_mut())
+      {
+        for window in windows {
+          if let Some(window) = window.as_object_mut() {
+            window.insert("useHttpsScheme".to_string(), true.into());
+          }
+        }
+      }
+
       // allowlist
       if let Some(allowlist) = tauri_config.remove("allowlist") {
         let allowlist = process_allowlist(tauri_config, allowlist)?;
@@ -802,7 +814,10 @@ mod test {
         "pattern": { "use": "brownfield" },
         "security": {
           "csp": "default-src 'self' tauri:"
-        }
+        },
+        "windows": [{
+          "label": "asd",
+        }]
       }
     });
 
@@ -907,6 +922,8 @@ mod test {
       migrated["app"]["withGlobalTauri"],
       original["build"]["withGlobalTauri"]
     );
+
+    assert_eq!(migrated["app"]["windows"][0]["useHttpsScheme"], true);
   }
 
   #[test]
