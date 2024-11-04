@@ -796,7 +796,7 @@ fn main() {
   ///
   /// ## Warning
   ///
-  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access them.
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
   #[must_use]
   pub fn use_https_scheme(mut self, enabled: bool) -> Self {
     self.webview_attributes.use_https_scheme = enabled;

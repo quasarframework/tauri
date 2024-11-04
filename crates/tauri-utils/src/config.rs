@@ -1495,7 +1495,7 @@ pub struct WindowConfig {
   ///
   /// ## Warning
   ///
-  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access them.
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
   #[serde(default, alias = "use-https-scheme")]
   pub use_https_scheme: bool,
 }
