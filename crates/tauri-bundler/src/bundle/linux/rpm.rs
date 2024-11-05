@@ -12,6 +12,7 @@ use std::{
   fs::{self, File},
   path::{Path, PathBuf},
 };
+use tauri_utils::config::RpmCompression;
 
 use super::freedesktop;
 
@@ -54,11 +55,24 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
 
   let license = settings.license().unwrap_or_default();
   let name = heck::AsKebabCase(settings.product_name()).to_string();
+
+  let compression = settings
+    .rpm()
+    .compression
+    .map(|c| match c {
+      RpmCompression::Gzip { level } => rpm::CompressionWithLevel::Gzip(level),
+      RpmCompression::Zstd { level } => rpm::CompressionWithLevel::Zstd(level),
+      RpmCompression::Xz { level } => rpm::CompressionWithLevel::Xz(level),
+      RpmCompression::Bzip2 { level } => rpm::CompressionWithLevel::Bzip2(level),
+      _ => rpm::CompressionWithLevel::None,
+    })
+    // This matches .deb compression. On a 240MB source binary the bundle will be 100KB larger than rpm's default while reducing build times by ~25%.
+    .unwrap_or(rpm::CompressionWithLevel::Gzip(6));
+
   let mut builder = rpm::PackageBuilder::new(&name, version, &license, arch, summary)
     .epoch(epoch)
     .release(release)
-    // This matches .deb compression. On a 240MB source binary the bundle will be 100KB larger than rpm's default while reducing build times by ~25%.
-    .compression(rpm::CompressionWithLevel::Gzip(6));
+    .compression(compression);
 
   if let Some(description) = settings.long_description() {
     builder = builder.description(description);

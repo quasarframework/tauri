@@ -1011,6 +1011,15 @@ pub(crate) mod sealed {
   }
 }
 
+struct UnsafeSend<T>(T);
+unsafe impl<T> Send for UnsafeSend<T> {}
+
+impl<T> UnsafeSend<T> {
+  fn take(self) -> T {
+    self.0
+  }
+}
+
 #[allow(unused)]
 macro_rules! run_main_thread {
   ($handle:ident, $ex:expr) => {{

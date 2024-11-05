@@ -204,17 +204,23 @@ pub struct WebviewAttributes {
   pub window_effects: Option<WindowEffectsConfig>,
   pub incognito: bool,
   pub transparent: bool,
+  pub focus: bool,
   pub bounds: Option<Rect>,
   pub auto_resize: bool,
   pub proxy_url: Option<Url>,
   pub zoom_hotkeys_enabled: bool,
   pub browser_extensions_enabled: bool,
+  pub use_https_scheme: bool,
 }
 
 impl From<&WindowConfig> for WebviewAttributes {
   fn from(config: &WindowConfig) -> Self {
-    let mut builder = Self::new(config.url.clone());
-    builder = builder.incognito(config.incognito);
+    let mut builder = Self::new(config.url.clone())
+      .incognito(config.incognito)
+      .focused(config.focus)
+      .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
+      .use_https_scheme(config.use_https_scheme)
+      .browser_extensions_enabled(config.browser_extensions_enabled);
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -235,8 +241,6 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(url) = &config.proxy_url {
       builder = builder.proxy_url(url.to_owned());
     }
-    builder = builder.zoom_hotkeys_enabled(config.zoom_hotkeys_enabled);
-    builder = builder.browser_extensions_enabled(config.browser_extensions_enabled);
     builder
   }
 }
@@ -256,11 +260,13 @@ impl WebviewAttributes {
       window_effects: None,
       incognito: false,
       transparent: false,
+      focus: true,
       bounds: None,
       auto_resize: false,
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
+      use_https_scheme: false,
     }
   }
 
@@ -338,6 +344,13 @@ impl WebviewAttributes {
     self
   }
 
+  /// Whether the webview should be focused or not.
+  #[must_use]
+  pub fn focused(mut self, focus: bool) -> Self {
+    self.focus = focus;
+    self
+  }
+
   /// Sets the webview to automatically grow and shrink its size and position when the parent window resizes.
   #[must_use]
   pub fn auto_resize(mut self) -> Self {
@@ -376,6 +389,21 @@ impl WebviewAttributes {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.browser_extensions_enabled = enabled;
+    self
+  }
+
+  /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+  ///
+  /// ## Note
+  ///
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  ///
+  /// ## Warning
+  ///
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
+  #[must_use]
+  pub fn use_https_scheme(mut self, enabled: bool) -> Self {
+    self.use_https_scheme = enabled;
     self
   }
 }

@@ -108,7 +108,6 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         with:
           key: ${{ matrix.settings.target }}
-          working-directory: 'crates/tauri-cli/'
         if: ${{ matrix.settings.docker }}
       - name: Setup toolchain
         run: ${{ matrix.settings.setup }}

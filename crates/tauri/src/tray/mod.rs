@@ -10,6 +10,7 @@ use crate::app::{GlobalMenuEventListener, GlobalTrayIconEventListener};
 use crate::menu::ContextMenu;
 use crate::menu::MenuEvent;
 use crate::resources::Resource;
+use crate::UnsafeSend;
 use crate::{
   image::Image, menu::run_item_main_thread, AppHandle, Manager, PhysicalPosition, Rect, Runtime,
 };
@@ -342,10 +343,24 @@ impl<R: Runtime> TrayIconBuilder<R> {
   /// Builds and adds a new [`TrayIcon`] to the system tray.
   pub fn build<M: Manager<R>>(self, manager: &M) -> crate::Result<TrayIcon<R>> {
     let id = self.id().clone();
-    let inner = self.inner.build()?;
+
+    // SAFETY:
+    // the menu within this builder was created on main thread
+    // and will be accessed on the main thread
+    let unsafe_builder = UnsafeSend(self.inner);
+
+    let (tx, rx) = std::sync::mpsc::channel();
+    let unsafe_tray = manager
+      .app_handle()
+      .run_on_main_thread(move || {
+        // SAFETY: will only be accessed on main thread
+        let _ = tx.send(unsafe_builder.take().build().map(UnsafeSend));
+      })
+      .and_then(|_| rx.recv().map_err(|_| crate::Error::FailedToReceiveMessage))??;
+
     let icon = TrayIcon {
       id,
-      inner,
+      inner: unsafe_tray.take(),
       app_handle: manager.app_handle().clone(),
     };
 
