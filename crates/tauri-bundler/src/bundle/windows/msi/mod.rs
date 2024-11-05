@@ -761,8 +761,8 @@ pub fn build_wix_app_installer(
   for fragment_path in fragment_paths {
     let fragment_path = current_dir.join(fragment_path);
     let fragment_content = fs::read_to_string(&fragment_path)?;
-    let fragment_handle_bars = Handlebars::new();
-    let fragment = fragment_handle_bars.render_template(&fragment_content, &data)?;
+    let fragment_handlebars = Handlebars::new();
+    let fragment = fragment_handlebars.render_template(&fragment_content, &data)?;
     let mut extensions = Vec::new();
     for cap in extension_regex.captures_iter(&fragment) {
       extensions.push(wix_toolset_path.join(format!("Wix{}.dll", &cap[1])));
