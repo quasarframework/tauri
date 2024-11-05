@@ -2926,43 +2926,7 @@ fn handle_user_message<T: UserEvent>(
           WindowMessage::IsEnabled(tx) => tx.send(window.is_enabled()).unwrap(),
 
           // Setters
-          WindowMessage::Center => {
-            #[cfg(not(target_os = "macos"))]
-            if let Some(monitor) = window.current_monitor() {
-              #[allow(unused_mut)]
-              let mut window_size = window.outer_size();
-              #[cfg(windows)]
-              if window.is_decorated() {
-                use windows::Win32::Foundation::RECT;
-                use windows::Win32::Graphics::Dwm::{
-                  DwmGetWindowAttribute, DWMWA_EXTENDED_FRAME_BOUNDS,
-                };
-                let mut rect = RECT::default();
-                let result = unsafe {
-                  DwmGetWindowAttribute(
-                    HWND(window.hwnd() as _),
-                    DWMWA_EXTENDED_FRAME_BOUNDS,
-                    &mut rect as *mut _ as *mut _,
-                    std::mem::size_of::<RECT>() as u32,
-                  )
-                };
-                if result.is_ok() {
-                  window_size.height = (rect.bottom - rect.top) as u32;
-                }
-              }
-              window.set_outer_position(window::calculate_window_center_position(
-                window_size,
-                monitor,
-              ));
-            }
-
-            #[cfg(target_os = "macos")]
-            {
-              use cocoa::{appkit::NSWindow, base::id};
-              let ns_window: id = window.ns_window() as _;
-              unsafe { ns_window.center() };
-            }
-          }
+          WindowMessage::Center => window.center(),
           WindowMessage::RequestUserAttention(request_type) => {
             window.request_user_attention(request_type.map(|r| r.0));
           }
