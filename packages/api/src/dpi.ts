@@ -15,8 +15,8 @@ class LogicalSize {
   height: number
 
   constructor(width: number, height: number)
-  constructor(objcet: { Logical: { width: number; height: number } })
-  constructor(objcet: { width: number; height: number })
+  constructor(object: { Logical: { width: number; height: number } })
+  constructor(object: { width: number; height: number })
   constructor(
     ...args:
       | [number, number]
@@ -80,8 +80,8 @@ class PhysicalSize {
   height: number
 
   constructor(width: number, height: number)
-  constructor(objcet: { Physical: { width: number; height: number } })
-  constructor(objcet: { width: number; height: number })
+  constructor(object: { Physical: { width: number; height: number } })
+  constructor(object: { width: number; height: number })
   constructor(
     ...args:
       | [number, number]
@@ -206,8 +206,8 @@ class LogicalPosition {
   y: number
 
   constructor(x: number, y: number)
-  constructor(objcet: { Logical: { x: number; y: number } })
-  constructor(objcet: { x: number; y: number })
+  constructor(object: { Logical: { x: number; y: number } })
+  constructor(object: { x: number; y: number })
   constructor(
     ...args:
       | [number, number]
@@ -271,8 +271,8 @@ class PhysicalPosition {
   y: number
 
   constructor(x: number, y: number)
-  constructor(objcet: { Physical: { x: number; y: number } })
-  constructor(objcet: { x: number; y: number })
+  constructor(object: { Physical: { x: number; y: number } })
+  constructor(object: { x: number; y: number })
   constructor(
     ...args:
       | [number, number]
