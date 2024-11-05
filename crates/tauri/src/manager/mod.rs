@@ -342,8 +342,8 @@ impl<R: Runtime> AppManager<R> {
 
   pub(crate) fn protocol_url(&self, https: bool) -> Cow<'_, Url> {
     if cfg!(windows) || cfg!(target_os = "android") {
-      let https = if https { "https" } else { "http" };
-      Cow::Owned(Url::parse(&format!("{https}://tauri.localhost")).unwrap())
+      let scheme = if https { "https" } else { "http" };
+      Cow::Owned(Url::parse(&format!("{scheme}://tauri.localhost")).unwrap())
     } else {
       Cow::Owned(Url::parse("tauri://localhost").unwrap())
     }

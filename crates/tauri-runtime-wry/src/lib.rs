@@ -22,8 +22,8 @@ use tauri_runtime::{
   monitor::Monitor,
   webview::{DetachedWebview, DownloadEvent, PendingWebview, WebviewIpcHandler},
   window::{
-    CursorIcon, DetachedWindow, DragDropEvent, PendingWindow, RawWindow, WebviewEvent,
-    WindowBuilder, WindowBuilderBase, WindowEvent, WindowId, WindowSizeConstraints,
+    CursorIcon, DetachedWindow, DetachedWindowWebview, DragDropEvent, PendingWindow, RawWindow,
+    WebviewEvent, WindowBuilder, WindowBuilderBase, WindowEvent, WindowId, WindowSizeConstraints,
   },
   DeviceEventFilter, Error, EventLoopProxy, ExitRequestedEventAction, Icon, ProgressBarState,
   ProgressBarStatus, Result, RunEvent, Runtime, RuntimeHandle, RuntimeInitArgs, UserAttentionType,
@@ -276,7 +276,16 @@ impl<T: UserEvent> Context<T> {
     let label = pending.label.clone();
     let context = self.clone();
     let window_id = self.next_window_id();
-    let webview_id = pending.webview.as_ref().map(|_| context.next_webview_id());
+    let (webview_id, use_https_scheme) = pending
+      .webview
+      .as_ref()
+      .map(|w| {
+        (
+          Some(context.next_webview_id()),
+          w.webview_attributes.use_https_scheme,
+        )
+      })
+      .unwrap_or((None, false));
 
     send_user_message(
       self,
@@ -300,13 +309,19 @@ impl<T: UserEvent> Context<T> {
       context: self.clone(),
     };
 
-    let detached_webview = webview_id.map(|id| DetachedWebview {
-      label: label.clone(),
-      dispatcher: WryWebviewDispatcher {
-        window_id: Arc::new(Mutex::new(window_id)),
-        webview_id: id,
-        context: self.clone(),
-      },
+    let detached_webview = webview_id.map(|id| {
+      let webview = DetachedWebview {
+        label: label.clone(),
+        dispatcher: WryWebviewDispatcher {
+          window_id: Arc::new(Mutex::new(window_id)),
+          webview_id: id,
+          context: self.clone(),
+        },
+      };
+      DetachedWindowWebview {
+        webview,
+        use_https_scheme,
+      }
     });
 
     Ok(DetachedWindow {
@@ -2499,10 +2514,16 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
   ) -> Result<DetachedWindow<T, Self>> {
     let label = pending.label.clone();
     let window_id = self.context.next_window_id();
-    let webview_id = pending
+    let (webview_id, use_https_scheme) = pending
       .webview
       .as_ref()
-      .map(|_| self.context.next_webview_id());
+      .map(|w| {
+        (
+          Some(self.context.next_webview_id()),
+          w.webview_attributes.use_https_scheme,
+        )
+      })
+      .unwrap_or((None, false));
 
     let window = create_window(
       window_id,
@@ -2526,13 +2547,19 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
       .borrow_mut()
       .insert(window_id, window);
 
-    let detached_webview = webview_id.map(|id| DetachedWebview {
-      label: label.clone(),
-      dispatcher: WryWebviewDispatcher {
-        window_id: Arc::new(Mutex::new(window_id)),
-        webview_id: id,
-        context: self.context.clone(),
-      },
+    let detached_webview = webview_id.map(|id| {
+      let webview = DetachedWebview {
+        label: label.clone(),
+        dispatcher: WryWebviewDispatcher {
+          window_id: Arc::new(Mutex::new(window_id)),
+          webview_id: id,
+          context: self.context.clone(),
+        },
+      };
+      DetachedWindowWebview {
+        webview,
+        use_https_scheme,
+      }
     });
 
     Ok(DetachedWindow {

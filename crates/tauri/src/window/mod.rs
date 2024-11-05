@@ -381,7 +381,11 @@ tauri::Builder::default()
       );
 
       if let Some(webview) = detached_window.webview {
-        app_manager.webview.attach_webview(window.clone(), webview);
+        app_manager.webview.attach_webview(
+          window.clone(),
+          webview.webview,
+          webview.use_https_scheme,
+        );
       }
 
       window

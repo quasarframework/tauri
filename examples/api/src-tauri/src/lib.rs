@@ -66,7 +66,8 @@ pub fn run_app<R: Runtime, F: FnOnce(&App<R>) + Send + 'static>(
           .build()?,
       ));
 
-      let mut window_builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default());
+      let mut window_builder =
+        WebviewWindowBuilder::new(app, "main", WebviewUrl::default()).use_https_scheme(true);
 
       #[cfg(all(desktop, not(test)))]
       {
