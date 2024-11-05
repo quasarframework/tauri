@@ -392,6 +392,36 @@ pub struct LinuxConfig {
   pub rpm: RpmConfig,
 }
 
+/// Compression algorithms used when bundling RPM packages.
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(rename_all = "camelCase", deny_unknown_fields, tag = "type")]
+#[non_exhaustive]
+pub enum RpmCompression {
+  /// Gzip compression
+  Gzip {
+    /// Gzip compression level
+    level: u32,
+  },
+  /// Zstd compression
+  Zstd {
+    /// Zstd compression level
+    level: i32,
+  },
+  /// Xz compression
+  Xz {
+    /// Xz compression level
+    level: u32,
+  },
+  /// Bzip2 compression
+  Bzip2 {
+    /// Bzip2 compression level
+    level: u32,
+  },
+  /// Disable compression
+  None,
+}
+
 /// Configuration for RPM bundles.
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
@@ -440,6 +470,8 @@ pub struct RpmConfig {
   /// <http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>
   #[serde(alias = "post-remove-script")]
   pub post_remove_script: Option<PathBuf>,
+  /// Compression algorithm and level. Defaults to `Gzip` with level 6.
+  pub compression: Option<RpmCompression>,
 }
 
 impl Default for RpmConfig {
@@ -458,6 +490,7 @@ impl Default for RpmConfig {
       post_install_script: None,
       pre_remove_script: None,
       post_remove_script: None,
+      compression: None,
     }
   }
 }
@@ -1518,6 +1551,18 @@ pub struct WindowConfig {
   /// - **MacOS / Linux / iOS / Android** - Unsupported.
   #[serde(default)]
   pub browser_extensions_enabled: bool,
+
+  /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+  ///
+  /// ## Note
+  ///
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  ///
+  /// ## Warning
+  ///
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
+  #[serde(default, alias = "use-https-scheme")]
+  pub use_https_scheme: bool,
 }
 
 impl Default for WindowConfig {
@@ -1567,6 +1612,7 @@ impl Default for WindowConfig {
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
+      use_https_scheme: false,
     }
   }
 }
@@ -2565,6 +2611,7 @@ mod build {
       let parent = opt_str_lit(self.parent.as_ref());
       let zoom_hotkeys_enabled = self.zoom_hotkeys_enabled;
       let browser_extensions_enabled = self.browser_extensions_enabled;
+      let use_https_scheme = self.use_https_scheme;
 
       literal_struct!(
         tokens,
@@ -2612,7 +2659,8 @@ mod build {
         incognito,
         parent,
         zoom_hotkeys_enabled,
-        browser_extensions_enabled
+        browser_extensions_enabled,
+        use_https_scheme
       );
     }
   }

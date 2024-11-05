@@ -75,7 +75,6 @@ macro_rules! gen_wrappers {
         app_handle: $crate::AppHandle<R>,
       }
 
-
       /// # Safety
       ///
       /// We make sure it always runs on the main thread.
@@ -96,11 +95,9 @@ macro_rules! gen_wrappers {
 
       impl<R: Runtime> Drop for $inner<R> {
         fn drop(&mut self) {
-          struct SafeSend<T>(T);
-          unsafe impl<T> Send for SafeSend<T> {}
-
           let inner = self.inner.take();
-          let inner = SafeSend(inner);
+          // SAFETY: inner was created on main thread and is being dropped on main thread
+          let inner = $crate::UnsafeSend(inner);
           let _ = self.app_handle.run_on_main_thread(move || {
             drop(inner);
           });

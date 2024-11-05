@@ -268,6 +268,10 @@ pub struct AssetResolver<R: Runtime> {
 impl<R: Runtime> AssetResolver<R> {
   /// Gets the app asset associated with the given path.
   ///
+  /// By default it tries to infer your application's URL scheme in production by checking if all webviews
+  /// were configured with [`crate::webview::WebviewBuilder::use_https_scheme`] or `tauri.conf.json > app > windows > useHttpsScheme`.
+  /// If you are resolving an asset for a webview with a more dynamic configuration, see [`AssetResolver::get_for_scheme`].
+  ///
   /// Resolves to the embedded asset that is part of the app
   /// in dev when [`devUrl`](https://v2.tauri.app/reference/config/#devurl) points to a folder in your filesystem
   /// or in production when [`frontendDist`](https://v2.tauri.app/reference/config/#frontenddist)
@@ -276,6 +280,19 @@ impl<R: Runtime> AssetResolver<R> {
   /// Fallbacks to reading the asset from the [distDir] folder so the behavior is consistent in development.
   /// Note that the dist directory must exist so you might need to build your frontend assets first.
   pub fn get(&self, path: String) -> Option<Asset> {
+    let use_https_scheme = self
+      .manager
+      .webviews()
+      .values()
+      .all(|webview| webview.use_https_scheme());
+    self.get_for_scheme(path, use_https_scheme)
+  }
+
+  ///  Same as [AssetResolver::get] but resolves the custom protocol scheme based on a parameter.
+  ///
+  /// - `use_https_scheme`: If `true` when using [`Pattern::Isolation`](tauri::Pattern::Isolation),
+  ///   the csp header will contain `https://tauri.localhost` instead of `http://tauri.localhost`
+  pub fn get_for_scheme(&self, path: String, use_https_scheme: bool) -> Option<Asset> {
     #[cfg(dev)]
     {
       // on dev if the devPath is a path to a directory we have the embedded assets
@@ -306,7 +323,7 @@ impl<R: Runtime> AssetResolver<R> {
       }
     }
 
-    self.manager.get_asset(path).ok()
+    self.manager.get_asset(path, use_https_scheme).ok()
   }
 
   /// Iterate on all assets.

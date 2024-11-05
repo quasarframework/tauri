@@ -605,11 +605,17 @@ tauri::Builder::default()
 
     pending.webview_attributes.bounds = Some(tauri_runtime::Rect { size, position });
 
+    let use_https_scheme = pending.webview_attributes.use_https_scheme;
+
     let webview = match &mut window.runtime() {
       RuntimeOrDispatch::Dispatch(dispatcher) => dispatcher.create_webview(pending),
       _ => unimplemented!(),
     }
-    .map(|webview| app_manager.webview.attach_webview(window.clone(), webview))?;
+    .map(|webview| {
+      app_manager
+        .webview
+        .attach_webview(window.clone(), webview, use_https_scheme)
+    })?;
 
     Ok(webview)
   }
@@ -794,6 +800,21 @@ fn main() {
     self.webview_attributes.browser_extensions_enabled = enabled;
     self
   }
+
+  /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+  ///
+  /// ## Note
+  ///
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  ///
+  /// ## Warning
+  ///
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
+  #[must_use]
+  pub fn use_https_scheme(mut self, enabled: bool) -> Self {
+    self.webview_attributes.use_https_scheme = enabled;
+    self
+  }
 }
 
 /// Webview.
@@ -806,6 +827,7 @@ pub struct Webview<R: Runtime> {
   pub(crate) manager: Arc<AppManager<R>>,
   pub(crate) app_handle: AppHandle<R>,
   pub(crate) resources_table: Arc<Mutex<ResourceTable>>,
+  use_https_scheme: bool,
 }
 
 impl<R: Runtime> std::fmt::Debug for Webview<R> {
@@ -813,6 +835,7 @@ impl<R: Runtime> std::fmt::Debug for Webview<R> {
     f.debug_struct("Window")
       .field("window", &self.window.lock().unwrap())
       .field("webview", &self.webview)
+      .field("use_https_scheme", &self.use_https_scheme)
       .finish()
   }
 }
@@ -825,6 +848,7 @@ impl<R: Runtime> Clone for Webview<R> {
       manager: self.manager.clone(),
       app_handle: self.app_handle.clone(),
       resources_table: self.resources_table.clone(),
+      use_https_scheme: self.use_https_scheme,
     }
   }
 }
@@ -847,13 +871,18 @@ impl<R: Runtime> PartialEq for Webview<R> {
 /// Base webview functions.
 impl<R: Runtime> Webview<R> {
   /// Create a new webview that is attached to the window.
-  pub(crate) fn new(window: Window<R>, webview: DetachedWebview<EventLoopMessage, R>) -> Self {
+  pub(crate) fn new(
+    window: Window<R>,
+    webview: DetachedWebview<EventLoopMessage, R>,
+    use_https_scheme: bool,
+  ) -> Self {
     Self {
       manager: window.manager.clone(),
       app_handle: window.app_handle.clone(),
       window: Arc::new(Mutex::new(window)),
       webview,
       resources_table: Default::default(),
+      use_https_scheme,
     }
   }
 
@@ -878,6 +907,11 @@ impl<R: Runtime> Webview<R> {
   /// The webview label.
   pub fn label(&self) -> &str {
     &self.webview.label
+  }
+
+  /// Whether the webview was configured to use the HTTPS scheme or not.
+  pub(crate) fn use_https_scheme(&self) -> bool {
+    self.use_https_scheme
   }
 
   /// Registers a window event listener.
@@ -1180,9 +1214,11 @@ fn main() {
   }
 
   fn is_local_url(&self, current_url: &Url) -> bool {
+    let uses_https = current_url.scheme() == "https";
+
     // if from `tauri://` custom protocol
     ({
-      let protocol_url = self.manager().protocol_url();
+      let protocol_url = self.manager().protocol_url(uses_https);
       current_url.scheme() == protocol_url.scheme()
       && current_url.domain() == protocol_url.domain()
     }) ||
@@ -1190,7 +1226,7 @@ fn main() {
     // or if relative to `devUrl` or `frontendDist`
       self
           .manager()
-          .get_url()
+          .get_url(uses_https)
           .make_relative(current_url)
           .is_some()
 
@@ -1206,7 +1242,7 @@ fn main() {
         // so we check using the first part of the domain
         #[cfg(any(windows, target_os = "android"))]
         let local = {
-          let protocol_url = self.manager().protocol_url();
+          let protocol_url = self.manager().protocol_url(uses_https);
           let maybe_protocol = current_url
             .domain()
             .and_then(|d| d .split_once('.'))
