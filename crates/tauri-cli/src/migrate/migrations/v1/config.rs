@@ -87,6 +87,28 @@ fn migrate_config(config: &mut Value) -> Result<MigratedConfig> {
         migrated.permissions = permissions;
       }
 
+      // dangerousUseHttpScheme/useHttpsScheme
+      let dangerouse_use_http = tauri_config
+        .get("security")
+        .and_then(|w| w.as_object())
+        .and_then(|w| {
+          w.get("dangerousUseHttpScheme")
+            .or_else(|| w.get("dangerous-use-http-scheme"))
+        })
+        .and_then(|v| v.as_bool())
+        .unwrap_or_default();
+
+      if let Some(windows) = tauri_config
+        .get_mut("windows")
+        .and_then(|w| w.as_array_mut())
+      {
+        for window in windows {
+          if let Some(window) = window.as_object_mut() {
+            window.insert("useHttpsScheme".to_string(), (!dangerouse_use_http).into());
+          }
+        }
+      }
+
       // security
       if let Some(security) = tauri_config
         .get_mut("security")
@@ -802,7 +824,8 @@ mod test {
         "pattern": { "use": "brownfield" },
         "security": {
           "csp": "default-src 'self' tauri:"
-        }
+        },
+        "windows": [{}]
       }
     });
 
@@ -907,6 +930,8 @@ mod test {
       migrated["app"]["withGlobalTauri"],
       original["build"]["withGlobalTauri"]
     );
+
+    assert_eq!(migrated["app"]["windows"][0]["useHttpsScheme"], true);
   }
 
   #[test]
@@ -938,6 +963,28 @@ mod test {
     assert_eq!(
       migrated["plugins"]["updater"]["pubkey"],
       original["tauri"]["updater"]["pubkey"]
+    );
+  }
+
+  #[test]
+  fn migrate_dangerous_use_http_scheme() {
+    let original = serde_json::json!({
+      "tauri": {
+        "windows": [{}],
+        "security": {
+          "dangerousUseHttpScheme": true,
+        }
+      }
+    });
+
+    let migrated = migrate(&original);
+    assert_eq!(
+      !migrated["app"]["windows"][0]["useHttpsScheme"]
+        .as_bool()
+        .unwrap(),
+      original["tauri"]["security"]["dangerousUseHttpScheme"]
+        .as_bool()
+        .unwrap()
     );
   }
 

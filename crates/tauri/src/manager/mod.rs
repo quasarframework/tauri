@@ -340,9 +340,10 @@ impl<R: Runtime> AppManager<R> {
     self.config.build.dev_url.as_ref()
   }
 
-  pub(crate) fn protocol_url(&self) -> Cow<'_, Url> {
+  pub(crate) fn protocol_url(&self, https: bool) -> Cow<'_, Url> {
     if cfg!(windows) || cfg!(target_os = "android") {
-      Cow::Owned(Url::parse("http://tauri.localhost").unwrap())
+      let scheme = if https { "https" } else { "http" };
+      Cow::Owned(Url::parse(&format!("{scheme}://tauri.localhost")).unwrap())
     } else {
       Cow::Owned(Url::parse("tauri://localhost").unwrap())
     }
@@ -351,10 +352,10 @@ impl<R: Runtime> AppManager<R> {
   /// Get the base URL to use for webview requests.
   ///
   /// In dev mode, this will be based on the `devUrl` configuration value.
-  pub(crate) fn get_url(&self) -> Cow<'_, Url> {
+  pub(crate) fn get_url(&self, https: bool) -> Cow<'_, Url> {
     match self.base_path() {
       Some(url) => Cow::Borrowed(url),
-      _ => self.protocol_url(),
+      _ => self.protocol_url(https),
     }
   }
 
@@ -372,7 +373,11 @@ impl<R: Runtime> AppManager<R> {
     }
   }
 
-  pub fn get_asset(&self, mut path: String) -> Result<Asset, Box<dyn std::error::Error>> {
+  pub fn get_asset(
+    &self,
+    mut path: String,
+    use_https_schema: bool,
+  ) -> Result<Asset, Box<dyn std::error::Error>> {
     let assets = &self.assets;
     if path.ends_with('/') {
       path.pop();
@@ -435,7 +440,7 @@ impl<R: Runtime> AppManager<R> {
               let default_src = csp_map
                 .entry("default-src".into())
                 .or_insert_with(Default::default);
-              default_src.push(crate::pattern::format_real_schema(schema));
+              default_src.push(crate::pattern::format_real_schema(schema, use_https_schema));
             }
 
             csp_header.replace(Csp::DirectiveMap(csp_map).to_string());
@@ -597,7 +602,31 @@ impl<R: Runtime> AppManager<R> {
       } => self.emit_filter(event, payload, |t| match t {
         EventTarget::Window { label }
         | EventTarget::Webview { label }
-        | EventTarget::WebviewWindow { label } => label == &target_label,
+        | EventTarget::WebviewWindow { label }
+        | EventTarget::AnyLabel { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::Window {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::Window { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::Webview {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::Webview { label } => label == &target_label,
+        _ => false,
+      }),
+
+      EventTarget::WebviewWindow {
+        label: target_label,
+      } => self.emit_filter(event, payload, |t| match t {
+        EventTarget::AnyLabel { label } | EventTarget::WebviewWindow { label } => {
+          label == &target_label
+        }
         _ => false,
       }),
 
@@ -747,9 +776,17 @@ mod test {
     #[cfg(custom_protocol)]
     {
       assert_eq!(
-        manager.get_url().to_string(),
+        manager.get_url(false).to_string(),
         if cfg!(windows) || cfg!(target_os = "android") {
           "http://tauri.localhost/"
+        } else {
+          "tauri://localhost"
+        }
+      );
+      assert_eq!(
+        manager.get_url(true).to_string(),
+        if cfg!(windows) || cfg!(target_os = "android") {
+          "https://tauri.localhost/"
         } else {
           "tauri://localhost"
         }
@@ -757,7 +794,7 @@ mod test {
     }
 
     #[cfg(dev)]
-    assert_eq!(manager.get_url().to_string(), "http://localhost:4000/");
+    assert_eq!(manager.get_url(false).to_string(), "http://localhost:4000/");
   }
 
   struct EventSetup {

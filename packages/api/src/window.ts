@@ -1408,7 +1408,7 @@ class Window {
    * await getCurrentWindow().setIcon('/tauri/awesome.png');
    * ```
    *
-   * Note that you need the `image-ico` or `image-png` Cargo features to use this API.
+   * Note that you may need the `image-ico` or `image-png` Cargo features to use this API.
    * To enable it, change your Cargo.toml file:
    * ```toml
    * [dependencies]
@@ -2221,6 +2221,17 @@ interface WindowOptions {
    * @since 2.0.0
    */
   visibleOnAllWorkspaces?: boolean
+  /**
+   * Window effects.
+   *
+   * Requires the window to be transparent.
+   *
+   * #### Platform-specific:
+   *
+   * - **Windows**: If using decorations or shadows, you may want to try this workaround <https://github.com/tauri-apps/tao/issues/72#issuecomment-975607891>
+   * - **Linux**: Unsupported
+   */
+  windowEffects?: Effects
 }
 
 function mapMonitor(m: Monitor | null): Monitor | null {

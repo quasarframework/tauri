@@ -655,6 +655,12 @@ interface WebviewOptions {
    */
   transparent?: boolean
   /**
+   * Whether the webview should have focus or not
+   *
+   * @since 2.1.0
+   */
+  focus?: boolean
+  /**
    * Whether the drag and drop is enabled or not on the webview. By default it is enabled.
    *
    * Disabling it is required to use HTML5 drag and drop on the frontend on Windows.
@@ -698,6 +704,35 @@ interface WebviewOptions {
    * - **Android / iOS**: Unsupported.
    */
   zoomHotkeysEnabled?: boolean
+
+  /**
+   * Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+   *
+   * #### Note
+   *
+   * Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+   *
+   * #### Warning
+   *
+   * Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access them.
+   *
+   * @since 2.1.0
+   */
+  useHttpsScheme?: boolean
+  /**
+   * Whether web inspector, which is usually called browser devtools, is enabled or not. Enabled by default.
+   *
+   * This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.
+   *
+   * #### Platform-specific
+   *
+   * - macOS: This will call private functions on **macOS**.
+   * - Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.
+   * - iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.
+   *
+   * @since 2.1.0
+   */
+  devtools?: boolean
 }
 
 export { Webview, getCurrentWebview, getAllWebviews }
