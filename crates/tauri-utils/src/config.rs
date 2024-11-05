@@ -392,6 +392,36 @@ pub struct LinuxConfig {
   pub rpm: RpmConfig,
 }
 
+/// Compression algorithms used when bundling RPM packages.
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(rename_all = "camelCase", deny_unknown_fields, tag = "type")]
+#[non_exhaustive]
+pub enum RpmCompression {
+  /// Gzip compression
+  Gzip {
+    /// Gzip compression level
+    level: u32,
+  },
+  /// Zstd compression
+  Zstd {
+    /// Zstd compression level
+    level: i32,
+  },
+  /// Xz compression
+  Xz {
+    /// Xz compression level
+    level: u32,
+  },
+  /// Bzip2 compression
+  Bzip2 {
+    /// Bzip2 compression level
+    level: u32,
+  },
+  /// Disable compression
+  None,
+}
+
 /// Configuration for RPM bundles.
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
@@ -440,6 +470,8 @@ pub struct RpmConfig {
   /// <http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>
   #[serde(alias = "post-remove-script")]
   pub post_remove_script: Option<PathBuf>,
+  /// Compression algorithm and level. Defaults to `Gzip` with level 6.
+  pub compression: Option<RpmCompression>,
 }
 
 impl Default for RpmConfig {
@@ -458,6 +490,7 @@ impl Default for RpmConfig {
       post_install_script: None,
       pre_remove_script: None,
       post_remove_script: None,
+      compression: None,
     }
   }
 }
