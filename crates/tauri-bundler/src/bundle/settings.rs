@@ -8,7 +8,10 @@ use crate::bundle::{common, platform::target_triple};
 use anyhow::Context;
 pub use tauri_utils::config::WebviewInstallMode;
 use tauri_utils::{
-  config::{BundleType, DeepLinkProtocol, FileAssociation, NSISInstallerMode, NsisCompression},
+  config::{
+    BundleType, DeepLinkProtocol, FileAssociation, NSISInstallerMode, NsisCompression,
+    RpmCompression,
+  },
   resources::{external_binaries, ResourcePaths},
 };
 
@@ -262,6 +265,8 @@ pub struct RpmSettings {
   /// Path to script that will be executed after the package is removed. See
   /// <http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>
   pub post_remove_script: Option<PathBuf>,
+  /// Compression algorithm and level. Defaults to `Gzip` with level 6.
+  pub compression: Option<RpmCompression>,
 }
 
 /// Position coordinates struct.

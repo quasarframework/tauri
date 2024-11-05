@@ -392,6 +392,36 @@ pub struct LinuxConfig {
   pub rpm: RpmConfig,
 }
 
+/// Compression algorithms used when bundling RPM packages.
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(rename_all = "camelCase", deny_unknown_fields, tag = "type")]
+#[non_exhaustive]
+pub enum RpmCompression {
+  /// Gzip compression
+  Gzip {
+    /// Gzip compression level
+    level: u32,
+  },
+  /// Zstd compression
+  Zstd {
+    /// Zstd compression level
+    level: i32,
+  },
+  /// Xz compression
+  Xz {
+    /// Xz compression level
+    level: u32,
+  },
+  /// Bzip2 compression
+  Bzip2 {
+    /// Bzip2 compression level
+    level: u32,
+  },
+  /// Disable compression
+  None,
+}
+
 /// Configuration for RPM bundles.
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
@@ -440,6 +470,8 @@ pub struct RpmConfig {
   /// <http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>
   #[serde(alias = "post-remove-script")]
   pub post_remove_script: Option<PathBuf>,
+  /// Compression algorithm and level. Defaults to `Gzip` with level 6.
+  pub compression: Option<RpmCompression>,
 }
 
 impl Default for RpmConfig {
@@ -458,6 +490,7 @@ impl Default for RpmConfig {
       post_install_script: None,
       pre_remove_script: None,
       post_remove_script: None,
+      compression: None,
     }
   }
 }
@@ -1396,6 +1429,8 @@ pub struct WindowConfig {
   /// If `true`, hides the window icon from the taskbar on Windows and Linux.
   #[serde(default, alias = "skip-taskbar")]
   pub skip_taskbar: bool,
+  /// The name of the window class created on Windows to create the window. **Windows only**.
+  pub window_classname: Option<String>,
   /// The initial window theme. Defaults to the system theme. Only implemented on Windows and macOS 10.14+.
   pub theme: Option<crate::Theme>,
   /// The style of the macOS title bar.
@@ -1486,6 +1521,18 @@ pub struct WindowConfig {
   /// - **MacOS / Linux / iOS / Android** - Unsupported.
   #[serde(default)]
   pub browser_extensions_enabled: bool,
+
+  /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+  ///
+  /// ## Note
+  ///
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  ///
+  /// ## Warning
+  ///
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
+  #[serde(default, alias = "use-https-scheme")]
+  pub use_https_scheme: bool,
   /// Enable web inspector which is usually called browser devtools. Enabled by default.
   ///
   /// This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.
@@ -1531,6 +1578,7 @@ impl Default for WindowConfig {
       visible_on_all_workspaces: false,
       content_protected: false,
       skip_taskbar: false,
+      window_classname: None,
       theme: None,
       title_bar_style: Default::default(),
       hidden_title: false,
@@ -1544,6 +1592,7 @@ impl Default for WindowConfig {
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
+      use_https_scheme: false,
       devtools: None,
     }
   }
@@ -2504,6 +2553,7 @@ mod build {
       let visible_on_all_workspaces = self.visible_on_all_workspaces;
       let content_protected = self.content_protected;
       let skip_taskbar = self.skip_taskbar;
+      let window_classname = opt_str_lit(self.window_classname.as_ref());
       let theme = opt_lit(self.theme.as_ref());
       let title_bar_style = &self.title_bar_style;
       let hidden_title = self.hidden_title;
@@ -2516,6 +2566,7 @@ mod build {
       let parent = opt_str_lit(self.parent.as_ref());
       let zoom_hotkeys_enabled = self.zoom_hotkeys_enabled;
       let browser_extensions_enabled = self.browser_extensions_enabled;
+      let use_https_scheme = self.use_https_scheme;
       let devtools = opt_lit(self.devtools.as_ref());
 
       literal_struct!(
@@ -2552,6 +2603,7 @@ mod build {
         visible_on_all_workspaces,
         content_protected,
         skip_taskbar,
+        window_classname,
         theme,
         title_bar_style,
         hidden_title,
@@ -2564,6 +2616,7 @@ mod build {
         parent,
         zoom_hotkeys_enabled,
         browser_extensions_enabled,
+        use_https_scheme,
         devtools
       );
     }

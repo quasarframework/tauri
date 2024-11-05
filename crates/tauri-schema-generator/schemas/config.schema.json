@@ -397,6 +397,13 @@
           "default": false,
           "type": "boolean"
         },
+        "windowClassname": {
+          "description": "The name of the window class created on Windows to create the window. **Windows only**.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "theme": {
           "description": "The initial window theme. Defaults to the system theme. Only implemented on Windows and macOS 10.14+.",
           "anyOf": [
@@ -484,6 +491,11 @@
         },
         "browserExtensionsEnabled": {
           "description": "Whether browser extensions can be installed for the webview process\n\n ## Platform-specific:\n\n - **Windows**: Enables the WebView2 environment's [`AreBrowserExtensionsEnabled`](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/winrt/microsoft_web_webview2_core/corewebview2environmentoptions?view=webview2-winrt-1.0.2739.15#arebrowserextensionsenabled)\n - **MacOS / Linux / iOS / Android** - Unsupported.",
+          "default": false,
+          "type": "boolean"
+        },
+        "useHttpsScheme": {
+          "description": "Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.\n\n ## Note\n\n Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.\n\n ## Warning\n\n Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.",
           "default": false,
           "type": "boolean"
         },
@@ -1111,7 +1123,7 @@
       ]
     },
     "Capability": {
-      "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\n It controls application windows fine grained access to the Tauri core, application, or plugin commands.\n If a window is not matching any capability then it has no access to the IPC layer at all.\n\n This can be done to create groups of windows, based on their required system access, which can reduce\n impact of frontend vulnerabilities in less privileged windows.\n Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`.\n A Window can have none, one, or multiple associated capabilities.\n\n ## Example\n\n ```json\n {\n   \"identifier\": \"main-user-files-write\",\n   \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programatic access to files selected by the user.\",\n   \"windows\": [\n     \"main\"\n   ],\n  \"permissions\": [\n   \"core:default\",\n   \"dialog:open\",\n   {\n     \"identifier\": \"fs:allow-write-text-file\",\n     \"allow\": [{ \"path\": \"$HOME/test.txt\" }]\n   },\n  ],\n  \"platforms\": [\"macOS\",\"windows\"]\n }\n ```",
+      "description": "A grouping and boundary mechanism developers can use to isolate access to the IPC layer.\n\n It controls application windows fine grained access to the Tauri core, application, or plugin commands.\n If a window is not matching any capability then it has no access to the IPC layer at all.\n\n This can be done to create groups of windows, based on their required system access, which can reduce\n impact of frontend vulnerabilities in less privileged windows.\n Windows can be added to a capability by exact name (e.g. `main-window`) or glob patterns like `*` or `admin-*`.\n A Window can have none, one, or multiple associated capabilities.\n\n ## Example\n\n ```json\n {\n   \"identifier\": \"main-user-files-write\",\n   \"description\": \"This capability allows the `main` window on macOS and Windows access to `filesystem` write related commands and `dialog` commands to enable programatic access to files selected by the user.\",\n   \"windows\": [\n     \"main\"\n   ],\n   \"permissions\": [\n     \"core:default\",\n     \"dialog:open\",\n     {\n       \"identifier\": \"fs:allow-write-text-file\",\n       \"allow\": [{ \"path\": \"$HOME/test.txt\" }]\n     },\n   ],\n   \"platforms\": [\"macOS\",\"windows\"]\n }\n ```",
       "type": "object",
       "required": [
         "identifier",
@@ -1158,7 +1170,7 @@
           }
         },
         "permissions": {
-          "description": "List of permissions attached to this capability.\n\n Must include the plugin name as prefix in the form of `${plugin-name}:${permission-name}`.\n For commands directly implemented in the application itself only `${permission-name}`\n is required.\n\n ## Example\n\n ```json\n [\n  \"core:default\",\n  \"shell:allow-open\",\n  \"dialog:open\",\n  {\n    \"identifier\": \"fs:allow-write-text-file\",\n    \"allow\": [{ \"path\": \"$HOME/test.txt\" }]\n  }\n ```",
+          "description": "List of permissions attached to this capability.\n\n Must include the plugin name as prefix in the form of `${plugin-name}:${permission-name}`.\n For commands directly implemented in the application itself only `${permission-name}`\n is required.\n\n ## Example\n\n ```json\n [\n   \"core:default\",\n   \"shell:allow-open\",\n   \"dialog:open\",\n   {\n     \"identifier\": \"fs:allow-write-text-file\",\n     \"allow\": [{ \"path\": \"$HOME/test.txt\" }]\n   }\n ]\n ```",
           "type": "array",
           "items": {
             "$ref": "#/definitions/PermissionEntry"
@@ -2796,9 +2808,132 @@
             "string",
             "null"
           ]
+        },
+        "compression": {
+          "description": "Compression algorithm and level. Defaults to `Gzip` with level 6.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RpmCompression"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false
+    },
+    "RpmCompression": {
+      "description": "Compression algorithms used when bundling RPM packages.",
+      "oneOf": [
+        {
+          "description": "Gzip compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "gzip"
+              ]
+            },
+            "level": {
+              "description": "Gzip compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Zstd compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "zstd"
+              ]
+            },
+            "level": {
+              "description": "Zstd compression level",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Xz compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "xz"
+              ]
+            },
+            "level": {
+              "description": "Xz compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Bzip2 compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "bzip2"
+              ]
+            },
+            "level": {
+              "description": "Bzip2 compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Disable compression",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "none"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "MacConfig": {
       "description": "Configuration for the macOS bundles.\n\n See more: <https://v2.tauri.app/reference/config/#macconfig>",

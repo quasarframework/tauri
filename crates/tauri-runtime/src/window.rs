@@ -438,6 +438,10 @@ pub trait WindowBuilder: WindowBuilderBase {
   fn has_icon(&self) -> bool;
 
   fn get_theme(&self) -> Option<Theme>;
+
+  /// Sets custom name for Windows' window class. **Windows only**.
+  #[must_use]
+  fn window_classname<S: Into<String>>(self, window_classname: S) -> Self;
 }
 
 /// A window that has yet to be built.
@@ -512,7 +516,23 @@ pub struct DetachedWindow<T: UserEvent, R: Runtime<T>> {
   pub dispatcher: R::WindowDispatcher,
 
   /// The webview dispatcher in case this window has an attached webview.
-  pub webview: Option<DetachedWebview<T, R>>,
+  pub webview: Option<DetachedWindowWebview<T, R>>,
+}
+
+/// A detached webview associated with a window.
+#[derive(Debug)]
+pub struct DetachedWindowWebview<T: UserEvent, R: Runtime<T>> {
+  pub webview: DetachedWebview<T, R>,
+  pub use_https_scheme: bool,
+}
+
+impl<T: UserEvent, R: Runtime<T>> Clone for DetachedWindowWebview<T, R> {
+  fn clone(&self) -> Self {
+    Self {
+      webview: self.webview.clone(),
+      use_https_scheme: self.use_https_scheme,
+    }
+  }
 }
 
 impl<T: UserEvent, R: Runtime<T>> Clone for DetachedWindow<T, R> {
