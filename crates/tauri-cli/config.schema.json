@@ -318,7 +318,7 @@
           "format": "double"
         },
         "preventOverflow": {
-          "description": "Whether or not to prevent window overflow",
+          "description": "Whether or not to prevent the window from overflowing the workarea\n\n ## Platform-specific\n\n - **Linux:** Prevent overflowing the monitor instead of workarea\n - **iOS / Android:** Unsupported.",
           "anyOf": [
             {
               "$ref": "#/definitions/PreventOverflowMarginConfig"
@@ -528,7 +528,7 @@
           "type": "boolean"
         },
         {
-          "description": "Enable prevent overflow with a margin",
+          "description": "Enable prevent overflow with a margin\n so that the window's size + this margin won't overflow the workarea",
           "allOf": [
             {
               "$ref": "#/definitions/PreventOverflowMargin"

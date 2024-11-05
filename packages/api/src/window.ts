@@ -2201,7 +2201,14 @@ interface WindowOptions {
   maxWidth?: number
   /** The maximum height. Only applies if `maxWidth` is also set. */
   maxHeight?: number
-  /** Prevent initial window from getting bigger than work area */
+  /**
+   * Prevent initial window from getting bigger than the work area
+   *
+   * ## Platform-specific
+   *
+   * - **Linux:** Prevent overflowing the monitor instead of workarea
+   * - **iOS / Android:** Unsupported.
+   */
   preventOverflow?: boolean | PreventOverflowMargin
   /** Whether the window is resizable or not. */
   resizable?: boolean

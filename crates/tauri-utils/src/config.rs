@@ -1292,6 +1292,7 @@ pub enum PreventOverflowMarginConfig {
   /// Enable prevent overflow or not
   Enable(bool),
   /// Enable prevent overflow with a margin
+  /// so that the window's size + this margin won't overflow the workarea
   Margin(PreventOverflowMargin),
 }
 
@@ -1354,7 +1355,12 @@ pub struct WindowConfig {
   /// The max window height.
   #[serde(alias = "max-height")]
   pub max_height: Option<f64>,
-  /// Whether or not to prevent window overflow
+  /// Whether or not to prevent the window from overflowing the workarea
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
   #[serde(alias = "prevent-overflow")]
   pub prevent_overflow: Option<PreventOverflowMarginConfig>,
   /// Whether the window is resizable or not. When resizable is set to false, native window's maximize button is automatically disabled.
