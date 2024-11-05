@@ -29,7 +29,13 @@
         return Array.from(new Uint8Array(val))
       } else if (typeof val === "object" && val !== null && SERIALIZE_TO_IPC_FN in val) {
         return val[SERIALIZE_TO_IPC_FN]()
-      } else {
+      } else if (
+        val instanceof Object &&
+        '__TAURI_CHANNEL_MARKER__' in val &&
+        typeof val.id === 'number'
+      ) {
+        return `__CHANNEL__:${val.id}`
+       } else {
         return val
       }
     })

@@ -76,6 +76,8 @@ function transformCallback<T = unknown>(
 
 class Channel<T = unknown> {
   id: number
+  // @ts-expect-error field used by the IPC serializer
+  private readonly __TAURI_CHANNEL_MARKER__ = true
   #onmessage: (response: T) => void = () => {
     // no-op
   }
