@@ -1296,12 +1296,6 @@ pub enum PreventOverflowMarginConfig {
   Margin(PreventOverflowMargin),
 }
 
-impl Default for PreventOverflowMarginConfig {
-  fn default() -> Self {
-    Self::Enable(true)
-  }
-}
-
 /// The window configuration object.
 ///
 /// See more: <https://v2.tauri.app/reference/config/#windowconfig>
