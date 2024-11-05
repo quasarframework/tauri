@@ -221,7 +221,8 @@ impl From<&WindowConfig> for WebviewAttributes {
       .focused(config.focus)
       .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
       .use_https_scheme(config.use_https_scheme)
-      .browser_extensions_enabled(config.browser_extensions_enabled);
+      .browser_extensions_enabled(config.browser_extensions_enabled)
+      .devtools(config.devtools);
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -242,9 +243,6 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(url) = &config.proxy_url {
       builder = builder.proxy_url(url.to_owned());
     }
-    builder = builder.zoom_hotkeys_enabled(config.zoom_hotkeys_enabled);
-    builder = builder.browser_extensions_enabled(config.browser_extensions_enabled);
-    builder = builder.devtools(config.devtools);
     builder
   }
 }
