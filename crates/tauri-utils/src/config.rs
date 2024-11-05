@@ -470,7 +470,7 @@ pub struct RpmConfig {
   /// <http://ftp.rpm.org/max-rpm/s1-rpm-inside-scripts.html>
   #[serde(alias = "post-remove-script")]
   pub post_remove_script: Option<PathBuf>,
-  /// Compression algorithim and level. Defaults to `Gzip` with level 6.
+  /// Compression algorithm and level. Defaults to `Gzip` with level 6.
   pub compression: Option<RpmCompression>,
 }
 

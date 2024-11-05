@@ -2791,7 +2791,7 @@
           ]
         },
         "compression": {
-          "description": "Compression algorithim and level. Defaults to `Gzip` with level 6.",
+          "description": "Compression algorithm and level. Defaults to `Gzip` with level 6.",
           "anyOf": [
             {
               "$ref": "#/definitions/RpmCompression"
