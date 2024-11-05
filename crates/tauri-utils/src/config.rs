@@ -1355,6 +1355,7 @@ pub struct WindowConfig {
   #[serde(alias = "max-height")]
   pub max_height: Option<f64>,
   /// Whether or not to prevent window overflow
+  #[serde(alias = "prevent-overflow")]
   pub prevent_overflow: Option<PreventOverflowMarginConfig>,
   /// Whether the window is resizable or not. When resizable is set to false, native window's maximize button is automatically disabled.
   #[serde(default = "default_true")]
