@@ -4486,10 +4486,10 @@ fn get_work_area_size(target_monitor: &MonitorHandle) -> TaoPhysicalSize<u32> {
   }
   #[cfg(target_os = "macos")]
   {
-    use cocoa::{appkit::NSScreen, base::id};
+    use objc2_app_kit::NSScreen;
     use tao::platform::macos::MonitorHandleExtMacOS;
     if let Some(ns_screen) = target_monitor.ns_screen() {
-      let ns_screen = ns_screen as id;
+      let ns_screen = ns_screen as NSScreen;
       let rect = unsafe { ns_screen.visibleFrame() };
       return TaoLogicalSize::new(rect.size.width, rect.size.height)
         .to_physical(target_monitor.scale_factor());
