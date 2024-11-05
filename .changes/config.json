@@ -288,11 +288,6 @@
           "name": "${ pkg.pkg }-${ pkgFile.version }.crate"
         }
       ]
-    },
-    "tauri-driver": {
-      "path": "./tooling/webdriver",
-      "manager": "rust",
-      "postversion": "cargo check"
     }
   }
 }
