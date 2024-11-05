@@ -1388,6 +1388,7 @@ fn tauri_config_to_bundle_settings(
       post_install_script: config.linux.rpm.post_install_script,
       pre_remove_script: config.linux.rpm.pre_remove_script,
       post_remove_script: config.linux.rpm.post_remove_script,
+      compression: config.linux.rpm.compression,
     },
     dmg: DmgSettings {
       background: config.macos.dmg.background,

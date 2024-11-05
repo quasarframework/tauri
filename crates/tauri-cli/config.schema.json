@@ -2789,9 +2789,132 @@
             "string",
             "null"
           ]
+        },
+        "compression": {
+          "description": "Compression algorithim and level. Defaults to `Gzip` with level 6.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RpmCompression"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false
+    },
+    "RpmCompression": {
+      "description": "Compression algorithms used when bundling RPM packages.",
+      "oneOf": [
+        {
+          "description": "Gzip compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "gzip"
+              ]
+            },
+            "level": {
+              "description": "Gzip compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Zstd compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "zstd"
+              ]
+            },
+            "level": {
+              "description": "Zstd compression level",
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Xz compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "xz"
+              ]
+            },
+            "level": {
+              "description": "Xz compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Bzip2 compression",
+          "type": "object",
+          "required": [
+            "level",
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "bzip2"
+              ]
+            },
+            "level": {
+              "description": "Bzip2 compression level",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Disable compression",
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "none"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "MacConfig": {
       "description": "Configuration for the macOS bundles.\n\n See more: <https://v2.tauri.app/reference/config/#macconfig>",
