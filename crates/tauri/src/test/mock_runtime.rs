@@ -352,7 +352,7 @@ impl WindowBuilder for MockWindowBuilder {
     self
   }
 
-  fn prevent_overflow_with_margin(self, margin: muda::dpi::Size) -> Self {
+  fn prevent_overflow_with_margin(self, margin: tauri_runtime::dpi::Size) -> Self {
     self
   }
 
