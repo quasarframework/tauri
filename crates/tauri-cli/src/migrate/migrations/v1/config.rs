@@ -158,7 +158,9 @@ fn process_package_metadata(config: &mut Map<String, Value>) {
             .map(|v| (v, "product-name"))
         })
       {
-        config.insert(key.into(), product_name);
+        config.insert(key.into(), product_name.clone());
+        // keep main binary name unchanged
+        config.insert("mainBinaryName".into(), product_name);
       }
 
       if let Some(version) = package_config.remove("version") {
@@ -682,6 +684,29 @@ mod test {
     let mut migrated = original.clone();
     super::migrate_config(&mut migrated).expect("failed to migrate config");
 
+    if original.get("$schema").is_some() {
+      if let Some(map) = migrated.as_object_mut() {
+        map.insert(
+          "$schema".to_string(),
+          serde_json::Value::String("https://schema.tauri.app/config/2".to_string()),
+        );
+      }
+    }
+
+    if original
+      .get("tauri")
+      .and_then(|v| v.get("bundle"))
+      .and_then(|v| v.get("identifier"))
+      .is_none()
+    {
+      if let Some(map) = migrated.as_object_mut() {
+        map.insert(
+          "identifier".to_string(),
+          serde_json::Value::String("com.tauri.test-injected".to_string()),
+        );
+      }
+    }
+
     if let Err(e) = serde_json::from_value::<tauri_utils::config::Config>(migrated.clone()) {
       panic!("migrated config is not valid: {e}");
     }
@@ -692,6 +717,7 @@ mod test {
   #[test]
   fn migrate_full() {
     let original = serde_json::json!({
+      "$schema": "../node_modules/@tauri-apps/cli/schema.json",
       "build": {
         "distDir": "../dist",
         "devPath": "http://localhost:1240",
@@ -782,6 +808,9 @@ mod test {
 
     let migrated = migrate(&original);
 
+    // $schema
+    assert_eq!(migrated["$schema"], "https://schema.tauri.app/config/2");
+
     // plugins > updater
     assert_eq!(
       migrated["plugins"]["updater"]["endpoints"],
@@ -858,6 +887,10 @@ mod test {
 
     // app information
     assert_eq!(migrated["productName"], original["package"]["productName"]);
+    assert_eq!(
+      migrated["mainBinaryName"],
+      original["package"]["productName"]
+    );
     assert_eq!(migrated["version"], original["package"]["version"]);
     assert_eq!(
       migrated["identifier"],

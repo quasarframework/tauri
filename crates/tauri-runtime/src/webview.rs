@@ -18,7 +18,7 @@ use std::{
   sync::Arc,
 };
 
-type UriSchemeProtocol = dyn Fn(http::Request<Vec<u8>>, Box<dyn FnOnce(http::Response<Cow<'static, [u8]>>) + Send>)
+type UriSchemeProtocol = dyn Fn(&str, http::Request<Vec<u8>>, Box<dyn FnOnce(http::Response<Cow<'static, [u8]>>) + Send>)
   + Send
   + Sync
   + 'static;
@@ -129,7 +129,7 @@ impl<T: UserEvent, R: Runtime<T>> PendingWebview<T, R> {
 
   pub fn register_uri_scheme_protocol<
     N: Into<String>,
-    H: Fn(http::Request<Vec<u8>>, Box<dyn FnOnce(http::Response<Cow<'static, [u8]>>) + Send>)
+    H: Fn(&str, http::Request<Vec<u8>>, Box<dyn FnOnce(http::Response<Cow<'static, [u8]>>) + Send>)
       + Send
       + Sync
       + 'static,
@@ -204,16 +204,21 @@ pub struct WebviewAttributes {
   pub window_effects: Option<WindowEffectsConfig>,
   pub incognito: bool,
   pub transparent: bool,
+  pub focus: bool,
   pub bounds: Option<Rect>,
   pub auto_resize: bool,
   pub proxy_url: Option<Url>,
   pub zoom_hotkeys_enabled: bool,
+  pub browser_extensions_enabled: bool,
 }
 
 impl From<&WindowConfig> for WebviewAttributes {
   fn from(config: &WindowConfig) -> Self {
-    let mut builder = Self::new(config.url.clone());
-    builder = builder.incognito(config.incognito);
+    let mut builder = Self::new(config.url.clone())
+      .incognito(config.incognito)
+      .focused(config.focus)
+      .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
+      .browser_extensions_enabled(config.browser_extensions_enabled);
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -234,7 +239,6 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(url) = &config.proxy_url {
       builder = builder.proxy_url(url.to_owned());
     }
-    builder = builder.zoom_hotkeys_enabled(config.zoom_hotkeys_enabled);
     builder
   }
 }
@@ -254,10 +258,12 @@ impl WebviewAttributes {
       window_effects: None,
       incognito: false,
       transparent: false,
+      focus: true,
       bounds: None,
       auto_resize: false,
       proxy_url: None,
       zoom_hotkeys_enabled: false,
+      browser_extensions_enabled: false,
     }
   }
 
@@ -335,6 +341,13 @@ impl WebviewAttributes {
     self
   }
 
+  /// Whether the webview should be focused or not.
+  #[must_use]
+  pub fn focused(mut self, focus: bool) -> Self {
+    self.focus = focus;
+    self
+  }
+
   /// Sets the webview to automatically grow and shrink its size and position when the parent window resizes.
   #[must_use]
   pub fn auto_resize(mut self) -> Self {
@@ -361,6 +374,18 @@ impl WebviewAttributes {
   #[must_use]
   pub fn zoom_hotkeys_enabled(mut self, enabled: bool) -> Self {
     self.zoom_hotkeys_enabled = enabled;
+    self
+  }
+
+  /// Whether browser extensions can be installed for the webview process
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Enables the WebView2 environment's [`AreBrowserExtensionsEnabled`](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/winrt/microsoft_web_webview2_core/corewebview2environmentoptions?view=webview2-winrt-1.0.2739.15#arebrowserextensionsenabled)
+  /// - **MacOS / Linux / iOS / Android** - Unsupported.
+  #[must_use]
+  pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
+    self.browser_extensions_enabled = enabled;
     self
   }
 }

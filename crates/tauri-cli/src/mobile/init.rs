@@ -90,6 +90,9 @@ pub fn exec(
 
             return (binary, build_args);
           }
+        } else if bin_stem == "deno" {
+          build_args.insert(0, "task");
+          return (std::ffi::OsString::from("deno"), build_args);
         } else if !cfg!(debug_assertions) && bin_stem == "cargo-tauri" {
           return (std::ffi::OsString::from("cargo"), build_args);
         }
@@ -195,17 +198,9 @@ fn get_str<'a>(helper: &'a Helper) -> &'a str {
 
 fn get_str_array(helper: &Helper, formatter: impl Fn(&str) -> String) -> Option<Vec<String>> {
   helper.param(0).and_then(|v| {
-    v.value().as_array().and_then(|arr| {
-      arr
-        .iter()
-        .map(|val| {
-          val.as_str().map(
-            #[allow(clippy::redundant_closure)]
-            |s| formatter(s),
-          )
-        })
-        .collect()
-    })
+    v.value()
+      .as_array()
+      .and_then(|arr| arr.iter().map(|val| val.as_str().map(&formatter)).collect())
   })
 }
 

@@ -147,6 +147,10 @@ macro_rules! gen_wrappers {
 gen_wrappers!(
   /// A type that is either a menu bar on the window
   /// on Windows and Linux or as a global menu in the menubar on macOS.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **macOS**: if using [`Menu`] for the global menubar, it can only contain [`Submenu`]s
   Menu(MenuInner),
   /// A menu item inside a [`Menu`] or [`Submenu`] and contains only text.
   MenuItem(MenuItemInner, MenuItem),
@@ -732,6 +736,15 @@ pub trait IsMenuItem<R: Runtime>: sealed::IsMenuItemBase {
 ///
 /// This trait is ONLY meant to be implemented internally by the crate.
 pub trait ContextMenu: sealed::ContextMenuBase + Send + Sync {
+  /// Get the popup [`HMENU`] for this menu.
+  ///
+  /// The returned [`HMENU`] is valid as long as the [`ContextMenu`] is.
+  ///
+  /// [`HMENU`]: https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types#HMENU
+  #[cfg(windows)]
+  #[cfg_attr(docsrs, doc(cfg(windows)))]
+  fn hpopupmenu(&self) -> crate::Result<isize>;
+
   /// Popup this menu as a context menu on the specified window at the cursor position.
   fn popup<R: crate::Runtime>(&self, window: crate::Window<R>) -> crate::Result<()>;
 

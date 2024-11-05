@@ -29,7 +29,7 @@ use tauri_utils::config::{parse::is_configuration_file, DeepLinkProtocol, Update
 use super::{AppSettings, DevProcess, ExitReason, Interface};
 use crate::{
   helpers::{
-    app_paths::{app_dir, tauri_dir},
+    app_paths::{frontend_dir, tauri_dir},
     config::{nsis_settings, reload as reload_config, wix_settings, BundleResources, Config},
   },
   ConfigValue,
@@ -115,6 +115,7 @@ pub struct Rust {
   app_settings: Arc<RustAppSettings>,
   config_features: Vec<String>,
   available_targets: Option<Vec<RustupTarget>>,
+  main_binary_name: Option<String>,
 }
 
 impl Interface for Rust {
@@ -146,20 +147,24 @@ impl Interface for Rust {
       manifest
     };
 
-    if let Some(minimum_system_version) = &config.bundle.macos.minimum_system_version {
+    let target_ios = target.as_ref().map_or(false, |target| {
+      target.ends_with("ios") || target.ends_with("ios-sim")
+    });
+    if target_ios {
+      std::env::set_var(
+        "IPHONEOS_DEPLOYMENT_TARGET",
+        &config.bundle.ios.minimum_system_version,
+      );
+    } else if let Some(minimum_system_version) = &config.bundle.macos.minimum_system_version {
       std::env::set_var("MACOSX_DEPLOYMENT_TARGET", minimum_system_version);
     }
-
-    std::env::set_var(
-      "IPHONEOS_DEPLOYMENT_TARGET",
-      &config.bundle.ios.minimum_system_version,
-    );
 
     let app_settings = RustAppSettings::new(config, manifest, target)?;
 
     Ok(Self {
       app_settings: Arc::new(app_settings),
       config_features: config.build.features.clone().unwrap_or_default(),
+      main_binary_name: config.main_binary_name.clone(),
       available_targets: None,
     })
   }
@@ -168,14 +173,14 @@ impl Interface for Rust {
     self.app_settings.clone()
   }
 
-  fn build(&mut self, options: Options) -> crate::Result<()> {
+  fn build(&mut self, options: Options) -> crate::Result<PathBuf> {
     desktop::build(
       options,
       &self.app_settings,
       &mut self.available_targets,
       self.config_features.clone(),
-    )?;
-    Ok(())
+      self.main_binary_name.as_deref(),
+    )
   }
 
   fn dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
@@ -498,6 +503,7 @@ impl Rust {
       &mut self.available_targets,
       self.config_features.clone(),
       &self.app_settings,
+      self.main_binary_name.clone(),
       on_exit,
     )
     .map(|c| Box::new(c) as Box<dyn DevProcess + Send>)
@@ -512,7 +518,7 @@ impl Rust {
 
     let process = Arc::new(Mutex::new(child));
     let (tx, rx) = sync_channel(1);
-    let app_path = app_dir();
+    let frontend_path = frontend_dir();
 
     let watch_folders = get_watch_folders()?;
 
@@ -566,7 +572,11 @@ impl Rust {
 
             log::info!(
               "File {} changed. Rebuilding application...",
-              display_path(event_path.strip_prefix(app_path).unwrap_or(&event_path))
+              display_path(
+                event_path
+                  .strip_prefix(frontend_path)
+                  .unwrap_or(&event_path)
+              )
             );
 
             let mut p = process.lock().unwrap();
@@ -861,36 +871,28 @@ impl AppSettings for RustAppSettings {
   }
 
   fn app_binary_path(&self, options: &Options) -> crate::Result<PathBuf> {
-    let binaries = self.get_binaries(&self.target_triple)?;
+    let binaries = self.get_binaries()?;
     let bin_name = binaries
       .iter()
       .find(|x| x.main())
-      .expect("failed to find main binary")
+      .context("failed to find main binary, make sure you have a `package > default-run` in the Cargo.toml file")?
       .name();
 
     let out_dir = self
       .out_dir(options)
-      .with_context(|| "failed to get project out directory")?;
+      .context("failed to get project out directory")?;
 
-    let binary_extension: String = if self.target_triple.contains("windows") {
+    let ext = if self.target_triple.contains("windows") {
       "exe"
     } else {
       ""
-    }
-    .into();
+    };
 
-    Ok(out_dir.join(bin_name).with_extension(binary_extension))
+    Ok(out_dir.join(bin_name).with_extension(ext))
   }
 
-  fn get_binaries(&self, target: &str) -> crate::Result<Vec<BundleBinary>> {
+  fn get_binaries(&self) -> crate::Result<Vec<BundleBinary>> {
     let mut binaries: Vec<BundleBinary> = vec![];
-
-    let binary_extension: String = if target.contains("windows") {
-      ".exe"
-    } else {
-      ""
-    }
-    .into();
 
     if let Some(bins) = &self.cargo_settings.bin {
       let default_run = self
@@ -899,44 +901,69 @@ impl AppSettings for RustAppSettings {
         .clone()
         .unwrap_or_default();
       for bin in bins {
-        let name = format!("{}{}", bin.name, binary_extension);
-        let is_main =
-          bin.name == self.cargo_package_settings.name || bin.name.as_str() == default_run;
-        binaries.push(BundleBinary::with_path(name, is_main, bin.path.clone()))
+        let is_main = bin.name == self.cargo_package_settings.name || bin.name == default_run;
+        binaries.push(BundleBinary::with_path(
+          bin.name.clone(),
+          is_main,
+          bin.path.clone(),
+        ))
       }
     }
 
-    let mut bins_path = tauri_dir().to_path_buf();
-    bins_path.push("src/bin");
-    if let Ok(fs_bins) = std::fs::read_dir(bins_path) {
-      for entry in fs_bins {
-        let path = entry?.path();
-        if let Some(name) = path.file_stem() {
-          let bin_exists = binaries.iter().any(|bin| {
-            bin.name() == name || path.ends_with(bin.src_path().unwrap_or(&"".to_string()))
-          });
-          if !bin_exists {
-            binaries.push(BundleBinary::new(
-              format!("{}{}", name.to_string_lossy(), &binary_extension),
-              false,
-            ))
-          }
-        }
+    let tauri_dir = tauri_dir();
+
+    let mut binaries_paths = std::fs::read_dir(tauri_dir.join("src/bin"))
+      .map(|dir| {
+        dir
+          .into_iter()
+          .flatten()
+          .map(|entry| {
+            (
+              entry
+                .path()
+                .file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .into_owned(),
+              entry.path(),
+            )
+          })
+          .collect::<Vec<_>>()
+      })
+      .unwrap_or_default();
+
+    if !binaries_paths
+      .iter()
+      .any(|(_name, path)| path == Path::new("src/main.rs"))
+      && tauri_dir.join("src/main.rs").exists()
+    {
+      binaries_paths.push((
+        self.cargo_package_settings.name.clone(),
+        tauri_dir.join("src/main.rs"),
+      ));
+    }
+
+    for (name, path) in binaries_paths {
+      // see https://github.com/tauri-apps/tauri/pull/10977#discussion_r1759742414
+      let bin_exists = binaries
+        .iter()
+        .any(|bin| bin.name() == name || path.ends_with(bin.src_path().unwrap_or(&"".to_string())));
+      if !bin_exists {
+        binaries.push(BundleBinary::new(name, false))
       }
     }
 
     if let Some(default_run) = self.package_settings.default_run.as_ref() {
-      if !binaries.iter_mut().any(|bin| bin.name() == default_run) {
-        binaries.push(BundleBinary::new(
-          format!("{}{}", default_run, binary_extension),
-          true,
-        ));
+      if let Some(binary) = binaries.iter_mut().find(|bin| bin.name() == default_run) {
+        binary.set_main(true);
+      } else {
+        binaries.push(BundleBinary::new(default_run.clone(), true));
       }
     }
 
     match binaries.len() {
       0 => binaries.push(BundleBinary::new(
-        format!("{}{}", self.cargo_package_settings.name, &binary_extension),
+        self.cargo_package_settings.name.clone(),
         true,
       )),
       1 => binaries.get_mut(0).unwrap().set_main(true),
@@ -977,8 +1004,9 @@ impl AppSettings for RustAppSettings {
 
 impl RustAppSettings {
   pub fn new(config: &Config, manifest: Manifest, target: Option<String>) -> crate::Result<Self> {
+    let tauri_dir = tauri_dir();
     let cargo_settings =
-      CargoSettings::load(tauri_dir()).with_context(|| "failed to load cargo settings")?;
+      CargoSettings::load(tauri_dir).with_context(|| "failed to load cargo settings")?;
     let cargo_package_settings = match &cargo_settings.package {
       Some(package_info) => package_info.clone(),
       None => {
@@ -1052,7 +1080,7 @@ impl RustAppSettings {
       default_run: cargo_package_settings.default_run.clone(),
     };
 
-    let cargo_config = CargoConfig::load(tauri_dir())?;
+    let cargo_config = CargoConfig::load(tauri_dir)?;
 
     let target_triple = target.unwrap_or_else(|| {
       cargo_config
@@ -1181,7 +1209,7 @@ pub fn get_profile_dir(options: &Options) -> &str {
   }
 }
 
-#[allow(unused_variables)]
+#[allow(unused_variables, deprecated)]
 fn tauri_config_to_bundle_settings(
   settings: &RustAppSettings,
   features: &[String],
@@ -1195,18 +1223,6 @@ fn tauri_config_to_bundle_settings(
     .lock()
     .unwrap()
     .all_enabled_features(features);
-
-  #[cfg(windows)]
-  let windows_icon_path = PathBuf::from(
-    config
-      .icon
-      .iter()
-      .find(|i| i.ends_with(".ico"))
-      .cloned()
-      .expect("the bundle config must have a `.ico` icon"),
-  );
-  #[cfg(not(windows))]
-  let windows_icon_path = PathBuf::from("");
 
   #[allow(unused_mut)]
   let mut resources = config
@@ -1337,6 +1353,7 @@ fn tauri_config_to_bundle_settings(
       } else {
         Some(depends_deb)
       },
+      recommends: config.linux.deb.recommends,
       provides: config.linux.deb.provides,
       conflicts: config.linux.deb.conflicts,
       replaces: config.linux.deb.replaces,
@@ -1359,6 +1376,7 @@ fn tauri_config_to_bundle_settings(
       } else {
         Some(depends_rpm)
       },
+      recommends: config.linux.rpm.recommends,
       provides: config.linux.rpm.provides,
       conflicts: config.linux.rpm.conflicts,
       obsoletes: config.linux.rpm.obsoletes,
@@ -1419,7 +1437,7 @@ fn tauri_config_to_bundle_settings(
       certificate_thumbprint: config.windows.certificate_thumbprint,
       wix: config.windows.wix.map(wix_settings),
       nsis: config.windows.nsis.map(nsis_settings),
-      icon_path: windows_icon_path,
+      icon_path: PathBuf::new(),
       webview_install_mode: config.windows.webview_install_mode,
       allow_downgrades: config.windows.allow_downgrades,
       sign_command: config.windows.sign_command.map(custom_sign_settings),

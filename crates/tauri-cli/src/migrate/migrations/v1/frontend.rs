@@ -68,7 +68,7 @@ const MODULES_MAP: phf::Map<&str, &str> = phf::phf_map! {
 const JS_EXTENSIONS: &[&str] = &["js", "mjs", "jsx", "ts", "mts", "tsx", "svelte", "vue"];
 
 /// Returns a list of migrated plugins
-pub fn migrate(app_dir: &Path) -> Result<Vec<String>> {
+pub fn migrate(frontend_dir: &Path) -> Result<Vec<String>> {
   let mut new_npm_packages = Vec::new();
   let mut new_plugins = Vec::new();
   let mut npm_packages_to_remove = Vec::new();
@@ -84,14 +84,14 @@ pub fn migrate(app_dir: &Path) -> Result<Vec<String>> {
     )
   };
 
-  let pm = PackageManager::from_project(app_dir)
+  let pm = PackageManager::from_project(frontend_dir)
     .into_iter()
     .next()
     .unwrap_or(PackageManager::Npm);
 
   for pkg in ["@tauri-apps/cli", "@tauri-apps/api"] {
     let version = pm
-      .current_package_version(pkg, app_dir)
+      .current_package_version(pkg, frontend_dir)
       .unwrap_or_default()
       .unwrap_or_default();
     if version.starts_with('1') {
@@ -99,7 +99,7 @@ pub fn migrate(app_dir: &Path) -> Result<Vec<String>> {
     }
   }
 
-  for entry in walk_builder(app_dir).build().flatten() {
+  for entry in walk_builder(frontend_dir).build().flatten() {
     if entry.file_type().map(|t| t.is_file()).unwrap_or_default() {
       let path = entry.path();
       let ext = path.extension().unwrap_or_default();
@@ -122,14 +122,14 @@ pub fn migrate(app_dir: &Path) -> Result<Vec<String>> {
   if !npm_packages_to_remove.is_empty() {
     npm_packages_to_remove.sort();
     npm_packages_to_remove.dedup();
-    pm.remove(&npm_packages_to_remove, app_dir)
+    pm.remove(&npm_packages_to_remove, frontend_dir)
       .context("Error removing npm packages")?;
   }
 
   if !new_npm_packages.is_empty() {
     new_npm_packages.sort();
     new_npm_packages.dedup();
-    pm.install(&new_npm_packages, app_dir)
+    pm.install(&new_npm_packages, frontend_dir)
       .context("Error installing new npm packages")?;
   }
 
@@ -522,7 +522,7 @@ function App() {
   const [name, setName] = useState("");
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    // Learn more about Tauri commands at https://v2.tauri.app/develop/calling-rust/#commands
     setGreetMsg(await invoke("greet", { name }));
     await open();
     await dialog.save();
@@ -596,7 +596,7 @@ function App() {
   const [name, setName] = useState("");
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    // Learn more about Tauri commands at https://v2.tauri.app/develop/calling-rust/#commands
     setGreetMsg(await invoke("greet", { name }));
     await open();
     await dialog.save();

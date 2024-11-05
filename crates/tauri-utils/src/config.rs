@@ -212,7 +212,7 @@ impl schemars::JsonSchema for BundleTarget {
   fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
     let any_of = vec![
       schemars::schema::SchemaObject {
-        enum_values: Some(vec!["all".into()]),
+        const_value: Some("all".into()),
         metadata: Some(Box::new(schemars::schema::Metadata {
           description: Some("Bundle all targets.".to_owned()),
           ..Default::default()
@@ -307,7 +307,7 @@ impl BundleTarget {
 
 /// Configuration for AppImage bundles.
 ///
-/// See more: <https://tauri.app/v1/api/config#appimageconfig>
+/// See more: <https://v2.tauri.app/reference/config/#appimageconfig>
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -323,7 +323,7 @@ pub struct AppImageConfig {
 
 /// Configuration for Debian (.deb) bundles.
 ///
-/// See more: <https://tauri.app/v1/api/config#debconfig>
+/// See more: <https://v2.tauri.app/reference/config/#debconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -331,6 +331,8 @@ pub struct AppImageConfig {
 pub struct DebConfig {
   /// The list of deb dependencies your application relies on.
   pub depends: Option<Vec<String>>,
+  /// The list of deb dependencies your application recommends.
+  pub recommends: Option<Vec<String>>,
   /// The list of dependencies the package provides.
   pub provides: Option<Vec<String>>,
   /// The list of package conflicts.
@@ -373,7 +375,7 @@ pub struct DebConfig {
 
 /// Configuration for Linux bundles.
 ///
-/// See more: <https://tauri.app/v1/api/config#linuxconfig>
+/// See more: <https://v2.tauri.app/reference/config/#linuxconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -398,13 +400,15 @@ pub struct LinuxConfig {
 pub struct RpmConfig {
   /// The list of RPM dependencies your application relies on.
   pub depends: Option<Vec<String>>,
+  /// The list of RPM dependencies your application recommends.
+  pub recommends: Option<Vec<String>>,
   /// The list of RPM dependencies your application provides.
   pub provides: Option<Vec<String>>,
   /// The list of RPM dependencies your application conflicts with. They must not be present
   /// in order for the package to be installed.
   pub conflicts: Option<Vec<String>>,
   /// The list of RPM dependencies your application supersedes - if this package is installed,
-  /// packages listed as “obsoletes” will be automatically removed (if they are present).
+  /// packages listed as "obsoletes" will be automatically removed (if they are present).
   pub obsoletes: Option<Vec<String>>,
   /// The RPM release tag.
   #[serde(default = "default_release")]
@@ -442,6 +446,7 @@ impl Default for RpmConfig {
   fn default() -> Self {
     Self {
       depends: None,
+      recommends: None,
       provides: None,
       conflicts: None,
       obsoletes: None,
@@ -485,7 +490,7 @@ pub struct Size {
 
 /// Configuration for Apple Disk Image (.dmg) bundles.
 ///
-/// See more: <https://tauri.app/v1/api/config#dmgconfig>
+/// See more: <https://v2.tauri.app/reference/config/#dmgconfig>
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -549,7 +554,7 @@ where
 
 /// Configuration for the macOS bundles.
 ///
-/// See more: <https://tauri.app/v1/api/config#macconfig>
+/// See more: <https://v2.tauri.app/reference/config/#macconfig>
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -622,7 +627,7 @@ fn ios_minimum_system_version() -> String {
 
 /// Configuration for a target language for the WiX build.
 ///
-/// See more: <https://tauri.app/v1/api/config#wixlanguageconfig>
+/// See more: <https://v2.tauri.app/reference/config/#wixlanguageconfig>
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -653,11 +658,30 @@ impl Default for WixLanguage {
 
 /// Configuration for the MSI bundle using WiX.
 ///
-/// See more: <https://tauri.app/v1/api/config#wixconfig>
+/// See more: <https://v2.tauri.app/reference/config/#wixconfig>
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct WixConfig {
+  /// MSI installer version in the format `major.minor.patch.build` (build is optional).
+  ///
+  /// Because a valid version is required for MSI installer, it will be derived from [`Config::version`] if this field is not set.
+  ///
+  /// The first field is the major version and has a maximum value of 255. The second field is the minor version and has a maximum value of 255.
+  /// The third and foruth fields have a maximum value of 65,535.
+  ///
+  /// See <https://learn.microsoft.com/en-us/windows/win32/msi/productversion> for more info.
+  pub version: Option<String>,
+  /// A GUID upgrade code for MSI installer. This code **_must stay the same across all of your updates_**,
+  /// otherwise, Windows will treat your update as a different app and your users will have duplicate versions of your app.
+  ///
+  /// By default, tauri generates this code by generating a Uuid v5 using the string `<productName>.exe.app.x64` in the DNS namespace.
+  /// You can use Tauri's CLI to generate and print this code for you, run `tauri inspect wix-upgrade-code`.
+  ///
+  /// It is recommended that you set this value in your tauri config file to avoid accidental changes in your upgrade code
+  /// whenever you want to change your product name.
+  #[serde(alias = "upgrade-code")]
+  pub upgrade_code: Option<uuid::Uuid>,
   /// The installer languages to build. See <https://docs.microsoft.com/en-us/windows/win32/msi/localizing-the-error-and-actiontext-tables>.
   #[serde(default)]
   pub language: WixLanguage,
@@ -783,7 +807,7 @@ pub struct NsisConfig {
   /// A key-value pair where the key is the language and the
   /// value is the path to a custom `.nsh` file that holds the translated text for tauri's custom messages.
   ///
-  /// See <https://github.com/tauri-apps/tauri/blob/dev/crates/tauri-bundler/src/bundle/windows/templates/nsis-languages/English.nsh> for an example `.nsh` file.
+  /// See <https://github.com/tauri-apps/tauri/blob/dev/crates/tauri-bundler/src/bundle/windows/nsis/languages/English.nsh> for an example `.nsh` file.
   ///
   /// **Note**: the key must be a valid NSIS language and it must be added to [`NsisConfig`] languages array,
   pub custom_language_files: Option<HashMap<String, PathBuf>>,
@@ -848,7 +872,7 @@ pub struct NsisConfig {
 /// Install modes for the Webview2 runtime.
 /// Note that for the updater bundle [`Self::DownloadBootstrapper`] is used.
 ///
-/// For more information see <https://tauri.app/v1/guides/building/windows>.
+/// For more information see <https://v2.tauri.app/distribute/windows-installer/#webview2-installation-options>.
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase", deny_unknown_fields)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -926,7 +950,7 @@ pub enum CustomSignCommandConfig {
 
 /// Windows bundler configuration.
 ///
-/// See more: <https://tauri.app/v1/api/config#windowsconfig>
+/// See more: <https://v2.tauri.app/reference/config/#windowsconfig>
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -1058,7 +1082,7 @@ pub struct FileAssociation {
   pub mime_type: Option<String>,
 }
 
-/// File association
+/// Deep link protocol configuration.
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -1126,7 +1150,7 @@ pub enum V1Compatible {
 
 /// Configuration for tauri-bundler.
 ///
-/// See more: <https://tauri.app/v1/api/config#bundleconfig>
+/// See more: <https://v2.tauri.app/reference/config/#bundleconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -1142,7 +1166,9 @@ pub struct BundleConfig {
   /// Produce updaters and their signatures or not
   pub create_updater_artifacts: Updater,
   /// The application's publisher. Defaults to the second element in the identifier string.
-  /// Currently maps to the Manufacturer property of the Windows Installer.
+  ///
+  /// Currently maps to the Manufacturer property of the Windows Installer
+  /// and the Maintainer field of debian packages if the Cargo.toml does not have the authors field.
   pub publisher: Option<String>,
   /// A url to the home page of your application. If unset, will
   /// fallback to `homepage` defined in `Cargo.toml`.
@@ -1277,7 +1303,7 @@ impl Default for PreventOverflowMarginConfig {
 
 /// The window configuration object.
 ///
-/// See more: <https://tauri.app/v1/api/config#windowconfig>
+/// See more: <https://v2.tauri.app/reference/config/#windowconfig>
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -1286,6 +1312,12 @@ pub struct WindowConfig {
   /// The window identifier. It must be alphanumeric.
   #[serde(default = "default_window_label")]
   pub label: String,
+  /// Whether Tauri should create this window at app startup or not.
+  ///
+  /// When this is set to `false` you must manually grab the config object via `app.config().app.windows`
+  /// and create it with [`WebviewWindowBuilder::from_config`](https://docs.rs/tauri/2.0.0-rc/tauri/webview/struct.WebviewWindowBuilder.html#method.from_config).
+  #[serde(default = "default_true")]
+  pub create: bool,
   /// The window webview URL.
   #[serde(default)]
   pub url: WebviewUrl,
@@ -1477,6 +1509,14 @@ pub struct WindowConfig {
   /// - **Android / iOS**: Unsupported.
   #[serde(default)]
   pub zoom_hotkeys_enabled: bool,
+  /// Whether browser extensions can be installed for the webview process
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Enables the WebView2 environment's [`AreBrowserExtensionsEnabled`](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/winrt/microsoft_web_webview2_core/corewebview2environmentoptions?view=webview2-winrt-1.0.2739.15#arebrowserextensionsenabled)
+  /// - **MacOS / Linux / iOS / Android** - Unsupported.
+  #[serde(default)]
+  pub browser_extensions_enabled: bool,
 }
 
 impl Default for WindowConfig {
@@ -1484,6 +1524,7 @@ impl Default for WindowConfig {
     Self {
       label: default_window_label(),
       url: WebviewUrl::default(),
+      create: true,
       user_agent: None,
       drag_drop_enabled: true,
       center: false,
@@ -1524,6 +1565,7 @@ impl Default for WindowConfig {
       parent: None,
       proxy_url: None,
       zoom_hotkeys_enabled: false,
+      browser_extensions_enabled: false,
     }
   }
 }
@@ -1750,7 +1792,7 @@ impl FsScope {
 
 /// Config for the asset custom protocol.
 ///
-/// See more: <https://tauri.app/v1/api/config#assetprotocolconfig>
+/// See more: <https://v2.tauri.app/reference/config/#assetprotocolconfig>
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -1765,7 +1807,7 @@ pub struct AssetProtocolConfig {
 
 /// Security configuration.
 ///
-/// See more: <https://tauri.app/v1/api/config#securityconfig>
+/// See more: <https://v2.tauri.app/reference/config/#securityconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -1859,13 +1901,13 @@ impl Default for PatternKind {
 
 /// The App configuration object.
 ///
-/// See more: <https://tauri.app/v1/api/config#appconfig>
+/// See more: <https://v2.tauri.app/reference/config/#appconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct AppConfig {
-  /// The windows configuration.
+  /// The app windows configuration.
   #[serde(default)]
   pub windows: Vec<WindowConfig>,
   /// Security configuration.
@@ -1920,7 +1962,7 @@ impl AppConfig {
 
 /// Configuration for application tray icon.
 ///
-/// See more: <https://tauri.app/v1/api/config#trayiconconfig>
+/// See more: <https://v2.tauri.app/reference/config/#trayiconconfig>
 #[skip_serializing_none]
 #[derive(Debug, Default, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -2081,7 +2123,7 @@ pub enum HookCommand {
 
 /// The Build configuration object.
 ///
-/// See more: <https://tauri.app/v1/api/config#buildconfig>
+/// See more: <https://v2.tauri.app/reference/config/#buildconfig>
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -2200,7 +2242,7 @@ where
 /// configure the bundler and define a tray icon.
 ///
 /// The configuration file is generated by the
-/// [`tauri init`](https://tauri.app/v1/api/cli#init) command that lives in
+/// [`tauri init`](https://v2.tauri.app/reference/cli/#init) command that lives in
 /// your Tauri application source directory (src-tauri).
 ///
 /// Once generated, you may modify it at will to customize your Tauri application.
@@ -2272,6 +2314,9 @@ pub struct Config {
   #[serde(alias = "product-name")]
   #[cfg_attr(feature = "schema", validate(regex(pattern = "^[^/\\:*?\"<>|]+$")))]
   pub product_name: Option<String>,
+  /// App main binary filename. Defaults to the name of your cargo crate.
+  #[serde(alias = "main-binary-name")]
+  pub main_binary_name: Option<String>,
   /// App version. It is a semver version number or a path to a `package.json` file containing the `version` field. If removed the version number from `Cargo.toml` is used.
   ///
   /// By default version 1.0 is used on Android.
@@ -2280,9 +2325,8 @@ pub struct Config {
   /// The application identifier in reverse domain name notation (e.g. `com.tauri.example`).
   /// This string must be unique across applications since it is used in system configurations like
   /// the bundle ID and path to the webview data directory.
-  /// This string must contain only alphanumeric characters (A–Z, a–z, and 0–9), hyphens (-),
+  /// This string must contain only alphanumeric characters (A-Z, a-z, and 0-9), hyphens (-),
   /// and periods (.).
-  #[serde(default)]
   pub identifier: String,
   /// The App configuration.
   #[serde(default)]
@@ -2300,7 +2344,7 @@ pub struct Config {
 
 /// The plugin configs holds a HashMap mapping a plugin name to its configuration object.
 ///
-/// See more: <https://tauri.app/v1/api/config#pluginconfig>
+/// See more: <https://v2.tauri.app/reference/config/#pluginconfig>
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 pub struct PluginConfig(pub HashMap<String, JsonValue>);
@@ -2477,6 +2521,7 @@ mod build {
   impl ToTokens for WindowConfig {
     fn to_tokens(&self, tokens: &mut TokenStream) {
       let label = str_lit(&self.label);
+      let create = &self.create;
       let url = &self.url;
       let user_agent = opt_str_lit(self.user_agent.as_ref());
       let drag_drop_enabled = self.drag_drop_enabled;
@@ -2518,12 +2563,14 @@ mod build {
       let incognito = self.incognito;
       let parent = opt_str_lit(self.parent.as_ref());
       let zoom_hotkeys_enabled = self.zoom_hotkeys_enabled;
+      let browser_extensions_enabled = self.browser_extensions_enabled;
 
       literal_struct!(
         tokens,
         ::tauri::utils::config::WindowConfig,
         label,
         url,
+        create,
         user_agent,
         drag_drop_enabled,
         center,
@@ -2563,7 +2610,8 @@ mod build {
         window_effects,
         incognito,
         parent,
-        zoom_hotkeys_enabled
+        zoom_hotkeys_enabled,
+        browser_extensions_enabled
       );
     }
   }
@@ -2895,6 +2943,7 @@ mod build {
     fn to_tokens(&self, tokens: &mut TokenStream) {
       let schema = quote!(None);
       let product_name = opt_str_lit(self.product_name.as_ref());
+      let main_binary_name = opt_str_lit(self.main_binary_name.as_ref());
       let version = opt_str_lit(self.version.as_ref());
       let identifier = str_lit(&self.identifier);
       let app = &self.app;
@@ -2907,6 +2956,7 @@ mod build {
         ::tauri::utils::config::Config,
         schema,
         product_name,
+        main_binary_name,
         version,
         identifier,
         app,

@@ -68,6 +68,10 @@ export interface MenuOptions {
 
 /** A type that is either a menu bar on the window
  * on Windows and Linux or as a global menu in the menubar on macOS.
+ *
+ * #### Platform-specific:
+ *
+ * - **macOS**: if using {@linkcode Menu} for the global menubar, it can only contain {@linkcode Submenu}s.
  */
 export class Menu extends MenuItemBase {
   /** @ignore */
@@ -90,7 +94,7 @@ export class Menu extends MenuItemBase {
   /**
    * Add a menu item to the end of this menu.
    *
-   * ## Platform-specific:
+   * #### Platform-specific:
    *
    * - **macOS:** Only {@linkcode Submenu}s can be added to a {@linkcode Menu}.
    */
@@ -119,7 +123,7 @@ export class Menu extends MenuItemBase {
   /**
    * Add a menu item to the beginning of this menu.
    *
-   * ## Platform-specific:
+   * #### Platform-specific:
    *
    * - **macOS:** Only {@linkcode Submenu}s can be added to a {@linkcode Menu}.
    */
@@ -148,7 +152,7 @@ export class Menu extends MenuItemBase {
   /**
    * Add a menu item to the specified position in this menu.
    *
-   * ## Platform-specific:
+   * #### Platform-specific:
    *
    * - **macOS:** Only {@linkcode Submenu}s can be added to a {@linkcode Menu}.
    */

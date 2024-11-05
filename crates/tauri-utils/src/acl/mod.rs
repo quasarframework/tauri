@@ -22,7 +22,7 @@
 //! [Struct Update Syntax]: https://doc.rust-lang.org/book/ch05-01-defining-structs.html#creating-instances-from-other-instances-with-struct-update-syntax
 
 use serde::{Deserialize, Serialize};
-use std::{num::NonZeroU64, str::FromStr, sync::Arc};
+use std::{num::NonZeroU64, path::PathBuf, str::FromStr, sync::Arc};
 use thiserror::Error;
 use url::Url;
 
@@ -30,10 +30,16 @@ use crate::platform::Target;
 
 pub use self::{identifier::*, value::*};
 
+/// Known foldername of the permission schema files
+pub const PERMISSION_SCHEMAS_FOLDER_NAME: &str = "schemas";
 /// Known filename of the permission schema JSON file
 pub const PERMISSION_SCHEMA_FILE_NAME: &str = "schema.json";
 /// Known ACL key for the app permissions.
 pub const APP_ACL_KEY: &str = "__app-acl__";
+/// Known acl manifests file
+pub const ACL_MANIFESTS_FILE_NAME: &str = "acl-manifests.json";
+/// Known capabilityies file
+pub const CAPABILITIES_FILE_NAME: &str = "capabilities.json";
 
 #[cfg(feature = "build")]
 pub mod build;
@@ -41,6 +47,8 @@ pub mod capability;
 pub mod identifier;
 pub mod manifest;
 pub mod resolved;
+#[cfg(feature = "schema")]
+pub mod schema;
 pub mod value;
 
 /// Possible errors while processing ACL files.
@@ -63,16 +71,20 @@ pub enum Error {
   LinksName,
 
   /// IO error while reading a file
-  #[error("failed to read file: {0}")]
-  ReadFile(std::io::Error),
+  #[error("failed to read file '{}': {}", _1.display(), _0)]
+  ReadFile(std::io::Error, PathBuf),
 
   /// IO error while writing a file
-  #[error("failed to write file: {0}")]
-  WriteFile(std::io::Error),
+  #[error("failed to write file '{}': {}", _1.display(), _0)]
+  WriteFile(std::io::Error, PathBuf),
 
   /// IO error while creating a file
-  #[error("failed to create file: {0}")]
-  CreateFile(std::io::Error),
+  #[error("failed to create file '{}': {}", _1.display(), _0)]
+  CreateFile(std::io::Error, PathBuf),
+
+  /// IO error while creating a dir
+  #[error("failed to create dir '{}': {}", _1.display(), _0)]
+  CreateDir(std::io::Error, PathBuf),
 
   /// [`cargo_metadata`] was not able to complete successfully
   #[cfg(feature = "build")]
@@ -126,6 +138,13 @@ pub enum Error {
     /// Permission identifier.
     permission: String,
   },
+
+  /// Capability with the given identifier already exists.
+  #[error("capability with identifier `{identifier}` already exists")]
+  CapabilityAlreadyExists {
+    /// Capability identifier.
+    identifier: String,
+  },
 }
 
 /// Allowed and denied commands inside a permission.
@@ -178,7 +197,7 @@ impl Scopes {
 /// It can enable commands to be accessible in the frontend of the application.
 ///
 /// If the scope is defined it can be used to fine grain control the access of individual or multiple commands.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 pub struct Permission {
   /// The version of the permission.
@@ -205,6 +224,17 @@ pub struct Permission {
   /// Target platforms this permission applies. By default all platforms are affected by this permission.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub platforms: Option<Vec<Target>>,
+}
+
+impl Permission {
+  /// Whether this permission should be active based on the platform target or not.
+  pub fn is_active(&self, target: &Target) -> bool {
+    self
+      .platforms
+      .as_ref()
+      .map(|platforms| platforms.contains(target))
+      .unwrap_or(true)
+  }
 }
 
 /// A set of direct permissions grouped together under a new name.
@@ -244,7 +274,7 @@ impl FromStr for RemoteUrlPattern {
     {
       init.pathname.replace("*".to_string());
     }
-    let pattern = urlpattern::UrlPattern::parse(init)?;
+    let pattern = urlpattern::UrlPattern::parse(init, Default::default())?;
     Ok(Self(Arc::new(pattern), s.to_string()))
   }
 }

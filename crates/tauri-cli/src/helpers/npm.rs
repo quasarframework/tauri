@@ -14,6 +14,7 @@ pub enum PackageManager {
   Yarn,
   YarnBerry,
   Bun,
+  Deno,
 }
 
 impl Display for PackageManager {
@@ -27,6 +28,7 @@ impl Display for PackageManager {
         PackageManager::Yarn => "yarn",
         PackageManager::YarnBerry => "yarn berry",
         PackageManager::Bun => "bun",
+        PackageManager::Deno => "deno",
       }
     )
   }
@@ -34,44 +36,24 @@ impl Display for PackageManager {
 
 impl PackageManager {
   pub fn from_project<P: AsRef<Path>>(path: P) -> Vec<Self> {
-    let mut use_npm = false;
-    let mut use_pnpm = false;
-    let mut use_yarn = false;
-    let mut use_bun = false;
+    let mut found = Vec::new();
 
     if let Ok(entries) = std::fs::read_dir(path) {
       for entry in entries.flatten() {
         let path = entry.path();
         let name = path.file_name().unwrap().to_string_lossy();
         if name.as_ref() == "package-lock.json" {
-          use_npm = true;
+          found.push(PackageManager::Npm);
         } else if name.as_ref() == "pnpm-lock.yaml" {
-          use_pnpm = true;
+          found.push(PackageManager::Pnpm);
         } else if name.as_ref() == "yarn.lock" {
-          use_yarn = true;
+          found.push(PackageManager::Yarn);
         } else if name.as_ref() == "bun.lockb" {
-          use_bun = true;
+          found.push(PackageManager::Bun);
+        } else if name.as_ref() == "deno.lock" {
+          found.push(PackageManager::Deno);
         }
       }
-    }
-
-    if !use_npm && !use_pnpm && !use_yarn && !use_bun {
-      return Vec::new();
-    }
-
-    let mut found = Vec::new();
-
-    if use_npm {
-      found.push(PackageManager::Npm);
-    }
-    if use_pnpm {
-      found.push(PackageManager::Pnpm);
-    }
-    if use_yarn {
-      found.push(PackageManager::Yarn);
-    }
-    if use_bun {
-      found.push(PackageManager::Bun);
     }
 
     found
@@ -84,10 +66,15 @@ impl PackageManager {
       PackageManager::Npm => cross_command("npm"),
       PackageManager::Pnpm => cross_command("pnpm"),
       PackageManager::Bun => cross_command("bun"),
+      PackageManager::Deno => cross_command("deno"),
     }
   }
 
-  pub fn install<P: AsRef<Path>>(&self, dependencies: &[String], app_dir: P) -> crate::Result<()> {
+  pub fn install<P: AsRef<Path>>(
+    &self,
+    dependencies: &[String],
+    frontend_dir: P,
+  ) -> crate::Result<()> {
     let dependencies_str = if dependencies.len() > 1 {
       "dependencies"
     } else {
@@ -106,7 +93,7 @@ impl PackageManager {
       .cross_command()
       .arg("add")
       .args(dependencies)
-      .current_dir(app_dir)
+      .current_dir(frontend_dir)
       .status()
       .with_context(|| format!("failed to run {self}"))?;
 
@@ -117,7 +104,11 @@ impl PackageManager {
     Ok(())
   }
 
-  pub fn remove<P: AsRef<Path>>(&self, dependencies: &[String], app_dir: P) -> crate::Result<()> {
+  pub fn remove<P: AsRef<Path>>(
+    &self,
+    dependencies: &[String],
+    frontend_dir: P,
+  ) -> crate::Result<()> {
     let dependencies_str = if dependencies.len() > 1 {
       "dependencies"
     } else {
@@ -140,7 +131,7 @@ impl PackageManager {
         "remove"
       })
       .args(dependencies)
-      .current_dir(app_dir)
+      .current_dir(frontend_dir)
       .status()
       .with_context(|| format!("failed to run {self}"))?;
 
@@ -154,7 +145,7 @@ impl PackageManager {
   pub fn current_package_version<P: AsRef<Path>>(
     &self,
     name: &str,
-    app_dir: P,
+    frontend_dir: P,
   ) -> crate::Result<Option<String>> {
     let (output, regex) = match self {
       PackageManager::Yarn => (
@@ -162,7 +153,7 @@ impl PackageManager {
           .args(["list", "--pattern"])
           .arg(name)
           .args(["--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),
@@ -171,35 +162,26 @@ impl PackageManager {
           .arg("info")
           .arg(name)
           .arg("--json")
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         Some(regex::Regex::new("\"Version\":\"([\\da-zA-Z\\-\\.]+)\"").unwrap()),
-      ),
-      PackageManager::Npm => (
-        cross_command("npm")
-          .arg("list")
-          .arg(name)
-          .args(["version", "--depth", "0"])
-          .current_dir(app_dir)
-          .output()?,
-        None,
       ),
       PackageManager::Pnpm => (
         cross_command("pnpm")
           .arg("list")
           .arg(name)
           .args(["--parseable", "--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),
-      // Bun doesn't support `list` command
-      PackageManager::Bun => (
+      // Bun and Deno don't support `list` command
+      PackageManager::Npm | PackageManager::Bun | PackageManager::Deno => (
         cross_command("npm")
           .arg("list")
           .arg(name)
           .args(["version", "--depth", "0"])
-          .current_dir(app_dir)
+          .current_dir(frontend_dir)
           .output()?,
         None,
       ),

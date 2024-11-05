@@ -4,7 +4,7 @@
 
 use crate::{
   helpers::{
-    app_paths::{app_dir, tauri_dir},
+    app_paths::{frontend_dir, tauri_dir},
     command_env,
     config::{
       get as get_config, reload as reload_config, BeforeDevCommand, ConfigHandle, FrontendDist,
@@ -140,7 +140,7 @@ pub fn setup(interface: &AppInterface, options: &mut Options, config: ConfigHand
         (Some(script), cwd.map(Into::into), wait)
       }
     };
-    let cwd = script_cwd.unwrap_or_else(|| app_dir().clone());
+    let cwd = script_cwd.unwrap_or_else(|| frontend_dir().clone());
     if let Some(before_dev) = script {
       log::info!(action = "Running"; "BeforeDevCommand (`{}`)", before_dev);
       let mut env = command_env(true);

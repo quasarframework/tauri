@@ -29,8 +29,8 @@ use crate::{
   app::{UriSchemeResponder, WebviewEvent},
   event::{EmitArgs, EventTarget},
   ipc::{
-    CallbackFn, CommandArg, CommandItem, Invoke, InvokeBody, InvokeError, InvokeMessage,
-    InvokeResolver, Origin, OwnedInvokeResponder,
+    CallbackFn, CommandArg, CommandItem, CommandScope, GlobalScope, Invoke, InvokeBody,
+    InvokeError, InvokeMessage, InvokeResolver, Origin, OwnedInvokeResponder, ScopeObject,
   },
   manager::AppManager,
   sealed::{ManagerBase, RuntimeOrDispatch},
@@ -49,7 +49,7 @@ pub(crate) type WebResourceRequestHandler =
   dyn Fn(http::Request<Vec<u8>>, &mut http::Response<Cow<'static, [u8]>>) + Send + Sync;
 pub(crate) type NavigationHandler = dyn Fn(&Url) -> bool + Send;
 pub(crate) type UriSchemeProtocolHandler =
-  Box<dyn Fn(http::Request<Vec<u8>>, UriSchemeResponder) + Send + Sync>;
+  Box<dyn Fn(&str, http::Request<Vec<u8>>, UriSchemeResponder) + Send + Sync>;
 pub(crate) type OnPageLoad<R> = dyn Fn(Webview<R>, PageLoadPayload<'_>) + Send + Sync + 'static;
 
 pub(crate) type DownloadHandler<R> = dyn Fn(Webview<R>, DownloadEvent<'_>) -> bool + Send + Sync;
@@ -115,10 +115,8 @@ impl<'a> PageLoadPayload<'a> {
 /// # Stability
 ///
 /// This struct is **NOT** part of the public stable API and is only meant to be used
-/// by internal code and external testing/fuzzing tools. If not used with feature `unstable`, this
-/// struct is marked `#[non_exhaustive]` and is non-constructable externally.
+/// by internal code and external testing/fuzzing tools or custom invoke systems.
 #[derive(Debug)]
-#[cfg_attr(not(feature = "test"), non_exhaustive)]
 pub struct InvokeRequest {
   /// The invoke command.
   pub cmd: String,
@@ -179,7 +177,7 @@ impl PlatformWebview {
   /// [WKWebView]: https://developer.apple.com/documentation/webkit/wkwebview
   #[cfg(any(target_os = "macos", target_os = "ios"))]
   #[cfg_attr(docsrs, doc(cfg(any(target_os = "macos", target_os = "ios"))))]
-  pub fn inner(&self) -> cocoa::base::id {
+  pub fn inner(&self) -> *mut std::ffi::c_void {
     self.0.webview
   }
 
@@ -188,7 +186,7 @@ impl PlatformWebview {
   /// [controller]: https://developer.apple.com/documentation/webkit/wkusercontentcontroller
   #[cfg(any(target_os = "macos", target_os = "ios"))]
   #[cfg_attr(docsrs, doc(cfg(any(target_os = "macos", target_os = "ios"))))]
-  pub fn controller(&self) -> cocoa::base::id {
+  pub fn controller(&self) -> *mut std::ffi::c_void {
     self.0.manager
   }
 
@@ -197,7 +195,7 @@ impl PlatformWebview {
   /// [NSWindow]: https://developer.apple.com/documentation/appkit/nswindow
   #[cfg(target_os = "macos")]
   #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
-  pub fn ns_window(&self) -> cocoa::base::id {
+  pub fn ns_window(&self) -> *mut std::ffi::c_void {
     self.0.ns_window
   }
 
@@ -206,7 +204,7 @@ impl PlatformWebview {
   /// [UIViewController]: https://developer.apple.com/documentation/uikit/uiviewcontroller
   #[cfg(target_os = "ios")]
   #[cfg_attr(docsrs, doc(cfg(target_os = "ios")))]
-  pub fn view_controller(&self) -> cocoa::base::id {
+  pub fn view_controller(&self) -> *mut std::ffi::c_void {
     self.0.view_controller
   }
 
@@ -756,6 +754,13 @@ fn main() {
     self
   }
 
+  /// Whether the webview should be focused or not.
+  #[must_use]
+  pub fn focused(mut self, focus: bool) -> Self {
+    self.webview_attributes.focus = focus;
+    self
+  }
+
   /// Sets the webview to automatically grow and shrink its size and position when the parent window resizes.
   #[must_use]
   pub fn auto_resize(mut self) -> Self {
@@ -777,24 +782,36 @@ fn main() {
     self.webview_attributes.zoom_hotkeys_enabled = enabled;
     self
   }
+
+  /// Whether browser extensions can be installed for the webview process
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Enables the WebView2 environment's [`AreBrowserExtensionsEnabled`](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/winrt/microsoft_web_webview2_core/corewebview2environmentoptions?view=webview2-winrt-1.0.2739.15#arebrowserextensionsenabled)
+  /// - **MacOS / Linux / iOS / Android** - Unsupported.
+  #[must_use]
+  pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
+    self.webview_attributes.browser_extensions_enabled = enabled;
+    self
+  }
 }
 
 /// Webview.
 #[default_runtime(crate::Wry, wry)]
 pub struct Webview<R: Runtime> {
-  window_label: Arc<Mutex<String>>,
+  pub(crate) window: Arc<Mutex<Window<R>>>,
+  /// The webview created by the runtime.
+  pub(crate) webview: DetachedWebview<EventLoopMessage, R>,
   /// The manager to associate this webview with.
   pub(crate) manager: Arc<AppManager<R>>,
   pub(crate) app_handle: AppHandle<R>,
-  /// The webview created by the runtime.
-  pub(crate) webview: DetachedWebview<EventLoopMessage, R>,
   pub(crate) resources_table: Arc<Mutex<ResourceTable>>,
 }
 
 impl<R: Runtime> std::fmt::Debug for Webview<R> {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     f.debug_struct("Window")
-      .field("window_label", &self.window_label)
+      .field("window", &self.window.lock().unwrap())
       .field("webview", &self.webview)
       .finish()
   }
@@ -803,10 +820,10 @@ impl<R: Runtime> std::fmt::Debug for Webview<R> {
 impl<R: Runtime> Clone for Webview<R> {
   fn clone(&self) -> Self {
     Self {
-      window_label: self.window_label.clone(),
+      window: self.window.clone(),
+      webview: self.webview.clone(),
       manager: self.manager.clone(),
       app_handle: self.app_handle.clone(),
-      webview: self.webview.clone(),
       resources_table: self.resources_table.clone(),
     }
   }
@@ -832,9 +849,9 @@ impl<R: Runtime> Webview<R> {
   /// Create a new webview that is attached to the window.
   pub(crate) fn new(window: Window<R>, webview: DetachedWebview<EventLoopMessage, R>) -> Self {
     Self {
-      window_label: Arc::new(Mutex::new(window.label().into())),
       manager: window.manager.clone(),
       app_handle: window.app_handle.clone(),
+      window: Arc::new(Mutex::new(window)),
       webview,
       resources_table: Default::default(),
     }
@@ -869,6 +886,83 @@ impl<R: Runtime> Webview<R> {
       .webview
       .dispatcher
       .on_webview_event(move |event| f(&event.clone().into()));
+  }
+
+  /// Resolves the given command scope for this webview on the currently loaded URL.
+  ///
+  /// If the command is not allowed, returns None.
+  ///
+  /// If the scope cannot be deserialized to the given type, an error is returned.
+  ///
+  /// In a command context this can be directly resolved from the command arguments via [CommandScope]:
+  ///
+  /// ```
+  /// use tauri::ipc::CommandScope;
+  ///
+  /// #[derive(Debug, serde::Deserialize)]
+  /// struct ScopeType {
+  ///   some_value: String,
+  /// }
+  /// #[tauri::command]
+  /// fn my_command(scope: CommandScope<ScopeType>) {
+  ///   // check scope
+  /// }
+  /// ```
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// use tauri::Manager;
+  ///
+  /// #[derive(Debug, serde::Deserialize)]
+  /// struct ScopeType {
+  ///   some_value: String,
+  /// }
+  ///
+  /// tauri::Builder::default()
+  ///   .setup(|app| {
+  ///     let webview = app.get_webview_window("main").unwrap();
+  ///     let scope = webview.resolve_command_scope::<ScopeType>("my-plugin", "read");
+  ///     Ok(())
+  ///   });
+  /// ```
+  pub fn resolve_command_scope<T: ScopeObject>(
+    &self,
+    plugin: &str,
+    command: &str,
+  ) -> crate::Result<Option<ResolvedScope<T>>> {
+    let current_url = self.url()?;
+    let is_local = self.is_local_url(&current_url);
+    let origin = if is_local {
+      Origin::Local
+    } else {
+      Origin::Remote { url: current_url }
+    };
+
+    let cmd_name = format!("plugin:{plugin}|{command}");
+    let resolved_access = self
+      .manager()
+      .runtime_authority
+      .lock()
+      .unwrap()
+      .resolve_access(&cmd_name, self.window().label(), self.label(), &origin);
+
+    if let Some(access) = resolved_access {
+      let scope_ids = access
+        .iter()
+        .filter_map(|cmd| cmd.scope_id)
+        .collect::<Vec<_>>();
+
+      let command_scope = CommandScope::resolve(self, scope_ids)?;
+      let global_scope = GlobalScope::resolve(self, plugin)?;
+
+      Ok(Some(ResolvedScope {
+        global_scope,
+        command_scope,
+      }))
+    } else {
+      Ok(None)
+    }
   }
 }
 
@@ -933,18 +1027,27 @@ impl<R: Runtime> Webview<R> {
     self.webview.dispatcher.set_focus().map_err(Into::into)
   }
 
+  /// Hide the webview.
+  pub fn hide(&self) -> crate::Result<()> {
+    self.webview.dispatcher.hide().map_err(Into::into)
+  }
+
+  /// Show the webview.
+  pub fn show(&self) -> crate::Result<()> {
+    self.webview.dispatcher.show().map_err(Into::into)
+  }
+
   /// Move the webview to the given window.
   pub fn reparent(&self, window: &Window<R>) -> crate::Result<()> {
     #[cfg(not(feature = "unstable"))]
     {
-      let current_window = self.window();
-      if current_window.is_webview_window() || window.is_webview_window() {
+      if self.window_ref().is_webview_window() || window.is_webview_window() {
         return Err(crate::Error::CannotReparentWebviewWindow);
       }
     }
 
+    *self.window.lock().unwrap() = window.clone();
     self.webview.dispatcher.reparent(window.window.id)?;
-    *self.window_label.lock().unwrap() = window.label().to_string();
     Ok(())
   }
 
@@ -980,14 +1083,16 @@ impl<R: Runtime> Webview<R> {
 impl<R: Runtime> Webview<R> {
   /// The window that is hosting this webview.
   pub fn window(&self) -> Window<R> {
-    self
-      .manager
-      .get_window(&self.window_label.lock().unwrap())
-      .expect("could not locate webview parent window")
+    self.window.lock().unwrap().clone()
+  }
+
+  /// A reference to the window that is hosting this webview.
+  pub fn window_ref(&self) -> MutexGuard<'_, Window<R>> {
+    self.window.lock().unwrap()
   }
 
   pub(crate) fn window_label(&self) -> String {
-    self.window_label.lock().unwrap().clone()
+    self.window_ref().label().to_string()
   }
 
   /// Executes a closure, providing it with the webview handle that is specific to the current platform.
@@ -1000,9 +1105,6 @@ impl<R: Runtime> Webview<R> {
     feature = "unstable",
     doc = r####"
 ```rust,no_run
-#[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
 use tauri::Manager;
 
 fn main() {
@@ -1026,10 +1128,14 @@ fn main() {
 
         #[cfg(target_os = "macos")]
         unsafe {
-          let () = msg_send![webview.inner(), setPageZoom: 4.];
-          let () = msg_send![webview.controller(), removeAllUserScripts];
-          let bg_color: cocoa::base::id = msg_send![class!(NSColor), colorWithDeviceRed:0.5 green:0.2 blue:0.4 alpha:1.];
-          let () = msg_send![webview.ns_window(), setBackgroundColor: bg_color];
+          let view: &objc2_web_kit::WKWebView = &*webview.inner().cast();
+          let controller: &objc2_web_kit::WKUserContentController = &*webview.controller().cast();
+          let window: &objc2_app_kit::NSWindow = &*webview.ns_window().cast();
+
+          view.setPageZoom(4.);
+          controller.removeAllUserScripts();
+          let bg_color = objc2_app_kit::NSColor::colorWithDeviceRed_green_blue_alpha(0.5, 0.2, 0.4, 1.);
+          window.setBackgroundColor(Some(&bg_color));
         }
 
         #[cfg(target_os = "android")]
@@ -1137,17 +1243,11 @@ fn main() {
       return;
     }
 
-    let custom_responder = self.manager().webview.invoke_responder.clone();
-
     let resolver = InvokeResolver::new(
       self.clone(),
       Arc::new(Mutex::new(Some(Box::new(
         #[allow(unused_variables)]
         move |webview: Webview<R>, cmd, response, callback, error| {
-          if let Some(responder) = &custom_responder {
-            (responder)(&webview, &cmd, &response, callback, error);
-          }
-
           responder(webview, cmd, response, callback, error);
         },
       )))),
@@ -1178,7 +1278,7 @@ fn main() {
       let runtime_authority = manager.runtime_authority.lock().unwrap();
       let acl = runtime_authority.resolve_access(
         &request.cmd,
-        message.webview.window().label(),
+        message.webview.window_ref().label(),
         message.webview.label(),
         &acl_origin,
       );
@@ -1467,6 +1567,15 @@ tauri::Builder::default()
       .set_zoom(scale_factor)
       .map_err(Into::into)
   }
+
+  /// Clear all browsing data for this webview.
+  pub fn clear_all_browsing_data(&self) -> crate::Result<()> {
+    self
+      .webview
+      .dispatcher
+      .clear_all_browsing_data()
+      .map_err(Into::into)
+  }
 }
 
 impl<R: Runtime> Listener<R> for Webview<R> {
@@ -1674,6 +1783,24 @@ impl<'de, R: Runtime> CommandArg<'de, R> for Webview<R> {
   /// Grabs the [`Webview`] from the [`CommandItem`]. This will never fail.
   fn from_command(command: CommandItem<'de, R>) -> Result<Self, InvokeError> {
     Ok(command.message.webview())
+  }
+}
+
+/// Resolved scope that can be obtained via [`Webview::resolve_command_scope`].
+pub struct ResolvedScope<T: ScopeObject> {
+  command_scope: CommandScope<T>,
+  global_scope: GlobalScope<T>,
+}
+
+impl<T: ScopeObject> ResolvedScope<T> {
+  /// The global plugin scope.
+  pub fn global_scope(&self) -> &GlobalScope<T> {
+    &self.global_scope
+  }
+
+  /// The command-specific scope.
+  pub fn command_scope(&self) -> &CommandScope<T> {
+    &self.command_scope
   }
 }
 
