@@ -103,21 +103,14 @@ pub use tao::platform::macos::{
 use tauri_runtime::ActivationPolicy;
 
 use std::{
-  cell::RefCell,
-  collections::{
+  cell::RefCell, collections::{
     hash_map::Entry::{Occupied, Vacant},
     BTreeMap, HashMap, HashSet,
-  },
-  fmt,
-  ops::Deref,
-  path::PathBuf,
-  rc::Rc,
-  sync::{
+  }, ffi::c_void, fmt, ops::Deref, path::PathBuf, rc::Rc, sync::{
     atomic::{AtomicBool, AtomicU32, Ordering},
     mpsc::{channel, Sender},
     Arc, Mutex, Weak,
-  },
-  thread::{current as current_thread, ThreadId},
+  }, thread::{current as current_thread, ThreadId}
 };
 
 pub type WebviewId = u32;
@@ -4489,7 +4482,7 @@ fn get_work_area_size(target_monitor: &MonitorHandle) -> TaoPhysicalSize<u32> {
     use objc2_app_kit::NSScreen;
     use tao::platform::macos::MonitorHandleExtMacOS;
     if let Some(ns_screen) = target_monitor.ns_screen() {
-      let ns_screen = ns_screen as NSScreen;
+      let ns_screen: NSScreen = ns_screen.cast();
       let rect = unsafe { ns_screen.visibleFrame() };
       return TaoLogicalSize::new(rect.size.width, rect.size.height)
         .to_physical(target_monitor.scale_factor());
