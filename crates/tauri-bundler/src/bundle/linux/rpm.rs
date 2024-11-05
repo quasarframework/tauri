@@ -57,7 +57,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
 
   let compression = settings
     .rpm()
-    .compression()
+    .compression
     // This matches .deb compression. On a 240MB source binary the bundle will be 100KB larger than rpm's default while reducing build times by ~25%.
     .unwrap_or(rpm::CompressionWithLevel::Gzip(6));
 
