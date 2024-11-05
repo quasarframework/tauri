@@ -103,14 +103,21 @@ pub use tao::platform::macos::{
 use tauri_runtime::ActivationPolicy;
 
 use std::{
-  cell::RefCell, collections::{
+  cell::RefCell,
+  collections::{
     hash_map::Entry::{Occupied, Vacant},
     BTreeMap, HashMap, HashSet,
-  }, ffi::c_void, fmt, ops::Deref, path::PathBuf, rc::Rc, sync::{
+  },
+  fmt,
+  ops::Deref,
+  path::PathBuf,
+  rc::Rc,
+  sync::{
     atomic::{AtomicBool, AtomicU32, Ordering},
     mpsc::{channel, Sender},
     Arc, Mutex, Weak,
-  }, thread::{current as current_thread, ThreadId}
+  },
+  thread::{current as current_thread, ThreadId},
 };
 
 pub type WebviewId = u32;
