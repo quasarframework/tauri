@@ -469,9 +469,27 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   }
 
   /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size) on creation
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
   #[must_use]
-  pub fn prevent_overflow(mut self, margin: Option<Size>) -> Self {
-    self.window_builder = self.window_builder.prevent_overflow(margin);
+  fn prevent_overflow(mut self) -> Self {
+    self.window_builder = self.window_builder.prevent_overflow();
+    self
+  }
+
+  /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size)
+  /// on creation with a margin
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
+  #[must_use]
+  fn prevent_overflow_with_margin(mut self, margin: Size) -> Self {
+    self.window_builder = self.window_builder.prevent_overflow_with_margin(margin);
     self
   }
 

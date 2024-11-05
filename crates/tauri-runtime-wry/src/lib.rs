@@ -709,25 +709,13 @@ impl From<ProgressBarState> for ProgressBarStateWrapper {
   }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct WindowBuilderWrapper {
   inner: TaoWindowBuilder,
   center: bool,
   prevent_overflow: Option<Size>,
   #[cfg(target_os = "macos")]
   tabbing_identifier: Option<String>,
-}
-
-impl Default for WindowBuilderWrapper {
-  fn default() -> Self {
-    Self {
-      inner: Default::default(),
-      center: Default::default(),
-      prevent_overflow: Some(PhysicalSize::new(0, 0).into()),
-      #[cfg(target_os = "macos")]
-      tabbing_identifier: Default::default(),
-    }
-  }
 }
 
 impl std::fmt::Debug for WindowBuilderWrapper {
@@ -850,10 +838,9 @@ impl WindowBuilder for WindowBuilderWrapper {
 
       if let Some(prevent_overflow) = &config.prevent_overflow {
         window = match prevent_overflow {
-          PreventOverflowMarginConfig::Enable(false) => window.prevent_overflow(None),
-          PreventOverflowMarginConfig::Margin(margin) => window.prevent_overflow(Some(
-            TaoPhysicalSize::new(margin.width, margin.height).into(),
-          )),
+          PreventOverflowMarginConfig::Enable(true) => window.prevent_overflow(),
+          PreventOverflowMarginConfig::Margin(margin) => window
+            .prevent_overflow_with_margin(TaoPhysicalSize::new(margin.width, margin.height).into()),
           _ => window,
         };
       }
@@ -904,9 +891,29 @@ impl WindowBuilder for WindowBuilderWrapper {
   }
 
   /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size) on creation
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
   #[must_use]
-  fn prevent_overflow(mut self, margin: Option<Size>) -> Self {
-    self.prevent_overflow = margin;
+  fn prevent_overflow(mut self) -> Self {
+    self
+      .prevent_overflow
+      .replace(PhysicalSize::new(0, 0).into());
+    self
+  }
+
+  /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size)
+  /// on creation with a margin
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
+  #[must_use]
+  fn prevent_overflow_with_margin(mut self, margin: Size) -> Self {
+    self.prevent_overflow.replace(margin);
     self
   }
 

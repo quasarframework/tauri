@@ -264,9 +264,24 @@ pub trait WindowBuilder: WindowBuilderBase {
   #[must_use]
   fn inner_size_constraints(self, constraints: WindowSizeConstraints) -> Self;
 
-  /// Window max inner size.
+  /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size) on creation
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
   #[must_use]
-  fn prevent_overflow(self, margin: Option<dpi::Size>) -> Self;
+  fn prevent_overflow(self) -> Self;
+
+  /// Prevent the window from overflowing the working area (e.g. monitor size - taskbar size)
+  /// on creation with a margin
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux:** Prevent overflowing the monitor instead of workarea
+  /// - **iOS / Android:** Unsupported.
+  #[must_use]
+  fn prevent_overflow_with_margin(self, margin: dpi::Size) -> Self;
 
   /// Whether the window is resizable or not.
   /// When resizable is set to false, native window's maximize button is automatically disabled.
