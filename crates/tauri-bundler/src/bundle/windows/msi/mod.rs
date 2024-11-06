@@ -726,38 +726,26 @@ pub fn build_wix_app_installer(
     );
 
     // Create the update task XML
-    let mut skip_uac_task = Handlebars::new();
+    let skip_uac_task = Handlebars::new();
     let xml = include_str!("./update-task.xml");
-    skip_uac_task
-      .register_template_string("update.xml", xml)
-      .map_err(|e| e.to_string())
-      .expect("Failed to setup Update Task handlebars");
+    let update_content = skip_uac_task.render_template(xml, &data)?;
     let temp_xml_path = output_path.join("update.xml");
-    let update_content = skip_uac_task.render("update.xml", &data)?;
     fs::write(temp_xml_path, update_content)?;
 
     // Create the Powershell script to install the task
     let mut skip_uac_task_installer = Handlebars::new();
     skip_uac_task_installer.register_escape_fn(handlebars::no_escape);
     let xml = include_str!("./install-task.ps1");
-    skip_uac_task_installer
-      .register_template_string("install-task.ps1", xml)
-      .map_err(|e| e.to_string())
-      .expect("Failed to setup Update Task Installer handlebars");
+    let install_script_content = skip_uac_task_installer.render_template(xml, &data)?;
     let temp_ps1_path = output_path.join("install-task.ps1");
-    let install_script_content = skip_uac_task_installer.render("install-task.ps1", &data)?;
     fs::write(temp_ps1_path, install_script_content)?;
 
     // Create the Powershell script to uninstall the task
     let mut skip_uac_task_uninstaller = Handlebars::new();
     skip_uac_task_uninstaller.register_escape_fn(handlebars::no_escape);
     let xml = include_str!("./uninstall-task.ps1");
-    skip_uac_task_uninstaller
-      .register_template_string("uninstall-task.ps1", xml)
-      .map_err(|e| e.to_string())
-      .expect("Failed to setup Update Task Uninstaller handlebars");
+    let install_script_content = skip_uac_task_uninstaller.render_template(xml, &data)?;
     let temp_ps1_path = output_path.join("uninstall-task.ps1");
-    let install_script_content = skip_uac_task_uninstaller.render("uninstall-task.ps1", &data)?;
     fs::write(temp_ps1_path, install_script_content)?;
 
     data.insert("enable_elevated_update_task", to_json(true));
@@ -772,7 +760,9 @@ pub fn build_wix_app_installer(
   let extension_regex = Regex::new("\"http://schemas.microsoft.com/wix/(\\w+)\"")?;
   for fragment_path in fragment_paths {
     let fragment_path = current_dir.join(fragment_path);
-    let fragment = fs::read_to_string(&fragment_path)?;
+    let fragment_content = fs::read_to_string(&fragment_path)?;
+    let fragment_handlebars = Handlebars::new();
+    let fragment = fragment_handlebars.render_template(&fragment_content, &data)?;
     let mut extensions = Vec::new();
     for cap in extension_regex.captures_iter(&fragment) {
       extensions.push(wix_toolset_path.join(format!("Wix{}.dll", &cap[1])));

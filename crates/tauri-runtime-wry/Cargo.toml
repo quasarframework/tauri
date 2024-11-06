@@ -23,7 +23,7 @@ wry = { version = "0.46.1", default-features = false, features = [
   "os-webview",
   "linux-body",
 ] }
-tao = { git = "https://github.com/tauri-apps/tao", branch = "feat/background-color", default-features = false, features = [
+tao = { version = "0.30.5", default-features = false, features = [
   "rwh_06",
 ] }
 tauri-runtime = { version = "2.1.0", path = "../tauri-runtime" }

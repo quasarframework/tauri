@@ -106,10 +106,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   // initialize shell script template.
   let mut handlebars = Handlebars::new();
   handlebars.register_escape_fn(handlebars::no_escape);
-  handlebars
-    .register_template_string("appimage", include_str!("./appimage"))
-    .expect("Failed to register template for handlebars");
-  let temp = handlebars.render("appimage", &sh_map)?;
+  let temp = handlebars.render_template(include_str!("./appimage"), &sh_map)?;
 
   // create the shell script file in the target/ folder.
   let sh_file = output_path.join("build_appimage.sh");
