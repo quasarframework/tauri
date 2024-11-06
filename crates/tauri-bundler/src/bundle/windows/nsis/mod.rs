@@ -90,8 +90,8 @@ pub fn bundle_project(settings: &Settings, updater: bool) -> crate::Result<Vec<P
 
     if !mismatched.is_empty() {
       log::warn!("NSIS directory contains mis-hashed files. Redownloading them.");
-      for (path, url, hash, hash_algorithim) in mismatched {
-        let data = download_and_verify(url, hash, *hash_algorithim)?;
+      for (path, url, hash, hash_algorithm) in mismatched {
+        let data = download_and_verify(url, hash, *hash_algorithm)?;
         fs::write(nsis_toolset_path.join(path), data)?;
       }
     }

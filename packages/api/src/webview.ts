@@ -18,6 +18,7 @@
 
 import { PhysicalPosition, PhysicalSize } from './dpi'
 import type { LogicalPosition, LogicalSize } from './dpi'
+import { Position, Size } from './dpi'
 import type { EventName, EventCallback, UnlistenFn } from './event'
 import {
   TauriEvent,
@@ -361,7 +362,7 @@ class Webview {
   async position(): Promise<PhysicalPosition> {
     return invoke<{ x: number; y: number }>('plugin:webview|webview_position', {
       label: this.label
-    }).then(({ x, y }) => new PhysicalPosition(x, y))
+    }).then((p) => new PhysicalPosition(p))
   }
 
   /**
@@ -381,7 +382,7 @@ class Webview {
       {
         label: this.label
       }
-    ).then(({ width, height }) => new PhysicalSize(width, height))
+    ).then((s) => new PhysicalSize(s))
   }
 
   // Setters
@@ -413,22 +414,10 @@ class Webview {
    * @param size The logical or physical size.
    * @returns A promise indicating the success or failure of the operation.
    */
-  async setSize(size: LogicalSize | PhysicalSize): Promise<void> {
-    if (!size || (size.type !== 'Logical' && size.type !== 'Physical')) {
-      throw new Error(
-        'the `size` argument must be either a LogicalSize or a PhysicalSize instance'
-      )
-    }
-
-    const value = {} as Record<string, unknown>
-    value[`${size.type}`] = {
-      width: size.width,
-      height: size.height
-    }
-
+  async setSize(size: LogicalSize | PhysicalSize | Size): Promise<void> {
     return invoke('plugin:webview|set_webview_size', {
       label: this.label,
-      value
+      value: size instanceof Size ? size : new Size(size)
     })
   }
 
@@ -444,26 +433,11 @@ class Webview {
    * @returns A promise indicating the success or failure of the operation.
    */
   async setPosition(
-    position: LogicalPosition | PhysicalPosition
+    position: LogicalPosition | PhysicalPosition | Position
   ): Promise<void> {
-    if (
-      !position ||
-      (position.type !== 'Logical' && position.type !== 'Physical')
-    ) {
-      throw new Error(
-        'the `position` argument must be either a LogicalPosition or a PhysicalPosition instance'
-      )
-    }
-
-    const value = {} as Record<string, unknown>
-    value[`${position.type}`] = {
-      x: position.x,
-      y: position.y
-    }
-
     return invoke('plugin:webview|set_webview_position', {
       label: this.label,
-      value
+      value: position instanceof Position ? position : new Position(position)
     })
   }
 
@@ -603,7 +577,7 @@ class Webview {
           payload: {
             type: 'enter',
             paths: event.payload.paths,
-            position: mapPhysicalPosition(event.payload.position)
+            position: new PhysicalPosition(event.payload.position)
           }
         })
       }
@@ -616,7 +590,7 @@ class Webview {
           ...event,
           payload: {
             type: 'over',
-            position: mapPhysicalPosition(event.payload.position)
+            position: new PhysicalPosition(event.payload.position)
           }
         })
       }
@@ -630,7 +604,7 @@ class Webview {
           payload: {
             type: 'drop',
             paths: event.payload.paths,
-            position: mapPhysicalPosition(event.payload.position)
+            position: new PhysicalPosition(event.payload.position)
           }
         })
       }
@@ -650,10 +624,6 @@ class Webview {
       unlistenDragLeave()
     }
   }
-}
-
-function mapPhysicalPosition(m: PhysicalPosition): PhysicalPosition {
-  return new PhysicalPosition(m.x, m.y)
 }
 
 /**
@@ -684,6 +654,12 @@ interface WebviewOptions {
    * WARNING: Using private APIs on `macOS` prevents your application from being accepted to the `App Store`.
    */
   transparent?: boolean
+  /**
+   * Whether the webview should have focus or not
+   *
+   * @since 2.1.0
+   */
+  focus?: boolean
   /**
    * Whether the drag and drop is enabled or not on the webview. By default it is enabled.
    *
@@ -728,6 +704,35 @@ interface WebviewOptions {
    * - **Android / iOS**: Unsupported.
    */
   zoomHotkeysEnabled?: boolean
+
+  /**
+   * Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+   *
+   * #### Note
+   *
+   * Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+   *
+   * #### Warning
+   *
+   * Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access them.
+   *
+   * @since 2.1.0
+   */
+  useHttpsScheme?: boolean
+  /**
+   * Whether web inspector, which is usually called browser devtools, is enabled or not. Enabled by default.
+   *
+   * This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.
+   *
+   * #### Platform-specific
+   *
+   * - macOS: This will call private functions on **macOS**.
+   * - Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.
+   * - iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.
+   *
+   * @since 2.1.0
+   */
+  devtools?: boolean
 }
 
 export { Webview, getCurrentWebview, getAllWebviews }

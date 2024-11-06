@@ -22,8 +22,8 @@ use tauri_runtime::{
   monitor::Monitor,
   webview::{DetachedWebview, DownloadEvent, PendingWebview, WebviewIpcHandler},
   window::{
-    CursorIcon, DetachedWindow, DragDropEvent, PendingWindow, RawWindow, WebviewEvent,
-    WindowBuilder, WindowBuilderBase, WindowEvent, WindowId, WindowSizeConstraints,
+    CursorIcon, DetachedWindow, DetachedWindowWebview, DragDropEvent, PendingWindow, RawWindow,
+    WebviewEvent, WindowBuilder, WindowBuilderBase, WindowEvent, WindowId, WindowSizeConstraints,
   },
   DeviceEventFilter, Error, EventLoopProxy, ExitRequestedEventAction, Icon, ProgressBarState,
   ProgressBarStatus, Result, RunEvent, Runtime, RuntimeHandle, RuntimeInitArgs, UserAttentionType,
@@ -276,7 +276,16 @@ impl<T: UserEvent> Context<T> {
     let label = pending.label.clone();
     let context = self.clone();
     let window_id = self.next_window_id();
-    let webview_id = pending.webview.as_ref().map(|_| context.next_webview_id());
+    let (webview_id, use_https_scheme) = pending
+      .webview
+      .as_ref()
+      .map(|w| {
+        (
+          Some(context.next_webview_id()),
+          w.webview_attributes.use_https_scheme,
+        )
+      })
+      .unwrap_or((None, false));
 
     send_user_message(
       self,
@@ -300,13 +309,19 @@ impl<T: UserEvent> Context<T> {
       context: self.clone(),
     };
 
-    let detached_webview = webview_id.map(|id| DetachedWebview {
-      label: label.clone(),
-      dispatcher: WryWebviewDispatcher {
-        window_id: Arc::new(Mutex::new(window_id)),
-        webview_id: id,
-        context: self.clone(),
-      },
+    let detached_webview = webview_id.map(|id| {
+      let webview = DetachedWebview {
+        label: label.clone(),
+        dispatcher: WryWebviewDispatcher {
+          window_id: Arc::new(Mutex::new(window_id)),
+          webview_id: id,
+          context: self.clone(),
+        },
+      };
+      DetachedWindowWebview {
+        webview,
+        use_https_scheme,
+      }
     });
 
     Ok(DetachedWindow {
@@ -746,6 +761,13 @@ impl WindowBuilder for WindowBuilderWrapper {
       builder = builder.title_bar_style(TitleBarStyle::Visible);
     }
 
+    builder = builder.title("Tauri App");
+
+    #[cfg(windows)]
+    {
+      builder = builder.window_classname("Tauri Window");
+    }
+
     builder
   }
 
@@ -789,6 +811,7 @@ impl WindowBuilder for WindowBuilderWrapper {
       window = window
         .title(config.title.to_string())
         .inner_size(config.width, config.height)
+        .focused(config.focus)
         .visible(config.visible)
         .resizable(config.resizable)
         .fullscreen(config.fullscreen)
@@ -827,6 +850,10 @@ impl WindowBuilder for WindowBuilderWrapper {
 
       if config.center {
         window = window.center();
+      }
+
+      if let Some(window_classname) = &config.window_classname {
+        window = window.window_classname(window_classname);
       }
     }
 
@@ -1087,6 +1114,16 @@ impl WindowBuilder for WindowBuilderWrapper {
       TaoTheme::Dark => Theme::Dark,
       _ => Theme::Light,
     })
+  }
+
+  #[cfg(windows)]
+  fn window_classname<S: Into<String>>(mut self, window_classname: S) -> Self {
+    self.inner = self.inner.with_window_classname(window_classname);
+    self
+  }
+  #[cfg(not(windows))]
+  fn window_classname<S: Into<String>>(self, _window_classname: S) -> Self {
+    self
   }
 }
 
@@ -2496,10 +2533,16 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
   ) -> Result<DetachedWindow<T, Self>> {
     let label = pending.label.clone();
     let window_id = self.context.next_window_id();
-    let webview_id = pending
+    let (webview_id, use_https_scheme) = pending
       .webview
       .as_ref()
-      .map(|_| self.context.next_webview_id());
+      .map(|w| {
+        (
+          Some(self.context.next_webview_id()),
+          w.webview_attributes.use_https_scheme,
+        )
+      })
+      .unwrap_or((None, false));
 
     let window = create_window(
       window_id,
@@ -2523,13 +2566,19 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
       .borrow_mut()
       .insert(window_id, window);
 
-    let detached_webview = webview_id.map(|id| DetachedWebview {
-      label: label.clone(),
-      dispatcher: WryWebviewDispatcher {
-        window_id: Arc::new(Mutex::new(window_id)),
-        webview_id: id,
-        context: self.context.clone(),
-      },
+    let detached_webview = webview_id.map(|id| {
+      let webview = DetachedWebview {
+        label: label.clone(),
+        dispatcher: WryWebviewDispatcher {
+          window_id: Arc::new(Mutex::new(window_id)),
+          webview_id: id,
+          context: self.context.clone(),
+        },
+      };
+      DetachedWindowWebview {
+        webview,
+        use_https_scheme,
+      }
     });
 
     Ok(DetachedWindow {
@@ -4017,13 +4066,18 @@ fn create_webview<T: UserEvent>(
 
   let mut webview_builder = WebViewBuilder::with_web_context(&mut web_context.inner)
     .with_id(&label)
-    .with_focused(window.is_focused())
+    .with_focused(webview_attributes.focus)
     .with_url(&url)
     .with_transparent(webview_attributes.transparent)
     .with_accept_first_mouse(webview_attributes.accept_first_mouse)
     .with_incognito(webview_attributes.incognito)
     .with_clipboard(webview_attributes.clipboard)
     .with_hotkeys_zoom(webview_attributes.zoom_hotkeys_enabled);
+
+  #[cfg(any(target_os = "windows", target_os = "android"))]
+  {
+    webview_builder = webview_builder.with_https_scheme(webview_attributes.use_https_scheme);
+  }
 
   if webview_attributes.drag_drop_handler_enabled {
     let proxy = context.proxy.clone();
@@ -4169,11 +4223,6 @@ fn create_webview<T: UserEvent>(
 
   #[cfg(windows)]
   {
-    webview_builder = webview_builder.with_https_scheme(false);
-  }
-
-  #[cfg(windows)]
-  {
     webview_builder = webview_builder
       .with_browser_extensions_enabled(webview_attributes.browser_extensions_enabled);
   }
@@ -4225,7 +4274,7 @@ fn create_webview<T: UserEvent>(
 
   #[cfg(any(debug_assertions, feature = "devtools"))]
   {
-    webview_builder = webview_builder.with_devtools(true);
+    webview_builder = webview_builder.with_devtools(webview_attributes.devtools.unwrap_or(true));
   }
 
   #[cfg(target_os = "android")]
@@ -4281,7 +4330,7 @@ fn create_webview<T: UserEvent>(
       builder
     }
   }
-  .map_err(|e| Error::CreateWebview(Box::new(dbg!(e))))?;
+  .map_err(|e| Error::CreateWebview(Box::new(e)))?;
 
   if kind == WebviewKind::WindowContent {
     #[cfg(any(

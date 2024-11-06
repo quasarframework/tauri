@@ -381,7 +381,11 @@ tauri::Builder::default()
       );
 
       if let Some(webview) = detached_window.webview {
-        app_manager.webview.attach_webview(window.clone(), webview);
+        app_manager.webview.attach_webview(
+          window.clone(),
+          webview.webview,
+          webview.use_https_scheme,
+        );
       }
 
       window
@@ -531,7 +535,7 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[must_use]
   #[deprecated(
     since = "1.2.0",
-    note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
+    note = "The window is automatically focused by default. This function Will be removed in 3.0.0. Use `focused` instead."
   )]
   pub fn focus(mut self) -> Self {
     self.window_builder = self.window_builder.focused(true);
@@ -638,6 +642,13 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[must_use]
   pub fn skip_taskbar(mut self, skip: bool) -> Self {
     self.window_builder = self.window_builder.skip_taskbar(skip);
+    self
+  }
+
+  /// Sets custom name for Windows' window class. **Windows only**.
+  #[must_use]
+  pub fn window_classname<S: Into<String>>(mut self, classname: S) -> Self {
+    self.window_builder = self.window_builder.window_classname(classname);
     self
   }
 
@@ -2041,7 +2052,7 @@ tauri::Builder::default()
   docsrs,
   doc(cfg(any(target_os = "macos", target_os = "linux", windows)))
 )]
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 pub struct ProgressBarState {
   /// The progress bar status.
   pub status: Option<ProgressBarStatus>,
