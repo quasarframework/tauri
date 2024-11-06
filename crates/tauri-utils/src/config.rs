@@ -1306,7 +1306,7 @@ pub struct WindowEffectsConfig {
 }
 
 /// Enable prevent overflow with a margin
-#[skip_serializing_none]
+/// so that the window's size + this margin won't overflow the workarea
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]

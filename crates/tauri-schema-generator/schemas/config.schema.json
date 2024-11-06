@@ -557,7 +557,7 @@
       ]
     },
     "PreventOverflowMargin": {
-      "description": "Enable prevent overflow with a margin",
+      "description": "Enable prevent overflow with a margin\n so that the window's size + this margin won't overflow the workarea",
       "type": "object",
       "required": [
         "height",
