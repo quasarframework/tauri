@@ -56,7 +56,7 @@ futures-util = "0.3"
 uuid = { version = "1", features = ["v4"], optional = true }
 url = "2"
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 tauri-runtime = { version = "2.1.1", path = "../tauri-runtime" }
 tauri-macros = { version = "2.0.2", path = "../tauri-macros" }
 tauri-utils = { version = "2.0.2", features = [
