@@ -769,6 +769,11 @@ impl WindowBuilder for WindowBuilderWrapper {
 
     builder = builder.title("Tauri App");
 
+    #[cfg(windows)]
+    {
+      builder = builder.window_classname("Tauri Window");
+    }
+
     builder
   }
 
@@ -851,6 +856,10 @@ impl WindowBuilder for WindowBuilderWrapper {
 
       if config.center {
         window = window.center();
+      }
+
+      if let Some(window_classname) = &config.window_classname {
+        window = window.window_classname(window_classname);
       }
 
       if let Some(prevent_overflow) = &config.prevent_overflow {
@@ -1147,6 +1156,16 @@ impl WindowBuilder for WindowBuilderWrapper {
       TaoTheme::Dark => Theme::Dark,
       _ => Theme::Light,
     })
+  }
+
+  #[cfg(windows)]
+  fn window_classname<S: Into<String>>(mut self, window_classname: S) -> Self {
+    self.inner = self.inner.with_window_classname(window_classname);
+    self
+  }
+  #[cfg(not(windows))]
+  fn window_classname<S: Into<String>>(self, _window_classname: S) -> Self {
+    self
   }
 }
 
@@ -4323,7 +4342,7 @@ fn create_webview<T: UserEvent>(
 
   #[cfg(any(debug_assertions, feature = "devtools"))]
   {
-    webview_builder = webview_builder.with_devtools(true);
+    webview_builder = webview_builder.with_devtools(webview_attributes.devtools.unwrap_or(true));
   }
 
   #[cfg(target_os = "android")]

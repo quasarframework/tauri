@@ -408,6 +408,13 @@
           "default": false,
           "type": "boolean"
         },
+        "windowClassname": {
+          "description": "The name of the window class created on Windows to create the window. **Windows only**.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "theme": {
           "description": "The initial window theme. Defaults to the system theme. Only implemented on Windows and macOS 10.14+.",
           "anyOf": [
@@ -502,6 +509,13 @@
           "description": "Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.\n\n ## Note\n\n Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.\n\n ## Warning\n\n Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.",
           "default": false,
           "type": "boolean"
+        },
+        "devtools": {
+          "description": "Enable web inspector which is usually called browser devtools. Enabled by default.\n\n This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.\n\n ## Platform-specific\n\n - macOS: This will call private functions on **macOS**.\n - Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.\n - iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.",
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "additionalProperties": false

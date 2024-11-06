@@ -670,6 +670,13 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
     self
   }
 
+  /// Sets custom name for Windows' window class. **Windows only**.
+  #[must_use]
+  pub fn window_classname<S: Into<String>>(mut self, classname: S) -> Self {
+    self.window_builder = self.window_builder.window_classname(classname);
+    self
+  }
+
   /// Sets whether or not the window has shadow.
   ///
   /// ## Platform-specific
@@ -2070,7 +2077,7 @@ tauri::Builder::default()
   docsrs,
   doc(cfg(any(target_os = "macos", target_os = "linux", windows)))
 )]
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 pub struct ProgressBarState {
   /// The progress bar status.
   pub status: Option<ProgressBarStatus>,

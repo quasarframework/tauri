@@ -211,6 +211,7 @@ pub struct WebviewAttributes {
   pub zoom_hotkeys_enabled: bool,
   pub browser_extensions_enabled: bool,
   pub use_https_scheme: bool,
+  pub devtools: Option<bool>,
 }
 
 impl From<&WindowConfig> for WebviewAttributes {
@@ -220,7 +221,8 @@ impl From<&WindowConfig> for WebviewAttributes {
       .focused(config.focus)
       .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
       .use_https_scheme(config.use_https_scheme)
-      .browser_extensions_enabled(config.browser_extensions_enabled);
+      .browser_extensions_enabled(config.browser_extensions_enabled)
+      .devtools(config.devtools);
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -267,6 +269,7 @@ impl WebviewAttributes {
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
       use_https_scheme: false,
+      devtools: None,
     }
   }
 
@@ -404,6 +407,21 @@ impl WebviewAttributes {
   #[must_use]
   pub fn use_https_scheme(mut self, enabled: bool) -> Self {
     self.use_https_scheme = enabled;
+    self
+  }
+
+  /// Whether web inspector, which is usually called browser devtools, is enabled or not. Enabled by default.
+  ///
+  /// This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - macOS: This will call private functions on **macOS**.
+  /// - Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.
+  /// - iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.
+  #[must_use]
+  pub fn devtools(mut self, enabled: Option<bool>) -> Self {
+    self.devtools = enabled;
     self
   }
 }

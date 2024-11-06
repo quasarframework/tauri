@@ -84,10 +84,7 @@ pub fn migrate(frontend_dir: &Path) -> Result<Vec<String>> {
     )
   };
 
-  let pm = PackageManager::from_project(frontend_dir)
-    .into_iter()
-    .next()
-    .unwrap_or(PackageManager::Npm);
+  let pm = PackageManager::from_project(frontend_dir);
 
   for pkg in ["@tauri-apps/cli", "@tauri-apps/api"] {
     let version = pm
