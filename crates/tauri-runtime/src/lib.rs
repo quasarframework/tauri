@@ -249,6 +249,11 @@ pub enum RunEvent<T: UserEvent> {
   },
   /// A custom event defined by the user.
   UserEvent(T),
+  /// Emitted when the NSApplicationDelegate's applicationShouldTerminate gets called
+  #[cfg(target_os = "macos")]
+  DockExitRequested {
+    tx: Sender<ExitRequestedEventAction>,
+  },
 }
 
 /// Action to take when the event loop is about to exit

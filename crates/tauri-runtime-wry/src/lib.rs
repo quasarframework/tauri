@@ -30,6 +30,9 @@ use tauri_runtime::{
   UserEvent, WebviewDispatch, WebviewEventId, WindowDispatch, WindowEventId,
 };
 
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc2;
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 use objc2::rc::Retained;
 #[cfg(target_os = "macos")]
@@ -3757,6 +3760,25 @@ fn handle_event_loop<T: UserEvent>(
     } => callback(RunEvent::Reopen {
       has_visible_windows,
     }),
+    #[cfg(target_os = "macos")]
+    Event::ExitRequested => {
+      let (tx, rx) = channel();
+      callback(RunEvent::DockExitRequested {tx});
+      let recv = rx.try_recv();
+      let should_prevent = matches!(recv, Ok(ExitRequestedEventAction::Prevent));
+
+      use objc2::ffi::{NO, YES};
+      use objc2_app_kit::NSApplication;
+      use objc2_foundation::MainThreadMarker;
+      
+      unsafe {
+        let mtm = MainThreadMarker::new_unchecked();
+        let app = NSApplication::sharedApplication(mtm);
+        
+        let action = if should_prevent { NO } else { YES };
+        let () = msg_send![app.as_ref(), replyToApplicationShouldTerminate: action];
+      }
+    }
     _ => (),
   }
 }
