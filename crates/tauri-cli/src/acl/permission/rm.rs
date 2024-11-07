@@ -46,13 +46,15 @@ fn rm_permission_files(identifier: &str, dir: &Path) -> Result<()> {
         permission_file.default = None;
       } else {
         let set_len = permission_file.set.len();
-        permission_file.set.retain(|s| s.identifier != identifier);
+        permission_file
+          .set
+          .retain(|s| !identifier_match(identifier, &s.identifier));
         updated = permission_file.set.len() != set_len;
 
         let permission_len = permission_file.permission.len();
         permission_file
           .permission
-          .retain(|s| s.identifier != identifier);
+          .retain(|s| !identifier_match(identifier, &s.identifier));
         updated = updated || permission_file.permission.len() != permission_len;
       }
 
@@ -84,7 +86,11 @@ fn rm_permission_from_capabilities(identifier: &str, dir: &Path) -> Result<()> {
           if let Ok(mut value) = content.parse::<toml_edit::DocumentMut>() {
             if let Some(permissions) = value.get_mut("permissions").and_then(|p| p.as_array_mut()) {
               let prev_len = permissions.len();
-              permissions.retain(|p| p.as_str().map(|p| p != identifier).unwrap_or(false));
+              permissions.retain(|p| {
+                p.as_str()
+                  .map(|p| !identifier_match(identifier, p))
+                  .unwrap_or(false)
+              });
               if prev_len != permissions.len() {
                 std::fs::write(&path, value.to_string())?;
                 log::info!(action = "Removed"; "permission from capability at {}", dunce::simplified(&path).display());
@@ -97,7 +103,11 @@ fn rm_permission_from_capabilities(identifier: &str, dir: &Path) -> Result<()> {
           if let Ok(mut value) = serde_json::from_slice::<serde_json::Value>(&content) {
             if let Some(permissions) = value.get_mut("permissions").and_then(|p| p.as_array_mut()) {
               let prev_len = permissions.len();
-              permissions.retain(|p| p.as_str().map(|p| p != identifier).unwrap_or(false));
+              permissions.retain(|p| {
+                p.as_str()
+                  .map(|p| !identifier_match(identifier, p))
+                  .unwrap_or(false)
+              });
               if prev_len != permissions.len() {
                 std::fs::write(&path, serde_json::to_vec_pretty(&value)?)?;
                 log::info!(action = "Removed"; "permission from capability at {}", dunce::simplified(&path).display());
@@ -113,10 +123,19 @@ fn rm_permission_from_capabilities(identifier: &str, dir: &Path) -> Result<()> {
   Ok(())
 }
 
+fn identifier_match(identifier: &str, permission: &str) -> bool {
+  match identifier.split_once(':') {
+    Some((plugin_name, "*")) => permission.contains(plugin_name),
+    _ => permission == identifier,
+  }
+}
+
 #[derive(Debug, Parser)]
 #[clap(about = "Remove a permission file, and its reference from any capability")]
 pub struct Options {
   /// Permission to remove.
+  ///
+  /// To remove all permissions for a given plugin, provide `<plugin-name>:*`
   pub identifier: String,
 }
 

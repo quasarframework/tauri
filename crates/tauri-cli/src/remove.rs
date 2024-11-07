@@ -62,7 +62,7 @@ pub fn run(options: Options) -> Result<()> {
     }
 
     let _ = acl::permission::rm::command(acl::permission::rm::Options {
-      identifier: format!("{plugin}:default"),
+      identifier: format!("{plugin}:*"),
     });
   }
 
