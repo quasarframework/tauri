@@ -30,7 +30,7 @@ import {
   once
 } from './event'
 import { invoke } from './core'
-import { Window, getCurrentWindow } from './window'
+import { Color, Window, getCurrentWindow } from './window'
 import { WebviewWindow } from './webviewWindow'
 
 /** The drag and drop event types. */
@@ -537,6 +537,24 @@ class Webview {
     return invoke('plugin:webview|clear_all_browsing_data')
   }
 
+  /**
+   * Specify the webview background color.
+   *
+   * #### Platfrom-specific:
+   *
+   * - **macOS / iOS**: Not implemented.
+   * - **Windows**:
+   *   - On Windows 7, transparency is not supported and the alpha value will be ignored.
+   *   - On Windows higher than 7: translucent colors are not supported so any alpha value other than `0` will be replaced by `255`
+   *
+   * @returns A promise indicating the success or failure of the operation.
+   *
+   * @since 2.1.0
+   */
+  async setBackgroundColor(color: Color | null): Promise<void> {
+    return invoke('plugin:webview|set_webview_background_color', { color })
+  }
+
   // Listeners
 
   /**
@@ -733,8 +751,21 @@ interface WebviewOptions {
    * @since 2.1.0
    */
   devtools?: boolean
+  /**
+   * Set the window and webview background color.
+   *
+   * #### Platform-specific:
+   *
+   * - **macOS / iOS**: Not implemented.
+   * - **Windows**:
+   *   - On Windows 7, alpha channel is ignored.
+   *   - On Windows 8 and newer, if alpha channel is not `0`, it will be ignored.
+   *
+   * @since 2.1.0
+   */
+  backgroundColor?: Color
 }
 
 export { Webview, getCurrentWebview, getAllWebviews }
 
-export type { DragDropEvent, WebviewOptions }
+export type { DragDropEvent, WebviewOptions, Color }

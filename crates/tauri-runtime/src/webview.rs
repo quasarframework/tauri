@@ -7,7 +7,7 @@
 use crate::{window::is_label_valid, Rect, Runtime, UserEvent};
 
 use http::Request;
-use tauri_utils::config::{WebviewUrl, WindowConfig, WindowEffectsConfig};
+use tauri_utils::config::{Color, WebviewUrl, WindowConfig, WindowEffectsConfig};
 use url::Url;
 
 use std::{
@@ -212,6 +212,7 @@ pub struct WebviewAttributes {
   pub browser_extensions_enabled: bool,
   pub use_https_scheme: bool,
   pub devtools: Option<bool>,
+  pub background_color: Option<Color>,
 }
 
 impl From<&WindowConfig> for WebviewAttributes {
@@ -243,6 +244,9 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(url) = &config.proxy_url {
       builder = builder.proxy_url(url.to_owned());
     }
+    if let Some(color) = config.background_color {
+      builder = builder.background_color(color);
+    }
     builder
   }
 }
@@ -270,6 +274,7 @@ impl WebviewAttributes {
       browser_extensions_enabled: false,
       use_https_scheme: false,
       devtools: None,
+      background_color: None,
     }
   }
 
@@ -422,6 +427,17 @@ impl WebviewAttributes {
   #[must_use]
   pub fn devtools(mut self, enabled: Option<bool>) -> Self {
     self.devtools = enabled;
+    self
+  }
+
+  /// Set the window and webview background color.
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: On Windows 7, alpha channel is ignored for the webview layer.
+  /// - **Windows**: On Windows 8 and newer, if alpha channel is not `0`, it will be ignored.
+  #[must_use]
+  pub fn background_color(mut self, color: Color) -> Self {
+    self.background_color = Some(color);
     self
   }
 }
