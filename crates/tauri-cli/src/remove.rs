@@ -7,7 +7,7 @@ use clap::Parser;
 use crate::{
   acl,
   helpers::{
-    app_paths::{resolve_app_dir, tauri_dir},
+    app_paths::{resolve_frontend_dir, tauri_dir},
     cargo,
     npm::PackageManager,
   },
@@ -34,7 +34,7 @@ pub fn run(options: Options) -> Result<()> {
   let mut plugins = crate::helpers::plugins::known_plugins();
   let metadata = plugins.remove(plugin.as_str()).unwrap_or_default();
 
-  let app_dir = resolve_app_dir();
+  let frontend_dir = resolve_frontend_dir();
   let tauri_dir = tauri_dir();
 
   let target_str = metadata
@@ -53,17 +53,14 @@ pub fn run(options: Options) -> Result<()> {
   })?;
 
   if !metadata.rust_only {
-    if let Some(manager) = app_dir
-      .map(PackageManager::from_project)
-      .and_then(|managers| managers.into_iter().next())
-    {
+    if let Some(manager) = frontend_dir.map(PackageManager::from_project) {
       let npm_name = format!("@tauri-apps/plugin-{plugin}");
       manager.remove(&[npm_name], tauri_dir)?;
     }
 
-    let _ = acl::permission::rm::command(acl::permission::rm::Options {
+    acl::permission::rm::command(acl::permission::rm::Options {
       identifier: format!("{plugin}:*"),
-    });
+    })?;
   }
 
   log::info!("Now, you must manually remove the plugin from your Rust code.",);
