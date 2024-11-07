@@ -1,5 +1,6 @@
 ---
 "tauri-cli": minor:feat
+"@tauri-apps/cli": minor:feat
 ---
 
-Add a cli command to `remove` plugins from projects.
+Add `tauri remove` to remove plugins from projects.
