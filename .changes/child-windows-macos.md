@@ -3,5 +3,5 @@
 "tauri-runtime-wry": "patch:bug"
 ---
 
-Fix child webviews on macOS and Windows.
+Fix regression in creating child webviews on macOS and Windows, covering the whole window.
 
