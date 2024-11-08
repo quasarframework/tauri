@@ -566,7 +566,7 @@ class Webview {
    * ```typescript
    * import { getCurrentWebview } from "@tauri-apps/api/webview";
    * const unlisten = await getCurrentWebview().onDragDropEvent((event) => {
-   *  if (event.payload.type === 'hover') {
+   *  if (event.payload.type === 'over') {
    *    console.log('User hovering', event.payload.paths);
    *  } else if (event.payload.type === 'drop') {
    *    console.log('User dropped', event.payload.paths);
