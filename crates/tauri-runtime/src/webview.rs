@@ -14,7 +14,7 @@ use std::{
   borrow::Cow,
   collections::HashMap,
   hash::{Hash, Hasher},
-  path::PathBuf,
+  path::{Path, PathBuf},
   sync::Arc,
 };
 
@@ -210,6 +210,7 @@ pub struct WebviewAttributes {
   pub proxy_url: Option<Url>,
   pub zoom_hotkeys_enabled: bool,
   pub browser_extensions_enabled: bool,
+  pub extension_path: Option<PathBuf>,
   pub use_https_scheme: bool,
   pub devtools: Option<bool>,
   pub background_color: Option<Color>,
@@ -247,6 +248,9 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(color) = config.background_color {
       builder = builder.background_color(color);
     }
+    if let Some(path) = &config.extension_path {
+      builder = builder.set_extension_path(path);
+    }
     builder
   }
 }
@@ -272,6 +276,7 @@ impl WebviewAttributes {
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
+      extension_path: None,
       use_https_scheme: false,
       devtools: None,
       background_color: None,
@@ -397,6 +402,19 @@ impl WebviewAttributes {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.browser_extensions_enabled = enabled;
+    self
+  }
+
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
+  /// - **Linux**: Browser extensions do not need to be enabled.
+  /// - **MacOS / iOS / Android** - Unsupported.
+  #[must_use]
+  pub fn set_extension_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.extension_path = Some(path.as_ref().to_path_buf());
     self
   }
 

@@ -4283,6 +4283,13 @@ fn create_webview<T: UserEvent>(
       .with_browser_extensions_enabled(webview_attributes.browser_extensions_enabled);
   }
 
+  #[cfg(any(windows,target_os = "linux"))]
+  {
+    if let Some(path) = &webview_attributes.extension_path {
+      webview_builder = webview_builder.with_extension_path(path);
+    }
+  }
+
   webview_builder = webview_builder.with_ipc_handler(create_ipc_handler(
     kind,
     window_id.clone(),

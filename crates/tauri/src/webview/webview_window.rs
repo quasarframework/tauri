@@ -6,7 +6,7 @@
 
 use std::{
   borrow::Cow,
-  path::PathBuf,
+  path::{Path, PathBuf},
   sync::{Arc, MutexGuard},
 };
 
@@ -903,6 +903,19 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.webview_builder = self.webview_builder.browser_extensions_enabled(enabled);
+    self
+  }
+
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
+  /// - **Linux**: Browser extensions do not need to be enabled.
+  /// - **MacOS / iOS / Android** - Unsupported.
+  #[must_use]
+  pub fn set_extension_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.webview_builder = self.webview_builder.set_extension_path(path);
     self
   }
 

@@ -42,7 +42,7 @@ use crate::{
 use std::{
   borrow::Cow,
   hash::{Hash, Hasher},
-  path::PathBuf,
+  path::{Path, PathBuf},
   sync::{Arc, Mutex, MutexGuard},
 };
 
@@ -799,6 +799,15 @@ fn main() {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.webview_attributes.browser_extensions_enabled = enabled;
+    self
+  }
+
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
+  ///
+  /// Does nothing if browser extensions are disabled. See [`with_browser_extensions_enabled`](Self::with_browser_extensions_enabled)
+  #[must_use]
+  pub fn set_extension_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.webview_attributes.extension_path = Some(path.as_ref().to_path_buf());
     self
   }
 
