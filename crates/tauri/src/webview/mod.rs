@@ -804,9 +804,13 @@ fn main() {
 
   /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
   ///
-  /// Does nothing if browser extensions are disabled. See [`with_browser_extensions_enabled`](Self::with_browser_extensions_enabled)
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
+  /// - **Linux**: Browser extensions do not need to be enabled.
+  /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
-  pub fn set_extension_path(mut self, path: impl AsRef<Path>) -> Self {
+  pub fn extension_path(mut self, path: impl AsRef<Path>) -> Self {
     self.webview_attributes.extension_path = Some(path.as_ref().to_path_buf());
     self
   }
