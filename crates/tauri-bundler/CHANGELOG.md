@@ -1,5 +1,17 @@
 # Changelog
 
+## \[2.1.0]
+
+### New Features
+
+- [`1b6b2cfaa`](https://www.github.com/tauri-apps/tauri/commit/1b6b2cfaa14ab1d418c676cedbf942a812377a30) ([#11521](https://www.github.com/tauri-apps/tauri/pull/11521) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Process `bundle > windows > wix > fragmentPaths` with Handlebars to interpolate expressions within it.
+- [`6dea12a06`](https://www.github.com/tauri-apps/tauri/commit/6dea12a0677a905cb1f14969fe05c53e7cd717c6) ([#11402](https://www.github.com/tauri-apps/tauri/pull/11402) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Add `bundle > linux > deb > recommends` and `bundle > linux > rpm > recommends` fields to declare a strong, but not absolute, dependency for your `.deb` and `.rpm` packages.
+- [`058c0db72`](https://www.github.com/tauri-apps/tauri/commit/058c0db72f43fbe1574d0db654560e693755cd7e) ([#11584](https://www.github.com/tauri-apps/tauri/pull/11584) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Add `bundle > linux > rpm > compression` config option to control RPM bundle compression type and level.
+
+### Dependencies
+
+- Upgraded to `tauri-utils@2.1.0`
+
 ## \[2.0.4]
 
 ### New Features
