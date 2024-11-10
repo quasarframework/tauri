@@ -244,7 +244,7 @@ class LogicalPosition {
    * @since 2.0.0
    */
   toPhysical(scaleFactor: number): PhysicalPosition {
-    return new PhysicalPosition(this.x * scaleFactor, this.x * scaleFactor)
+    return new PhysicalPosition(this.x * scaleFactor, this.y * scaleFactor)
   }
 
   [SERIALIZE_TO_IPC_FN]() {
@@ -309,7 +309,7 @@ class PhysicalPosition {
    * @since 2.0.0
    */
   toLogical(scaleFactor: number): LogicalPosition {
-    return new LogicalPosition(this.x / scaleFactor, this.x / scaleFactor)
+    return new LogicalPosition(this.x / scaleFactor, this.y / scaleFactor)
   }
 
   [SERIALIZE_TO_IPC_FN]() {
