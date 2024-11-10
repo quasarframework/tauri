@@ -4429,7 +4429,7 @@ fn create_webview<T: UserEvent>(
       target_os = "ios",
       target_os = "android"
     ))]
-    WebviewKind::WindowChild => webview_builder.build(&window),
+    WebviewKind::WindowChild => webview_builder.build_as_child(&window),
     WebviewKind::WindowContent => {
       #[cfg(any(
         target_os = "windows",

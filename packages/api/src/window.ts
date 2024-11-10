@@ -1770,7 +1770,7 @@ class Window {
    * ```typescript
    * import { getCurrentWindow } from "@tauri-apps/api/webview";
    * const unlisten = await getCurrentWindow().onDragDropEvent((event) => {
-   *  if (event.payload.type === 'hover') {
+   *  if (event.payload.type === 'over') {
    *    console.log('User hovering', event.payload.paths);
    *  } else if (event.payload.type === 'drop') {
    *    console.log('User dropped', event.payload.paths);
