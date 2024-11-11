@@ -13,7 +13,7 @@
  *
  * ### Vanilla JS API
  *
- * The above import syntax is for TypeScript. If you're using vanilla JavaScript, use `window.__TAURI__` instead. It requires `app.withGlobalTauri` configuration option enabled.
+ * The above import syntax is for JavaScript/TypeScript with a bundler. If you're using vanilla JavaScript, you can use the global `window.__TAURI__` object instead. It requires `app.withGlobalTauri` configuration option enabled.
  *
  * @example
  * ```js
