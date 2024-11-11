@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.1.1]
+
+### Bug Fixes
+
+- [`e8a50f6d7`](https://www.github.com/tauri-apps/tauri/commit/e8a50f6d760fad4529e7abb400302a1b487f11dd) ([#11645](https://www.github.com/tauri-apps/tauri/pull/11645)) Fix integer values of `BasDirectory.Home` and `BaseDirectory.Font` regression which broke path APIs in JS.
+
 ## \[2.1.0]
 
 ### New Features
