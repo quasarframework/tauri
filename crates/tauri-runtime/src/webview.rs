@@ -14,7 +14,7 @@ use std::{
   borrow::Cow,
   collections::HashMap,
   hash::{Hash, Hasher},
-  path::{Path, PathBuf},
+  path::PathBuf,
   sync::Arc,
 };
 
