@@ -188,8 +188,8 @@ fn de_and_session() -> String {
     let session = std::env::var("XDG_SESSION_TYPE");
     format!(
       " ({} on {})",
-      de.as_str().unwrap_or("Unknown DE"),
-      session.as_str().unwrap_or("Unknown Session")
+      de.as_deref().unwrap_or("Unknown DE"),
+      session.as_deref().unwrap_or("Unknown Session")
     )
   };
 
