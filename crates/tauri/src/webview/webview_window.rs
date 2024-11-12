@@ -914,8 +914,8 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   /// - **Linux**: Browser extensions do not need to be enabled.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
-  pub fn extension_path(mut self, path: impl AsRef<Path>) -> Self {
-    self.webview_builder = self.webview_builder.extension_path(path);
+  pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.webview_builder = self.webview_builder.extensions_path(path);
     self
   }
 

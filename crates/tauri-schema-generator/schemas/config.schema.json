@@ -494,7 +494,7 @@
           "default": false,
           "type": "boolean"
         },
-        "extensionPath": {
+        "extensionsPath": {
           "description": "Set the path from which to load extensions from. Extensions stored in this path should be unpacked.\n\n ## Platform-specific:\n\n - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)\n - **Linux**: Browser extensions do not need to be enabled.\n - **MacOS / iOS / Android** - Unsupported.",
           "type": [
             "string",

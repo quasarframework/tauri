@@ -210,7 +210,7 @@ pub struct WebviewAttributes {
   pub proxy_url: Option<Url>,
   pub zoom_hotkeys_enabled: bool,
   pub browser_extensions_enabled: bool,
-  pub extension_path: Option<PathBuf>,
+  pub extensions_path: Option<PathBuf>,
   pub use_https_scheme: bool,
   pub devtools: Option<bool>,
   pub background_color: Option<Color>,
@@ -248,8 +248,8 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(color) = config.background_color {
       builder = builder.background_color(color);
     }
-    if let Some(path) = &config.extension_path {
-      builder = builder.set_extension_path(path);
+    if let Some(path) = &config.extensions_path {
+      builder = builder.set_extensions_path(path);
     }
     builder
   }
@@ -276,7 +276,7 @@ impl WebviewAttributes {
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
-      extension_path: None,
+      extensions_path: None,
       use_https_scheme: false,
       devtools: None,
       background_color: None,
@@ -413,8 +413,8 @@ impl WebviewAttributes {
   /// - **Linux**: Browser extensions do not need to be enabled.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
-  pub fn set_extension_path(mut self, path: impl AsRef<Path>) -> Self {
-    self.extension_path = Some(path.as_ref().to_path_buf());
+  pub fn set_extensions_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.extensions_path = Some(path.as_ref().to_path_buf());
     self
   }
 

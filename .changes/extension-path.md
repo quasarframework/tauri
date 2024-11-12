@@ -6,4 +6,4 @@
 "tauri-utils": "patch:feat"
 ---
 
-Add `with_extension_path` to `WebviewBuilder` for Linux and Windows.
+Add `with_extensions_path` to `WebviewBuilder` for Linux and Windows.

@@ -4285,7 +4285,7 @@ fn create_webview<T: UserEvent>(
 
   #[cfg(any(windows, target_os = "linux"))]
   {
-    if let Some(path) = &webview_attributes.extension_path {
+    if let Some(path) = &webview_attributes.extensions_path {
       webview_builder = webview_builder.with_extension_path(path);
     }
   }

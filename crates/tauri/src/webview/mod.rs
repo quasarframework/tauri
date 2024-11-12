@@ -810,8 +810,8 @@ fn main() {
   /// - **Linux**: Browser extensions do not need to be enabled.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
-  pub fn extension_path(mut self, path: impl AsRef<Path>) -> Self {
-    self.webview_attributes.extension_path = Some(path.as_ref().to_path_buf());
+  pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.webview_attributes.extensions_path = Some(path.as_ref().to_path_buf());
     self
   }
 
