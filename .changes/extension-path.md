@@ -1,9 +1,7 @@
 ---
-"tauri": "patch:feat"
-"tauri-cli": "patch:feat"
-"tauri-runtime": "patch:feat"
-"tauri-runtime-wry": "patch:feat"
-"tauri-utils": "patch:feat"
+"tauri": "minor:feat"
+"tauri-runtime": "minor:feat"
+"tauri-runtime-wry": "minor:feat"
 ---
 
 Add `WebviewWindowBuilder/WebviewBuilder::extensions_path` on Linux and Windows.
