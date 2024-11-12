@@ -816,6 +816,26 @@ pub trait WindowDispatch<T: UserEvent>: Debug + Clone + Send + Sync + Sized + 's
   /// Starts resize-dragging the window.
   fn start_resize_dragging(&self, direction: ResizeDirection) -> Result<()>;
 
+  /// Sets the badge count on the taskbar
+  /// The badge count appears as a whole for the application
+  /// Setting the count to `0``will remove the badge
+  /// 
+  /// ## Platform-specific
+  /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
+  /// - **Android:** Unsupported.
+  /// - **iOS:** iOS expects i32, if the value is larger than i32::MAX, it will be clamped to i32::MAX.
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) -> Result<()>;
+
+  /// Sets the badge count on the taskbar (macOS only)
+  /// Setting the label to None will remove the badge
+  fn set_badge_label(&self, label: Option<String>) -> Result<()>;
+
+  /// Sets the overlay icon on the taskbar (Windows only)
+  /// Setting the icon to None will remove the overlay icon
+  /// 
+  /// The overlay icon can be unique for each window.
+  fn set_overlay_icon(&self, icon: Option<Icon>) -> Result<()>;
+
   /// Sets the taskbar progress state.
   ///
   /// ## Platform-specific
