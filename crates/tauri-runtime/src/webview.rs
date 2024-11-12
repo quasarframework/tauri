@@ -402,18 +402,6 @@ impl WebviewAttributes {
     self
   }
 
-  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked Chrome extensions on Windows, and compiled `.so` extensions on Linux.
-  ///
-  /// ## Platform-specific:
-  ///
-  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
-  /// - **MacOS / iOS / Android** - Unsupported.
-  #[must_use]
-  pub fn set_extensions_path(mut self, path: impl AsRef<Path>) -> Self {
-    self.extensions_path = Some(path.as_ref().to_path_buf());
-    self
-  }
-
   /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
   ///
   /// ## Note
