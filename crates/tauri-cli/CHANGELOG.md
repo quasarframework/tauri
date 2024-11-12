@@ -1,5 +1,30 @@
 # Changelog
 
+## \[2.1.0]
+
+### New Features
+
+- [`1b6b2cfaa`](https://www.github.com/tauri-apps/tauri/commit/1b6b2cfaa14ab1d418c676cedbf942a812377a30) ([#11521](https://www.github.com/tauri-apps/tauri/pull/11521) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Process `bundle > windows > wix > fragmentPaths` with Handlebars to interpolate expressions within it.
+- [`6bf917941`](https://www.github.com/tauri-apps/tauri/commit/6bf917941ff0fcc49e86b3ba427340b75f3ce49c) ([#11322](https://www.github.com/tauri-apps/tauri/pull/11322) by [@ShaunSHamilton](https://www.github.com/tauri-apps/tauri/../../ShaunSHamilton)) Add `tauri remove` to remove plugins from projects.
+- [`058c0db72`](https://www.github.com/tauri-apps/tauri/commit/058c0db72f43fbe1574d0db654560e693755cd7e) ([#11584](https://www.github.com/tauri-apps/tauri/pull/11584) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Add `bundle > linux > rpm > compression` config option to control RPM bundle compression type and level.
+
+### Enhancements
+
+- [`1f311832a`](https://www.github.com/tauri-apps/tauri/commit/1f311832ab5b2d62a533dfcf9b1d78bddf249ae8) ([#11405](https://www.github.com/tauri-apps/tauri/pull/11405) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Add more context for errors when decoding secret and public keys for signing updater artifacts.
+- [`e0d1307d3`](https://www.github.com/tauri-apps/tauri/commit/e0d1307d3f78987d0059921a5ab01ea4b26e0ef1) ([#11414](https://www.github.com/tauri-apps/tauri/pull/11414) by [@Czxck001](https://www.github.com/tauri-apps/tauri/../../Czxck001)) Migrate the `$schema` Tauri configuration to the v2 format.
+- [`c43d5df15`](https://www.github.com/tauri-apps/tauri/commit/c43d5df15828ecffa606482ea2b60350c488c981) ([#11512](https://www.github.com/tauri-apps/tauri/pull/11512) by [@lucasfernog](https://www.github.com/tauri-apps/tauri/../../lucasfernog)) Associate a newly created capability file with the `main` window on the `tauri add` and `tauri permission add` commands.
+
+### Bug Fixes
+
+- [`7af01ff2c`](https://www.github.com/tauri-apps/tauri/commit/7af01ff2ce623d727cd13a4c8a549c1c80031882) ([#11523](https://www.github.com/tauri-apps/tauri/pull/11523) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Fix `tauri migrate` failing to install NPM depenencies when running from Deno.
+- [`100a4455a`](https://www.github.com/tauri-apps/tauri/commit/100a4455aa48df508510bbc08273215bdf70c012) ([#11529](https://www.github.com/tauri-apps/tauri/pull/11529) by [@amrbashir](https://www.github.com/tauri-apps/tauri/../../amrbashir)) Fix detecting yarn berry (v2 and higher) in various tauri cli commands.
+- [`60e86d5f6`](https://www.github.com/tauri-apps/tauri/commit/60e86d5f6e0f0c769d34ef368cd8801a918d796d) ([#11624](https://www.github.com/tauri-apps/tauri/pull/11624) by [@lucasfernog](https://www.github.com/tauri-apps/tauri/../../lucasfernog)) Use the public network IP address on `android dev` by default on Windows.
+
+### Dependencies
+
+- Upgraded to `tauri-utils@2.1.0`
+- Upgraded to `tauri-bundler@2.1.0`
+
 ## \[2.0.4]
 
 ### Enhancements

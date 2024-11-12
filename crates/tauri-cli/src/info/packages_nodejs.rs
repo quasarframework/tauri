@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 use super::SectionItem;
-use super::{env_nodejs::manager_version, VersionMetadata};
+use super::VersionMetadata;
 use colored::Colorize;
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -77,7 +77,7 @@ pub fn npm_latest_version(pm: &PackageManager, name: &str) -> crate::Result<Opti
 }
 
 pub fn package_manager(frontend_dir: &PathBuf) -> PackageManager {
-  let found = PackageManager::from_project(frontend_dir);
+  let found = PackageManager::all_from_project(frontend_dir);
 
   if found.is_empty() {
     println!(
@@ -98,15 +98,7 @@ pub fn package_manager(frontend_dir: &PathBuf) -> PackageManager {
         );
   }
 
-  if pkg_manager == PackageManager::Yarn
-    && manager_version("yarn")
-      .map(|v| v.chars().next().map(|c| c > '1').unwrap_or_default())
-      .unwrap_or(false)
-  {
-    PackageManager::YarnBerry
-  } else {
-    pkg_manager
-  }
+  pkg_manager
 }
 
 pub fn items(

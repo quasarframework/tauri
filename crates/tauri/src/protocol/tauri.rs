@@ -5,6 +5,7 @@
 use std::{borrow::Cow, sync::Arc};
 
 use http::{header::CONTENT_TYPE, Request, Response as HttpResponse, StatusCode};
+use tauri_utils::config::HeaderAddition;
 
 use crate::{
   manager::{webview::PROXY_DEV_SERVER, AppManager},
@@ -30,7 +31,10 @@ pub fn get<R: Runtime>(
 ) -> UriSchemeProtocolHandler {
   #[cfg(all(dev, mobile))]
   let url = {
-    let mut url = manager.get_url().as_str().to_string();
+    let mut url = manager
+      .get_url(window_origin.starts_with("https"))
+      .as_str()
+      .to_string();
     if url.ends_with('/') {
       url.pop();
     }
@@ -95,7 +99,9 @@ fn get_response<R: Runtime>(
     // where `$P` is not `localhost/*`
     .unwrap_or_else(|| "".to_string());
 
-  let mut builder = HttpResponse::builder().header("Access-Control-Allow-Origin", window_origin);
+  let mut builder = HttpResponse::builder()
+    .add_configured_headers(manager.config.app.security.headers.as_ref())
+    .header("Access-Control-Allow-Origin", window_origin);
 
   #[cfg(all(dev, mobile))]
   let mut response = {
@@ -152,7 +158,8 @@ fn get_response<R: Runtime>(
 
   #[cfg(not(all(dev, mobile)))]
   let mut response = {
-    let asset = manager.get_asset(path)?;
+    let use_https_scheme = request.uri().scheme() == Some(&http::uri::Scheme::HTTPS);
+    let asset = manager.get_asset(path, use_https_scheme)?;
     builder = builder.header(CONTENT_TYPE, &asset.mime_type);
     if let Some(csp) = &asset.csp_header {
       builder = builder.header("Content-Security-Policy", csp);

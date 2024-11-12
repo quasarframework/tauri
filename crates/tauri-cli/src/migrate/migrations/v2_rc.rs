@@ -35,10 +35,7 @@ pub fn run() -> Result<()> {
 }
 
 fn migrate_npm_dependencies(frontend_dir: &Path) -> Result<()> {
-  let pm = PackageManager::from_project(frontend_dir)
-    .into_iter()
-    .next()
-    .unwrap_or(PackageManager::Npm);
+  let pm = PackageManager::from_project(frontend_dir);
 
   let mut install_deps = Vec::new();
   for pkg in [

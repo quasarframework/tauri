@@ -90,7 +90,6 @@ jobs:
 
       - name: downgrade crates with MSRV conflict
         run: |
-          cargo update -p ravif --precise 0.11.5
           cargo update -p aws-config --precise 1.5.5
           cargo update -p aws-sdk-ssooidc --precise 1.40.0
           cargo update -p aws-sdk-s3 --precise 1.46.0

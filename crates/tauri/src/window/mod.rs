@@ -381,7 +381,11 @@ tauri::Builder::default()
       );
 
       if let Some(webview) = detached_window.webview {
-        app_manager.webview.attach_webview(window.clone(), webview);
+        app_manager.webview.attach_webview(
+          window.clone(),
+          webview.webview,
+          webview.use_https_scheme,
+        );
       }
 
       window
@@ -531,7 +535,7 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[must_use]
   #[deprecated(
     since = "1.2.0",
-    note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
+    note = "The window is automatically focused by default. This function Will be removed in 3.0.0. Use `focused` instead."
   )]
   pub fn focus(mut self) -> Self {
     self.window_builder = self.window_builder.focused(true);
@@ -638,6 +642,13 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[must_use]
   pub fn skip_taskbar(mut self, skip: bool) -> Self {
     self.window_builder = self.window_builder.skip_taskbar(skip);
+    self
+  }
+
+  /// Sets custom name for Windows' window class. **Windows only**.
+  #[must_use]
+  pub fn window_classname<S: Into<String>>(mut self, classname: S) -> Self {
+    self.window_builder = self.window_builder.window_classname(classname);
     self
   }
 
@@ -835,6 +846,18 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   }
 }
 
+impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
+  /// Set the window and webview background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: alpha channel is ignored.
+  #[must_use]
+  pub fn background_color(mut self, color: Color) -> Self {
+    self.window_builder = self.window_builder.background_color(color);
+    self
+  }
+}
 /// A wrapper struct to hold the window menu state
 /// and whether it is global per-app or specific to this window.
 #[cfg(desktop)]
@@ -1806,6 +1829,20 @@ tauri::Builder::default()
       .map_err(Into::into)
   }
 
+  /// Sets the window background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows:** alpha channel is ignored.
+  /// - **iOS / Android:** Unsupported.
+  pub fn set_background_color(&self, color: Option<Color>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_background_color(color)
+      .map_err(Into::into)
+  }
+
   /// Prevents the window contents from being captured by other apps.
   pub fn set_content_protected(&self, protected: bool) -> crate::Result<()> {
     self
@@ -2041,7 +2078,7 @@ tauri::Builder::default()
   docsrs,
   doc(cfg(any(target_os = "macos", target_os = "linux", windows)))
 )]
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Debug)]
 pub struct ProgressBarState {
   /// The progress bar status.
   pub status: Option<ProgressBarStatus>,

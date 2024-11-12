@@ -29,7 +29,7 @@ use crate::{
 };
 use serde::Serialize;
 use tauri_utils::{
-  config::{WebviewUrl, WindowConfig},
+  config::{Color, WebviewUrl, WindowConfig},
   Theme,
 };
 use url::Url;
@@ -476,10 +476,11 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   #[deprecated(
     since = "1.2.0",
-    note = "The window is automatically focused by default. This function Will be removed in 2.0.0. Use `focused` instead."
+    note = "The window is automatically focused by default. This function Will be removed in 3.0.0. Use `focused` instead."
   )]
   pub fn focus(mut self) -> Self {
     self.window_builder = self.window_builder.focused(true);
+    self.webview_builder = self.webview_builder.focused(true);
     self
   }
 
@@ -487,6 +488,7 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn focused(mut self, focused: bool) -> Self {
     self.window_builder = self.window_builder.focused(focused);
+    self.webview_builder = self.webview_builder.focused(focused);
     self
   }
 
@@ -566,6 +568,13 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn skip_taskbar(mut self, skip: bool) -> Self {
     self.window_builder = self.window_builder.skip_taskbar(skip);
+    self
+  }
+
+  /// Sets custom name for Windows' window class.  **Windows only**.
+  #[must_use]
+  pub fn window_classname<S: Into<String>>(mut self, classname: S) -> Self {
+    self.window_builder = self.window_builder.window_classname(classname);
     self
   }
 
@@ -894,6 +903,53 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.webview_builder = self.webview_builder.browser_extensions_enabled(enabled);
+    self
+  }
+
+  /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
+  ///
+  /// ## Note
+  ///
+  /// Using a `https` scheme will NOT allow mixed content when trying to fetch `http` endpoints and therefore will not match the behavior of the `<scheme>://localhost` protocols used on macOS and Linux.
+  ///
+  /// ## Warning
+  ///
+  /// Changing this value between releases will change the IndexedDB, cookies and localstorage location and your app will not be able to access the old data.
+  #[must_use]
+  pub fn use_https_scheme(mut self, enabled: bool) -> Self {
+    self.webview_builder = self.webview_builder.use_https_scheme(enabled);
+    self
+  }
+
+  /// Whether web inspector, which is usually called browser devtools, is enabled or not. Enabled by default.
+  ///
+  /// This API works in **debug** builds, but requires `devtools` feature flag to enable it in **release** builds.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - macOS: This will call private functions on **macOS**.
+  /// - Android: Open `chrome://inspect/#devices` in Chrome to get the devtools window. Wry's `WebView` devtools API isn't supported on Android.
+  /// - iOS: Open Safari > Develop > [Your Device Name] > [Your WebView] to get the devtools window.
+  #[must_use]
+  pub fn devtools(mut self, enabled: bool) -> Self {
+    self.webview_builder = self.webview_builder.devtools(enabled);
+    self
+  }
+
+  /// Set the window and webview background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Android / iOS:** Unsupported for the window layer.
+  /// - **macOS / iOS**: Not implemented for the webview layer.
+  /// - **Windows**:
+  ///   - alpha channel is ignored for the window layer.
+  ///   - On Windows 7, alpha channel is ignored for the webview layer.
+  ///   - On Windows 8 and newer, if alpha channel is not `0`, it will be ignored.
+  #[must_use]
+  pub fn background_color(mut self, color: Color) -> Self {
+    self.window_builder = self.window_builder.background_color(color);
+    self.webview_builder = self.webview_builder.background_color(color);
     self
   }
 }
@@ -1576,6 +1632,21 @@ impl<R: Runtime> WebviewWindow<R> {
   /// Sets this window' icon.
   pub fn set_icon(&self, icon: Image<'_>) -> crate::Result<()> {
     self.window.set_icon(icon)
+  }
+
+  /// Sets the window background color.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **iOS / Android:** Unsupported.
+  /// - **macOS**: Not implemented for the webview layer..
+  /// - **Windows**:
+  ///   - alpha channel is ignored for the window layer.
+  ///   - On Windows 7, transparency is not supported and the alpha value will be ignored for the webview layer..
+  ///   - On Windows 8 and newer: translucent colors are not supported so any alpha value other than `0` will be replaced by `255` for the webview layer.
+  pub fn set_background_color(&self, color: Option<Color>) -> crate::Result<()> {
+    self.window.set_background_color(color)?;
+    self.webview.set_background_color(color)
   }
 
   /// Whether to hide the window icon from the taskbar or not.

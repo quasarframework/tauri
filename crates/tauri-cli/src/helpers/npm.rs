@@ -7,6 +7,22 @@ use anyhow::Context;
 use crate::helpers::cross_command;
 use std::{fmt::Display, path::Path, process::Command};
 
+pub fn manager_version(package_manager: &str) -> Option<String> {
+  cross_command(package_manager)
+    .arg("-v")
+    .output()
+    .map(|o| {
+      if o.status.success() {
+        let v = String::from_utf8_lossy(o.stdout.as_slice()).to_string();
+        Some(v.split('\n').next().unwrap().to_string())
+      } else {
+        None
+      }
+    })
+    .ok()
+    .unwrap_or_default()
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum PackageManager {
   Npm,
@@ -35,7 +51,16 @@ impl Display for PackageManager {
 }
 
 impl PackageManager {
-  pub fn from_project<P: AsRef<Path>>(path: P) -> Vec<Self> {
+  /// Detects package manager from the given directory, falls back to [`PackageManager::Npm`].
+  pub fn from_project<P: AsRef<Path>>(path: P) -> Self {
+    Self::all_from_project(path)
+      .first()
+      .copied()
+      .unwrap_or(Self::Npm)
+  }
+
+  /// Detects all possible package managers from the given directory.
+  pub fn all_from_project<P: AsRef<Path>>(path: P) -> Vec<Self> {
     let mut found = Vec::new();
 
     if let Ok(entries) = std::fs::read_dir(path) {
@@ -47,7 +72,15 @@ impl PackageManager {
         } else if name.as_ref() == "pnpm-lock.yaml" {
           found.push(PackageManager::Pnpm);
         } else if name.as_ref() == "yarn.lock" {
-          found.push(PackageManager::Yarn);
+          let yarn = if manager_version("yarn")
+            .map(|v| v.chars().next().map(|c| c > '1').unwrap_or_default())
+            .unwrap_or(false)
+          {
+            PackageManager::YarnBerry
+          } else {
+            PackageManager::Yarn
+          };
+          found.push(yarn);
         } else if name.as_ref() == "bun.lockb" {
           found.push(PackageManager::Bun);
         } else if name.as_ref() == "deno.lock" {
@@ -89,10 +122,15 @@ impl PackageManager {
         .join(", ")
     );
 
-    let status = self
-      .cross_command()
-      .arg("add")
-      .args(dependencies)
+    let mut command = self.cross_command();
+    command.arg("add");
+
+    match self {
+      PackageManager::Deno => command.args(dependencies.iter().map(|d| format!("npm:{d}"))),
+      _ => command.args(dependencies),
+    };
+
+    let status = command
       .current_dir(frontend_dir)
       .status()
       .with_context(|| format!("failed to run {self}"))?;
