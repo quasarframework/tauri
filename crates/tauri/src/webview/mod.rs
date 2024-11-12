@@ -42,7 +42,7 @@ use crate::{
 use std::{
   borrow::Cow,
   hash::{Hash, Hasher},
-  path::PathBuf,
+  path::{Path, PathBuf},
   sync::{Arc, Mutex, MutexGuard},
 };
 
@@ -799,6 +799,18 @@ fn main() {
   #[must_use]
   pub fn browser_extensions_enabled(mut self, enabled: bool) -> Self {
     self.webview_attributes.browser_extensions_enabled = enabled;
+    self
+  }
+
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked Chrome extensions on Windows, and compiled `.so` extensions on Linux.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
+  /// - **MacOS / iOS / Android** - Unsupported.
+  #[must_use]
+  pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {
+    self.webview_attributes.extensions_path = Some(path.as_ref().to_path_buf());
     self
   }
 
