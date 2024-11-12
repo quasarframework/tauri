@@ -906,12 +906,11 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
     self
   }
 
-  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked Chrome extensions on Windows, and compiled `.so` extensions on Linux.
   ///
   /// ## Platform-specific:
   ///
   /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
-  /// - **Linux**: Browser extensions do not need to be enabled.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
   pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {

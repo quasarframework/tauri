@@ -1656,16 +1656,6 @@ pub struct WindowConfig {
   #[serde(default, alias = "browser-extensions-enabled")]
   pub browser_extensions_enabled: bool,
 
-  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
-  ///
-  /// ## Platform-specific:
-  ///
-  /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
-  /// - **Linux**: Browser extensions do not need to be enabled.
-  /// - **MacOS / iOS / Android** - Unsupported.
-  #[serde(default, alias = "extensions-path")]
-  pub extensions_path: Option<PathBuf>,
-
   /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
   ///
   /// ## Note
@@ -1746,7 +1736,6 @@ impl Default for WindowConfig {
       proxy_url: None,
       zoom_hotkeys_enabled: false,
       browser_extensions_enabled: false,
-      extensions_path: None,
       use_https_scheme: false,
       devtools: None,
       background_color: None,
@@ -3000,7 +2989,6 @@ mod build {
       let parent = opt_str_lit(self.parent.as_ref());
       let zoom_hotkeys_enabled = self.zoom_hotkeys_enabled;
       let browser_extensions_enabled = self.browser_extensions_enabled;
-      let extensions_path = opt_lit(self.extensions_path.as_ref().map(path_buf_lit).as_ref());
       let use_https_scheme = self.use_https_scheme;
       let devtools = opt_lit(self.devtools.as_ref());
       let background_color = opt_lit(self.background_color.as_ref());
@@ -3052,7 +3040,6 @@ mod build {
         parent,
         zoom_hotkeys_enabled,
         browser_extensions_enabled,
-        extensions_path,
         use_https_scheme,
         devtools,
         background_color

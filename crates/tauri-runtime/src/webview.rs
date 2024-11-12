@@ -248,9 +248,6 @@ impl From<&WindowConfig> for WebviewAttributes {
     if let Some(color) = config.background_color {
       builder = builder.background_color(color);
     }
-    if let Some(path) = &config.extensions_path {
-      builder = builder.set_extensions_path(path);
-    }
     builder
   }
 }
@@ -405,12 +402,11 @@ impl WebviewAttributes {
     self
   }
 
-  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked.
+  /// Set the path from which to load extensions from. Extensions stored in this path should be unpacked Chrome extensions on Windows, and compiled `.so` extensions on Linux.
   ///
   /// ## Platform-specific:
   ///
   /// - **Windows**: Browser extensions must first be enabled. See [`browser_extensions_enabled`](Self::browser_extensions_enabled)
-  /// - **Linux**: Browser extensions do not need to be enabled.
   /// - **MacOS / iOS / Android** - Unsupported.
   #[must_use]
   pub fn set_extensions_path(mut self, path: impl AsRef<Path>) -> Self {
