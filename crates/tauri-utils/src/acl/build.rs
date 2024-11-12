@@ -34,7 +34,12 @@ pub const PERMISSION_FILE_EXTENSIONS: &[&str] = &["json", "toml"];
 pub const PERMISSION_DOCS_FILE_NAME: &str = "reference.md";
 
 /// Allowed capability file extensions
-const CAPABILITY_FILE_EXTENSIONS: &[&str] = &["json", "toml"];
+const CAPABILITY_FILE_EXTENSIONS: &[&str] = &[
+  "json",
+  #[cfg(feature = "config-json5")]
+  "json5",
+  "toml",
+];
 
 /// Known folder name of the capability schemas
 const CAPABILITIES_SCHEMA_FOLDER_NAME: &str = "schemas";
