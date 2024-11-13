@@ -2156,7 +2156,7 @@ interface WindowOptions {
   /**
    * Prevent initial window from getting bigger than the work area
    *
-   * ## Platform-specific
+   * #### Platform-specific
    *
    * - **Linux:** Prevent overflowing the monitor instead of workarea
    * - **iOS / Android:** Unsupported.

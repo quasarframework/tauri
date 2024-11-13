@@ -66,7 +66,7 @@ use tao::{
 #[cfg(target_os = "macos")]
 use tauri_utils::TitleBarStyle;
 use tauri_utils::{
-  config::{Color, PreventOverflowMarginConfig, WindowConfig},
+  config::{Color, PreventOverflowConfig, WindowConfig},
   Theme,
 };
 use url::Url;
@@ -867,8 +867,8 @@ impl WindowBuilder for WindowBuilderWrapper {
 
       if let Some(prevent_overflow) = &config.prevent_overflow {
         window = match prevent_overflow {
-          PreventOverflowMarginConfig::Enable(true) => window.prevent_overflow(),
-          PreventOverflowMarginConfig::Margin(margin) => window
+          PreventOverflowConfig::Enable(true) => window.prevent_overflow(),
+          PreventOverflowConfig::Margin(margin) => window
             .prevent_overflow_with_margin(TaoPhysicalSize::new(margin.width, margin.height).into()),
           _ => window,
         };

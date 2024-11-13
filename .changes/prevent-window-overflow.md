@@ -6,4 +6,4 @@
 "@tauri-apps/api": "patch:feat"
 ---
 
-Add an option `prevent_overflow` for preventing the window from overflowing the monitor on creation
+Add `preventOverflow` config option to prevent the window from overflowing the monitor size on creation

@@ -1454,7 +1454,7 @@ pub struct PreventOverflowMargin {
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(untagged)]
-pub enum PreventOverflowMarginConfig {
+pub enum PreventOverflowConfig {
   /// Enable prevent overflow or not
   Enable(bool),
   /// Enable prevent overflow with a margin
@@ -1522,7 +1522,7 @@ pub struct WindowConfig {
   /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[serde(alias = "prevent-overflow")]
-  pub prevent_overflow: Option<PreventOverflowMarginConfig>,
+  pub prevent_overflow: Option<PreventOverflowConfig>,
   /// Whether the window is resizable or not. When resizable is set to false, native window's maximize button is automatically disabled.
   #[serde(default = "default_true")]
   pub resizable: bool,
@@ -2990,7 +2990,7 @@ mod build {
     }
   }
 
-  impl ToTokens for PreventOverflowMarginConfig {
+  impl ToTokens for PreventOverflowConfig {
     fn to_tokens(&self, tokens: &mut TokenStream) {
       let prefix = quote! { ::tauri::utils::config::PreventOverflowMarginConfig };
 
