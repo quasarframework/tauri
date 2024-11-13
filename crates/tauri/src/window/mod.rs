@@ -39,7 +39,7 @@ use crate::{
     dpi::{Position, Size},
     UserAttentionType,
   },
-  CursorIcon,
+  CursorIcon
 };
 
 use serde::Serialize;
@@ -2011,6 +2011,43 @@ tauri::Builder::default()
       .window
       .dispatcher
       .start_resize_dragging(direction)
+      .map_err(Into::into)
+  }
+
+  /// Sets the overlay icon on the taskbar **Windows only**
+  /// Setting the icon to None will remove the overlay icon
+  ///
+  /// The overlay icon can be unique for each window.
+  pub fn set_overlay_icon(&self, icon: Option<Image<'_>>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_overlay_icon(icon.map(|x| x.into()))
+      .map_err(Into::into)
+  }
+
+  /// Sets the taskbar badge count
+  /// Setting the count to `0``will remove the badge
+  /// 
+  /// ## Platform-specific
+  /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
+  /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
+  /// - **Android:** Unsupported.
+  pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_badge_count(count, Some(format!("{}.desktop", self.package_info().name)))
+      .map_err(Into::into)
+  }
+
+  /// Sets the taskbar badge label **macOS only**
+  /// Setting the label to `0``will remove the badge
+  pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_badge_label(label)
       .map_err(Into::into)
   }
 
