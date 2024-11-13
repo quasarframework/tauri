@@ -151,6 +151,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<Bundle>> {
             | PackageType::MacOsBundle
             | PackageType::Nsis
             | PackageType::WindowsMsi
+            | PackageType::Deb
         )
       } else {
         matches!(package_type, PackageType::MacOsBundle)
@@ -166,7 +167,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<Bundle>> {
         // Self contained updater, no need to zip
         matches!(
           package_type,
-          PackageType::AppImage | PackageType::Nsis | PackageType::WindowsMsi
+          PackageType::AppImage | PackageType::Nsis | PackageType::WindowsMsi | PackageType::Deb
         )
       })
     {
