@@ -15,6 +15,7 @@
 )]
 
 use http::Request;
+use monitor::MonitorExt;
 use raw_window_handle::{DisplayHandle, HasDisplayHandle, HasWindowHandle};
 
 use tauri_runtime::{
@@ -123,6 +124,7 @@ use std::{
 pub type WebviewId = u32;
 type IpcHandler = dyn Fn(Request<String>) + 'static;
 
+mod monitor;
 #[cfg(any(
   windows,
   target_os = "linux",
@@ -3993,7 +3995,7 @@ fn create_window<T: UserEvent, F: Fn(RawWindow) + Send + 'static>(
       }
 
       if let Some(margin) = window_builder.prevent_overflow {
-        let size = get_work_area_size(&monitor);
+        let size = monitor.get_work_area_size();
         let margin = margin.to_physical::<u32>(scale_factor);
         let constraint = PhysicalSize::new(size.width - margin.width, size.height - margin.height);
         if window_size.width > constraint.width || window_size.height > constraint.height {
@@ -4586,36 +4588,4 @@ fn inner_size(
   has_children: bool,
 ) -> TaoPhysicalSize<u32> {
   window.inner_size()
-}
-
-fn get_work_area_size(target_monitor: &MonitorHandle) -> TaoPhysicalSize<u32> {
-  #[cfg(windows)]
-  {
-    use tao::platform::windows::MonitorHandleExtWindows;
-    use windows::Win32::Graphics::Gdi::{GetMonitorInfoW, HMONITOR, MONITORINFO};
-    let mut monitor_info = MONITORINFO {
-      cbSize: std::mem::size_of::<MONITORINFO>() as u32,
-      ..Default::default()
-    };
-    let status =
-      unsafe { GetMonitorInfoW(HMONITOR(target_monitor.hmonitor() as _), &mut monitor_info) };
-    if status.into() {
-      return TaoPhysicalSize::new(
-        (monitor_info.rcWork.right - monitor_info.rcWork.left) as u32,
-        (monitor_info.rcWork.bottom - monitor_info.rcWork.top) as u32,
-      );
-    }
-  }
-  #[cfg(target_os = "macos")]
-  {
-    use objc2_app_kit::NSScreen;
-    use tao::platform::macos::MonitorHandleExtMacOS;
-    if let Some(ns_screen) = target_monitor.ns_screen() {
-      let ns_screen: &NSScreen = unsafe { &*ns_screen.cast() };
-      let rect = ns_screen.visibleFrame();
-      return TaoLogicalSize::new(rect.size.width, rect.size.height)
-        .to_physical(target_monitor.scale_factor());
-    }
-  }
-  target_monitor.size()
 }
