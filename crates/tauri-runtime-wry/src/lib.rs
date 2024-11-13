@@ -3495,7 +3495,6 @@ fn handle_user_message<T: UserEvent>(
             }
             #[cfg(target_os = "ios")]
             {
-              use tao::platform::ios::WindowExtIOS;
               use wry::WebViewExtIOS;
 
               f(Webview {
