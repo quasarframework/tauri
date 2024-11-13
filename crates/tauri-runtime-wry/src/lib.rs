@@ -3135,7 +3135,7 @@ fn handle_user_message<T: UserEvent>(
           }
           WindowMessage::SetBadgeCount(_count, _desktop_filename) => {
             #[cfg(target_os = "ios")]
-            window.set_badge_count(_count.map_or(0, |x| x.clamp(i32::MAX as i64) as i32));
+            window.set_badge_count(_count.map_or(0, |x| x.clamp(i32::MIN as i64, i32::MAX as i64) as i32));
 
             #[cfg(target_os = "macos")]
             window.set_badge_label(_count.map(|x| x.to_string()));
