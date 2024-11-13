@@ -2132,21 +2132,18 @@ impl<T: UserEvent> WindowDispatch<T> for WryWindowDispatcher<T> {
 
   fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) -> Result<()> {
     send_user_message(
-      &self.context, 
+      &self.context,
       Message::Window(
         self.window_id,
-        WindowMessage::SetBadgeCount(count, desktop_filename)
-      )
+        WindowMessage::SetBadgeCount(count, desktop_filename),
+      ),
     )
   }
 
   fn set_badge_label(&self, label: Option<String>) -> Result<()> {
     send_user_message(
-      &self.context, 
-      Message::Window(
-        self.window_id,
-        WindowMessage::SetBadgeLabel(label)
-      )
+      &self.context,
+      Message::Window(self.window_id, WindowMessage::SetBadgeLabel(label)),
     )
   }
 
@@ -2154,11 +2151,8 @@ impl<T: UserEvent> WindowDispatch<T> for WryWindowDispatcher<T> {
     let icon: Result<Option<TaoIcon>> = icon.map_or(Ok(None), |x| Ok(Some(TaoIcon::try_from(x)?)));
 
     send_user_message(
-      &self.context, 
-      Message::Window(
-        self.window_id,
-        WindowMessage::SetOverlayIcon(icon?)
-      )
+      &self.context,
+      Message::Window(self.window_id, WindowMessage::SetOverlayIcon(icon?)),
     )
   }
 
@@ -3135,7 +3129,9 @@ fn handle_user_message<T: UserEvent>(
           }
           WindowMessage::SetBadgeCount(_count, _desktop_filename) => {
             #[cfg(target_os = "ios")]
-            window.set_badge_count(_count.map_or(0, |x| x.clamp(i32::MIN as i64, i32::MAX as i64) as i32));
+            window.set_badge_count(
+              _count.map_or(0, |x| x.clamp(i32::MIN as i64, i32::MAX as i64) as i32),
+            );
 
             #[cfg(target_os = "macos")]
             window.set_badge_label(_count.map(|x| x.to_string()));
@@ -3147,10 +3143,7 @@ fn handle_user_message<T: UserEvent>(
               target_os = "netbsd",
               target_os = "openbsd"
             ))]
-            window.set_badge_count(
-              _count, 
-              _desktop_filename
-            );
+            window.set_badge_count(_count, _desktop_filename);
           }
           WindowMessage::SetBadgeLabel(_label) => {
             #[cfg(target_os = "macos")]

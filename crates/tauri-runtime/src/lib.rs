@@ -819,7 +819,7 @@ pub trait WindowDispatch<T: UserEvent>: Debug + Clone + Send + Sync + Sized + 's
   /// Sets the badge count on the taskbar
   /// The badge count appears as a whole for the application
   /// Setting the count to `0``will remove the badge
-  /// 
+  ///
   /// ## Platform-specific
   /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
   /// - **Android:** Unsupported.
@@ -832,7 +832,7 @@ pub trait WindowDispatch<T: UserEvent>: Debug + Clone + Send + Sync + Sized + 's
 
   /// Sets the overlay icon on the taskbar (Windows only)
   /// Setting the icon to None will remove the overlay icon
-  /// 
+  ///
   /// The overlay icon can be unique for each window.
   fn set_overlay_icon(&self, icon: Option<Icon>) -> Result<()>;
 
