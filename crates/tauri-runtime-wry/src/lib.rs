@@ -15,6 +15,7 @@
 )]
 
 use http::Request;
+#[cfg(desktop)]
 use monitor::MonitorExt;
 use raw_window_handle::{DisplayHandle, HasDisplayHandle, HasWindowHandle};
 
