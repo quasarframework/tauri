@@ -1726,7 +1726,7 @@ impl<R: Runtime> WebviewWindow<R> {
 
   /// Sets the taskbar badge count
   /// Setting the count to `0``will remove the badge
-  /// 
+  ///
   /// ## Platform-specific
   /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
   /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.

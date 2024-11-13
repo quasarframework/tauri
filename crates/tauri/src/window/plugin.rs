@@ -161,9 +161,7 @@ mod desktop_commands {
       None => None,
     };
 
-    window
-      .set_overlay_icon(value)
-      .map_err(Into::into)
+    window.set_overlay_icon(value).map_err(Into::into)
   }
 
   #[command(root = "crate")]
