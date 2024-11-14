@@ -1610,7 +1610,7 @@ class Window {
    *
    * #### Platform-specific
    *
-   * - **Windows**: Use `setOverlayIcon` instead.
+   * - **Windows**: Unsupported. Use @{linkcode Window.setOverlayIcon} instead.
    *
    * @example
    * ```typescript
@@ -2344,11 +2344,11 @@ function mapMonitor(m: Monitor | null): Monitor | null {
   return m === null
     ? null
     : {
-        name: m.name,
-        scaleFactor: m.scaleFactor,
-        position: new PhysicalPosition(m.position),
-        size: new PhysicalSize(m.size)
-      }
+      name: m.name,
+      scaleFactor: m.scaleFactor,
+      position: new PhysicalPosition(m.position),
+      size: new PhysicalSize(m.size)
+    }
 }
 
 /**

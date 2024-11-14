@@ -1728,7 +1728,7 @@ impl<R: Runtime> WebviewWindow<R> {
   /// Setting the count to `0``will remove the badge
   ///
   /// ## Platform-specific
-  /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
+  /// - **Windows:** Unsupported, use [`WebviewWindow::set_overlay_icon`] instead.
   /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
   /// - **Android:** Unsupported.
   pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {

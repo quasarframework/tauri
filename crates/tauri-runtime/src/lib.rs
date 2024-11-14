@@ -821,7 +821,7 @@ pub trait WindowDispatch<T: UserEvent>: Debug + Clone + Send + Sync + Sized + 's
   /// Setting the count to `0``will remove the badge
   ///
   /// ## Platform-specific
-  /// - **Windows:** Windows supports arbitrary icon as the badge, use `set_overlay_icon` instead.
+  /// - **Windows:** Unsupported, use [`WindowDispatch::set_overlay_icon`] instead.
   /// - **Android:** Unsupported.
   /// - **iOS:** iOS expects i32, if the value is larger than i32::MAX, it will be clamped to i32::MAX.
   fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) -> Result<()>;
