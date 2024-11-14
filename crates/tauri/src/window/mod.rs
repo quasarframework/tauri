@@ -2018,6 +2018,8 @@ tauri::Builder::default()
   /// Setting the icon to None will remove the overlay icon
   ///
   /// The overlay icon can be unique for each window.
+  #[cfg(target_os = "windows")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "windows")))]
   pub fn set_overlay_icon(&self, icon: Option<Image<'_>>) -> crate::Result<()> {
     self
       .window
@@ -2033,6 +2035,8 @@ tauri::Builder::default()
   /// - **Windows:** Unsupported, use [`Window::set_overlay_icon`] instead.
   /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
   /// - **Android:** Unsupported.
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
   pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {
     self
       .window
