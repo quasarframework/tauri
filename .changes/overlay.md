@@ -4,6 +4,8 @@
 "tauri-runtime-wry": minor:feat
 "tauri-runtime": minor:feat
 "tauri-bundler": minor:feat
+'@tauri-apps/cli': minor:feat
+'@tauri-apps/api': minor:feat
 ---
 
 Implement Taskbar Badging APIs for Windows, macOS, IOS, Linux

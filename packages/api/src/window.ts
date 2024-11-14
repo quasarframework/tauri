@@ -1650,16 +1650,16 @@ class Window {
   /**
    * Sets the overlay icon. **Windows only**
    * The overlay icon can be set for every window.
-   * 
+   *
    *
    * Note that you may need the `image-ico` or `image-png` Cargo features to use this API.
    * To enable it, change your Cargo.toml file:
-   * 
+   *
    * ```toml
    * [dependencies]
    * tauri = { version = "...", features = ["...", "image-png"] }
    * ```
-   * 
+   *
    * @example
    * ```typescript
    * import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -1669,7 +1669,9 @@ class Window {
    * @param icon Icon bytes or path to the icon file. Set undefined to remove the overlay icon.
    * @return A promise indicating the success or failure of the operation.
    */
-  async setOverlayIcon(icon?: string | Image | Uint8Array | ArrayBuffer | number[]): Promise<void> {
+  async setOverlayIcon(
+    icon?: string | Image | Uint8Array | ArrayBuffer | number[]
+  ): Promise<void> {
     return invoke('plugin:window|set_overlay_icon', {
       label: this.label,
       value: icon ? transformImage(icon) : undefined
@@ -2342,11 +2344,11 @@ function mapMonitor(m: Monitor | null): Monitor | null {
   return m === null
     ? null
     : {
-      name: m.name,
-      scaleFactor: m.scaleFactor,
-      position: new PhysicalPosition(m.position),
-      size: new PhysicalSize(m.size)
-    }
+        name: m.name,
+        scaleFactor: m.scaleFactor,
+        position: new PhysicalPosition(m.position),
+        size: new PhysicalSize(m.size)
+      }
 }
 
 /**
