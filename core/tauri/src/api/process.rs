@@ -82,10 +82,14 @@ pub fn restart(env: &Env) {
   use std::process::{exit, Command};
 
   if let Ok(path) = current_binary(env) {
+    // Copy the existing command line arguments and add the "restart" argument to the beginning
+    let mut args = vec!["restart_from_tauri_api".to_string()]; 
+    args.extend(env.args.iter().cloned()); 
+
     Command::new(path)
-      .args(&env.args)
-      .spawn()
-      .expect("application failed to start");
+        .args(&args)
+        .spawn()
+        .expect("application failed to start")
   }
 
   exit(0);
