@@ -24,5 +24,5 @@ pub trait MonitorExt {
   /// ## Platform-specific:
   ///
   /// - **Android / iOS**: Unsupported.
-  fn get_work_area_size(&self) -> PhysicalSize<u32>;
+  fn work_area(&self) -> PhysicalSize<u32>;
 }

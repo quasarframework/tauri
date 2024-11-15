@@ -3996,7 +3996,7 @@ fn create_window<T: UserEvent, F: Fn(RawWindow) + Send + 'static>(
       }
 
       if let Some(margin) = window_builder.prevent_overflow {
-        let size = monitor.get_work_area_size();
+        let size = monitor.work_area();
         let margin = margin.to_physical::<u32>(scale_factor);
         let constraint = PhysicalSize::new(size.width - margin.width, size.height - margin.height);
         if window_size.width > constraint.width || window_size.height > constraint.height {

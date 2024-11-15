@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 impl super::MonitorExt for tao::monitor::MonitorHandle {
-  fn get_work_area_size(&self) -> tao::dpi::PhysicalSize<u32> {
+  fn work_area(&self) -> tao::dpi::PhysicalSize<u32> {
     use objc2_app_kit::NSScreen;
     use tao::platform::macos::MonitorHandleExtMacOS;
     if let Some(ns_screen) = self.ns_screen() {
