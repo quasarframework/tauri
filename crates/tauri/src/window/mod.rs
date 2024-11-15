@@ -2035,8 +2035,6 @@ tauri::Builder::default()
   /// - **Windows:** Unsupported, use [`Window::set_overlay_icon`] instead.
   /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
   /// - **Android:** Unsupported.
-  #[cfg(target_os = "macos")]
-  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
   pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {
     self
       .window
@@ -2047,6 +2045,8 @@ tauri::Builder::default()
 
   /// Sets the taskbar badge label **macOS only**
   /// Setting the label to `0``will remove the badge
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
   pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {
     self
       .window
