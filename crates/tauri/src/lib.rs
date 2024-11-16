@@ -489,7 +489,20 @@ impl<R: Runtime> Context<R> {
   pub fn runtime_authority_mut(&mut self) -> &mut RuntimeAuthority {
     &mut self.runtime_authority
   }
+  use tauri::{plugin, Runtime};
 
+  #[tauri::command]
+  fn scan_project_security() {
+      println!("Scanning for security vulnerabilities...");
+      // Implement security scanning logic here.
+  }
+  
+  pub fn init<R: Runtime>() -> plugin::TauriPlugin<R> {
+      plugin::Builder::new("security-scanner")
+          .invoke_handler(tauri::generate_handler![scan_project_security])
+          .build()
+  }
+  
   /// Create a new [`Context`] from the minimal required items.
   #[inline(always)]
   #[allow(clippy::too_many_arguments)]
@@ -618,7 +631,27 @@ pub trait Manager<R: Runtime>: sealed::ManagerBase<R> {
       })
       .collect::<HashMap<_, _>>()
   }
+  use tauri::{plugin, Runtime};
 
+  #[tauri::command]
+  fn show_notification(title: String, message: String) {
+      // Integrate with the OS's native notification system.
+      #[cfg(target_os = "windows")]
+      {
+          // Windows-specific notification logic
+      }
+      #[cfg(target_os = "macos")]
+      {
+          // macOS-specific notification logic
+      }
+  }
+  
+  pub fn init<R: Runtime>() -> plugin::TauriPlugin<R> {
+      plugin::Builder::new("advanced-notifications")
+          .invoke_handler(tauri::generate_handler![show_notification])
+          .build()
+  }
+  
   /// Add `state` to the state managed by the application.
   ///
   /// If the state for the `T` type has previously been set, the state is unchanged and false is returned. Otherwise true is returned.
@@ -783,8 +816,8 @@ pub trait Manager<R: Runtime>: sealed::ManagerBase<R> {
   ///     app.add_capability(include_str!("../capabilities/stable/cap.json"));
   ///     Ok(())
   ///   });
-  /// ```
-  ///
+  /// ``
+
   /// The above example assumes the following directory layout:
   /// ```md
   /// ├── capabilities
