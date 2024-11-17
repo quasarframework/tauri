@@ -26,9 +26,10 @@ use handlebars::Handlebars;
 use image::{self, codecs::png::PngDecoder, ImageDecoder};
 use serde::Serialize;
 
-use crate::bundle::common;
-use crate::utils;
-use crate::Settings;
+use crate::{
+  utils::{self, fs_utils},
+  Settings,
+};
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub struct Icon {
@@ -85,7 +86,7 @@ pub fn list_icon_files(
 pub fn copy_icon_files(settings: &Settings, data_dir: &Path) -> crate::Result<Vec<Icon>> {
   let icons = list_icon_files(settings, data_dir)?;
   for (icon, src) in &icons {
-    common::copy_file(src, &icon.path)?;
+    fs_utils::copy_file(src, &icon.path)?;
   }
 
   Ok(icons.into_keys().collect())
@@ -106,7 +107,7 @@ pub fn generate_desktop_file(
   let path = PathBuf::from("usr/share/applications").join(desktop_file_name);
   let dest_path = PathBuf::from("/").join(&path);
   let file_path = data_dir.join(&path);
-  let file = &mut common::create_file(&file_path)?;
+  let file = &mut fs_utils::create_file(&file_path)?;
 
   let mut handlebars = Handlebars::new();
   handlebars.register_escape_fn(handlebars::no_escape);

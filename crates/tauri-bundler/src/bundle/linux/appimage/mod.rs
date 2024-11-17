@@ -3,11 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use super::{
-  super::common::{self},
-  debian,
+use super::debian;
+use crate::{
+  bundle::settings::Arch,
+  utils::{fs_utils, CommandExt},
+  Settings,
 };
-use crate::{bundle::settings::Arch, Settings, utils::CommandExt};
 use anyhow::Context;
 use handlebars::Handlebars;
 use std::{
@@ -53,7 +54,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   // generate deb_folder structure
   let (data_dir, icons) = debian::generate_data(&settings, &package_dir)
     .with_context(|| "Failed to build data folders and files")?;
-  common::copy_custom_files(&settings.appimage().files, &data_dir)
+  fs_utils::copy_custom_files(&settings.appimage().files, &data_dir)
     .with_context(|| "Failed to copy custom files")?;
 
   let output_path = settings.project_out_directory().join("bundle/appimage");
@@ -69,7 +70,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     arch
   );
   let appimage_path = output_path.join(&appimage_filename);
-  common::create_dir(app_dir_path, true)?;
+  fs_utils::create_dir(app_dir_path, true)?;
 
   // setup data to insert into shell script
   let mut sh_map = BTreeMap::new();

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::{common, Settings};
-use crate::utils;
+use crate::bundle::{Settings};
+use crate::utils::{self, fs_utils};
 use std::{
   cmp::min,
   ffi::OsStr,
@@ -29,7 +29,7 @@ pub fn create_icns_file(out_dir: &Path, settings: &Settings) -> crate::Result<Op
     if icon_path.extension() == Some(OsStr::new("icns")) {
       let mut dest_path = out_dir.to_path_buf();
       dest_path.push(icon_path.file_name().expect("Could not get icon filename"));
-      common::copy_file(&icon_path, &dest_path)?;
+      fs_utils::copy_file(&icon_path, &dest_path)?;
       return Ok(Some(dest_path));
     }
   }

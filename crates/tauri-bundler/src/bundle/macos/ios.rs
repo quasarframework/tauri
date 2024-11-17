@@ -13,8 +13,10 @@
 // See https://developer.apple.com/go/?id=bundle-structure for a full
 // explanation.
 
-use crate::utils;
-use crate::{bundle::common, Settings};
+use crate::{
+  utils::{self, fs_utils},
+  Settings,
+};
 
 use anyhow::Context;
 use image::{codecs::png::PngDecoder, GenericImageView, ImageDecoder};
@@ -51,7 +53,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   for src in settings.resource_files() {
     let src = src?;
     let dest = app_bundle_path.join(tauri_utils::resources::resource_relpath(&src));
-    common::copy_file(&src, &dest)
+    fs_utils::copy_file(&src, &dest)
       .with_context(|| format!("Failed to copy resource file {:?}", src))?;
   }
 
@@ -62,7 +64,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
 
   for bin in settings.binaries() {
     let bin_path = settings.binary_path(bin);
-    common::copy_file(&bin_path, app_bundle_path.join(bin.name()))
+    fs_utils::copy_file(&bin_path, app_bundle_path.join(bin.name()))
       .with_context(|| format!("Failed to copy binary from {:?}", bin_path))?;
   }
 
@@ -98,7 +100,7 @@ fn generate_icon_files(bundle_dir: &Path, settings: &Settings) -> crate::Result<
       if !sizes.contains(&(width, height, is_retina)) {
         sizes.insert((width, height, is_retina));
         let dest_path = get_dest_path(width, height, is_retina);
-        common::copy_file(&icon_path, &dest_path)?;
+        fs_utils::copy_file(&icon_path, &dest_path)?;
       }
     }
     // Fall back to non-PNG files for any missing sizes.
@@ -127,7 +129,7 @@ fn generate_icon_files(bundle_dir: &Path, settings: &Settings) -> crate::Result<
           sizes.insert((width, height, is_retina));
           let dest_path = get_dest_path(width, height, is_retina);
           icon.write_to(
-            &mut common::create_file(&dest_path)?,
+            &mut fs_utils::create_file(&dest_path)?,
             image::ImageFormat::Png,
           )?;
         }
@@ -143,7 +145,7 @@ fn generate_info_plist(
   settings: &Settings,
   icon_filenames: &[String],
 ) -> crate::Result<()> {
-  let file = &mut common::create_file(&bundle_dir.join("Info.plist"))?;
+  let file = &mut fs_utils::create_file(&bundle_dir.join("Info.plist"))?;
   writeln!(
     file,
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\

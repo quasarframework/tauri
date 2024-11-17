@@ -6,6 +6,8 @@ use std::{
   sync::{Arc, Mutex},
 };
 
+pub mod fs_utils;
+
 /// Returns true if the path has a filename indicating that it is a high-density
 /// "retina" icon.  Specifically, returns true the file stem ends with
 /// "@2x" (a convention specified by the [Apple developer docs](

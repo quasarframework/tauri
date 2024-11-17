@@ -3,18 +3,19 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::{
-  common::copy_file,
-  settings::{Arch, Settings},
-  windows::{
-    sign::try_sign,
-    util::{
-      download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-      extract_zip, HashAlgorithm, WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
+use crate::{
+  bundle::{
+    settings::{Arch, Settings},
+    windows::{
+      sign::try_sign,
+      util::{
+        download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
+        extract_zip, HashAlgorithm, WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
+      },
     },
   },
+  utils::{fs_utils::copy_file, CommandExt},
 };
-use crate::utils::CommandExt;
 use anyhow::{bail, Context};
 use handlebars::{html_escape, to_json, Handlebars};
 use regex::Regex;

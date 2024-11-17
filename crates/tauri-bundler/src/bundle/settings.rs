@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use super::category::AppCategory;
-use crate::bundle::{common, platform::target_triple};
+use crate::{bundle::platform::target_triple, utils::fs_utils};
 use anyhow::Context;
 pub use tauri_utils::config::WebviewInstallMode;
 use tauri_utils::{
@@ -1064,7 +1064,7 @@ impl Settings {
           .to_string_lossy()
           .replace(&format!("-{}", self.target), ""),
       );
-      common::copy_file(&src, &dest)?;
+      fs_utils::copy_file(&src, &dest)?;
       paths.push(dest);
     }
     Ok(paths)
@@ -1075,7 +1075,7 @@ impl Settings {
     for resource in self.resource_files().iter() {
       let resource = resource?;
       let dest = path.join(resource.target());
-      common::copy_file(resource.path(), &dest)?;
+      fs_utils::copy_file(resource.path(), &dest)?;
     }
     Ok(())
   }
