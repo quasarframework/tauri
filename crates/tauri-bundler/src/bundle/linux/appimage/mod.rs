@@ -70,7 +70,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     arch
   );
   let appimage_path = output_path.join(&appimage_filename);
-  fs_utils::create_dir(app_dir_path, true)?;
+  fs_utils::create_dir(&app_dir_path, true)?;
 
   // setup data to insert into shell script
   let mut sh_map = BTreeMap::new();

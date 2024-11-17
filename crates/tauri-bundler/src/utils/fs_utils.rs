@@ -159,7 +159,7 @@ pub fn copy_custom_files(
       pkg_path
     };
     if path.is_file() {
-      copy_file(path, data_dir.join(pkg_path))?;
+      copy_file(path, &data_dir.join(pkg_path))?;
     } else {
       copy_dir(path, &data_dir.join(pkg_path))?;
     }
