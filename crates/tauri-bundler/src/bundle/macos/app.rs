@@ -175,7 +175,7 @@ fn copy_custom_files_to_bundle(bundle_directory: &Path, settings: &Settings) -> 
       contents_path
     };
     if path.is_file() {
-      fs_utils::copy_file(path, bundle_directory.join(contents_path))
+      fs_utils::copy_file(path, &bundle_directory.join(contents_path))
         .with_context(|| format!("Failed to copy file {:?} to {:?}", path, contents_path))?;
     } else {
       fs_utils::copy_dir(path, &bundle_directory.join(contents_path))
