@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::{Settings};
+use crate::bundle::Settings;
 use crate::utils::{self, fs_utils};
 use std::{
   cmp::min,
