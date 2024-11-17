@@ -135,6 +135,7 @@ pub fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
     }
   });
 
+  // TODO:
   let manually_killed_app = Arc::new(AtomicBool::default());
 
   Ok(DevChild {
