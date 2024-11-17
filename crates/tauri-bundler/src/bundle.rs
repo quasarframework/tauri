@@ -9,7 +9,6 @@ mod common;
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
-mod path_utils;
 mod platform;
 mod settings;
 mod updater_bundle;

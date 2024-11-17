@@ -36,6 +36,33 @@ pub fn create_file(path: &Path) -> crate::Result<BufWriter<File>> {
   Ok(BufWriter::new(file))
 }
 
+/// Creates the given directory path,
+/// erasing it first if specified.
+pub fn create_dir(path: &Path, erase: bool) -> crate::Result<()> {
+  if erase && path.exists() {
+    remove_dir_all(path)?;
+  }
+  Ok(fs::create_dir(path)?)
+}
+
+/// Creates all of the directories of the specified path,
+/// erasing it first if specified.
+pub fn create_dir_all(path: &Path, erase: bool) -> crate::Result<()> {
+  if erase && path.exists() {
+    remove_dir_all(path)?;
+  }
+  Ok(fs::create_dir_all(path)?)
+}
+
+/// Removes the directory and its contents if it exists.
+pub fn remove_dir_all(path: &Path) -> crate::Result<()> {
+  if path.exists() {
+    Ok(fs::remove_dir_all(path)?)
+  } else {
+    Ok(())
+  }
+}
+
 /// Makes a symbolic link to a directory.
 #[cfg(unix)]
 #[allow(dead_code)]
@@ -63,11 +90,9 @@ fn symlink_file(src: &Path, dst: &Path) -> io::Result<()> {
 }
 
 /// Copies a regular file from one path to another, creating any parent
-/// directories of the destination path as necessary.  Fails if the source path
+/// directories of the destination path as necessary. Fails if the source path
 /// is a directory or doesn't exist.
-pub fn copy_file(from: impl AsRef<Path>, to: impl AsRef<Path>) -> crate::Result<()> {
-  let from = from.as_ref();
-  let to = to.as_ref();
+pub fn copy_file(from: &Path, to: &Path) -> crate::Result<()> {
   if !from.exists() {
     return Err(crate::Error::GenericError(format!(
       "{from:?} does not exist"

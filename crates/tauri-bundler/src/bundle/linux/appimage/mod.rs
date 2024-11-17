@@ -4,10 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use super::{
-  super::{
-    common::{self, CommandExt},
-    path_utils,
-  },
+  super::common::{self, CommandExt},
   debian,
 };
 use crate::{bundle::settings::Arch, Settings};
@@ -72,7 +69,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     arch
   );
   let appimage_path = output_path.join(&appimage_filename);
-  path_utils::create(app_dir_path, true)?;
+  common::create_dir(app_dir_path, true)?;
 
   // setup data to insert into shell script
   let mut sh_map = BTreeMap::new();

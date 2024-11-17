@@ -1075,7 +1075,7 @@ impl Settings {
     for resource in self.resource_files().iter() {
       let resource = resource?;
       let dest = path.join(resource.target());
-      common::copy_file(resource.path(), dest)?;
+      common::copy_file(resource.path(), &dest)?;
     }
     Ok(())
   }

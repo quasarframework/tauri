@@ -4,8 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::bundle::{
-  common::CommandExt,
-  path_utils::{copy_file, FileOpts},
+  common::{copy_file, CommandExt},
   settings::{Arch, Settings},
   windows::{
     sign::try_sign,
@@ -198,14 +197,7 @@ fn copy_icon(settings: &Settings, filename: &str, path: &Path) -> crate::Result<
 
   let icon_path = std::env::current_dir()?.join(path);
 
-  copy_file(
-    icon_path,
-    &icon_target_path,
-    &FileOpts {
-      overwrite: true,
-      ..Default::default()
-    },
-  )?;
+  copy_file(&icon_path, &icon_target_path)?;
 
   Ok(icon_target_path)
 }
