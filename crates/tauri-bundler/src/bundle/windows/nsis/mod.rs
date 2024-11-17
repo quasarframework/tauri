@@ -14,7 +14,7 @@ use crate::{
     },
   },
   utils::{
-    http_utils::{download_and_verify, extract_zip, verify_file_hash, HashAlgorithm},
+    http_utils::{download_and_verify, verify_file_hash, HashAlgorithm},
     CommandExt,
   },
   Settings,
@@ -112,7 +112,7 @@ fn get_and_extract_nsis(nsis_toolset_path: &Path, _tauri_tools_path: &Path) -> c
   {
     let data = download_and_verify(NSIS_URL, NSIS_SHA1, HashAlgorithm::Sha1)?;
     log::info!("extracting NSIS");
-    extract_zip(&data, _tauri_tools_path)?;
+    crate::utils::http_utils::extract_zip(&data, _tauri_tools_path)?;
     fs::rename(_tauri_tools_path.join("nsis-3.08"), nsis_toolset_path)?;
   }
 
