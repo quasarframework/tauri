@@ -21,6 +21,7 @@ pub fn create_file(path: &Path) -> crate::Result<BufWriter<File>> {
 
 /// Creates the given directory path,
 /// erasing it first if specified.
+#[allow(dead_code)]
 pub fn create_dir(path: &Path, erase: bool) -> crate::Result<()> {
   if erase && path.exists() {
     remove_dir_all(path)?;
@@ -30,6 +31,7 @@ pub fn create_dir(path: &Path, erase: bool) -> crate::Result<()> {
 
 /// Creates all of the directories of the specified path,
 /// erasing it first if specified.
+#[allow(dead_code)]
 pub fn create_dir_all(path: &Path, erase: bool) -> crate::Result<()> {
   if erase && path.exists() {
     remove_dir_all(path)?;
@@ -38,6 +40,7 @@ pub fn create_dir_all(path: &Path, erase: bool) -> crate::Result<()> {
 }
 
 /// Removes the directory and its contents if it exists.
+#[allow(dead_code)]
 pub fn remove_dir_all(path: &Path) -> crate::Result<()> {
   if path.exists() {
     Ok(fs::remove_dir_all(path)?)
