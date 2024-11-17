@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::bundle::{
-  common::{copy_file, CommandExt},
+  common::copy_file,
   settings::{Arch, Settings},
   windows::{
     sign::try_sign,
@@ -14,6 +14,7 @@ use crate::bundle::{
     },
   },
 };
+use crate::utils::CommandExt;
 use anyhow::{bail, Context};
 use handlebars::{html_escape, to_json, Handlebars};
 use regex::Regex;

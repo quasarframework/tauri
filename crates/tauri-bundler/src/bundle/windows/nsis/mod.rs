@@ -6,13 +6,11 @@ use crate::bundle::settings::Arch;
 use crate::bundle::windows::sign::{sign_command, try_sign};
 
 use crate::{
-  bundle::{
-    common::CommandExt,
-    windows::util::{
-      download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-      verify_file_hash, HashAlgorithm, NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
-    },
+  bundle::windows::util::{
+    download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
+    verify_file_hash, HashAlgorithm, NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
   },
+  utils::CommandExt,
   Settings,
 };
 use tauri_utils::display_path;

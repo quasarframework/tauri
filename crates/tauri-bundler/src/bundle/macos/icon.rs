@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::bundle::{common, Settings};
+use crate::utils;
 use std::{
   cmp::min,
   ffi::OsStr,
@@ -63,7 +64,7 @@ pub fn create_icns_file(out_dir: &Path, settings: &Settings) -> crate::Result<Op
   for icon_path in settings.icon_files() {
     let icon_path = icon_path?;
     let icon = image::open(&icon_path)?;
-    let density = if common::is_retina(&icon_path) { 2 } else { 1 };
+    let density = if utils::is_retina(&icon_path) { 2 } else { 1 };
     let (w, h) = icon.dimensions();
     let orig_size = min(w, h);
     let next_size_down = 2f32.powf((orig_size as f32).log2().floor()) as u32;

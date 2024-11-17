@@ -13,6 +13,7 @@
 // See https://developer.apple.com/go/?id=bundle-structure for a full
 // explanation.
 
+use crate::utils;
 use crate::{bundle::common, Settings};
 
 use anyhow::Context;
@@ -93,7 +94,7 @@ fn generate_icon_files(bundle_dir: &Path, settings: &Settings) -> crate::Result<
       let decoder = PngDecoder::new(BufReader::new(File::open(&icon_path)?))?;
       let width = decoder.dimensions().0;
       let height = decoder.dimensions().1;
-      let is_retina = common::is_retina(&icon_path);
+      let is_retina = utils::is_retina(&icon_path);
       if !sizes.contains(&(width, height, is_retina)) {
         sizes.insert((width, height, is_retina));
         let dest_path = get_dest_path(width, height, is_retina);
@@ -121,7 +122,7 @@ fn generate_icon_files(bundle_dir: &Path, settings: &Settings) -> crate::Result<
       } else {
         let icon = image::open(&icon_path)?;
         let (width, height) = icon.dimensions();
-        let is_retina = common::is_retina(&icon_path);
+        let is_retina = utils::is_retina(&icon_path);
         if !sizes.contains(&(width, height, is_retina)) {
           sizes.insert((width, height, is_retina));
           let dest_path = get_dest_path(width, height, is_retina);

@@ -25,5 +25,6 @@
 /// The bundle API.
 pub mod bundle;
 mod error;
+mod utils;
 pub use bundle::*;
 pub use error::{Error, Result};

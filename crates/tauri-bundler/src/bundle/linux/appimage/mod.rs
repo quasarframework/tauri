@@ -4,10 +4,10 @@
 // SPDX-License-Identifier: MIT
 
 use super::{
-  super::common::{self, CommandExt},
+  super::common::{self},
   debian,
 };
-use crate::{bundle::settings::Arch, Settings};
+use crate::{bundle::settings::Arch, Settings, utils::CommandExt};
 use anyhow::Context;
 use handlebars::Handlebars;
 use std::{

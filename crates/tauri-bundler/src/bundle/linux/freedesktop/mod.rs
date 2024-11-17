@@ -27,6 +27,7 @@ use image::{self, codecs::png::PngDecoder, ImageDecoder};
 use serde::Serialize;
 
 use crate::bundle::common;
+use crate::utils;
 use crate::Settings;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
@@ -65,7 +66,7 @@ pub fn list_icon_files(
       let decoder = PngDecoder::new(BufReader::new(File::open(&icon_path)?))?;
       let width = decoder.dimensions().0;
       let height = decoder.dimensions().1;
-      let is_high_density = common::is_retina(&icon_path);
+      let is_high_density = utils::is_retina(&icon_path);
       let dest_path = get_dest_path(width, height, is_high_density);
       Icon {
         width,

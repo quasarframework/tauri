@@ -23,11 +23,11 @@
 // files into the `Contents` directory of the bundle.
 
 use super::{
-  super::common::{self, CommandExt},
+  super::common::{self},
   icon::create_icns_file,
   sign::{notarize, notarize_auth, sign, NotarizeAuthError, SignTarget},
 };
-use crate::Settings;
+use crate::{utils::CommandExt, Settings};
 
 use anyhow::Context;
 
