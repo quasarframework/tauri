@@ -191,6 +191,8 @@ mod tests {
   #[cfg(not(windows))]
   #[test]
   fn copy_dir_with_symlinks() {
+    use std::path::PathBuf;
+
     // Create a directory structure that looks like this:
     //   ${TMP}/orig/
     //       sub/
