@@ -12,6 +12,7 @@ use std::{
 };
 
 pub mod fs_utils;
+pub mod http_utils;
 
 /// Returns true if the path has a filename indicating that it is a high-density
 /// "retina" icon.  Specifically, returns true the file stem ends with

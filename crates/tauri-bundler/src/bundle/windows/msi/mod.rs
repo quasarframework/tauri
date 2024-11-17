@@ -9,12 +9,16 @@ use crate::{
     windows::{
       sign::try_sign,
       util::{
-        download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-        extract_zip, HashAlgorithm, WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
+        download_webview2_bootstrapper, download_webview2_offline_installer,
+        WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
       },
     },
   },
-  utils::{fs_utils::copy_file, CommandExt},
+  utils::{
+    fs_utils::copy_file,
+    http_utils::{download_and_verify, extract_zip, HashAlgorithm},
+    CommandExt,
+  },
 };
 use anyhow::{bail, Context};
 use handlebars::{html_escape, to_json, Handlebars};

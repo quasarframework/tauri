@@ -2,15 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::settings::Arch;
-use crate::bundle::windows::sign::{sign_command, try_sign};
-
 use crate::{
-  bundle::windows::util::{
-    download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-    verify_file_hash, HashAlgorithm, NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
+  bundle::{
+    settings::Arch,
+    windows::{
+      sign::{sign_command, try_sign},
+      util::{
+        download_webview2_bootstrapper, download_webview2_offline_installer,
+        NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
+      },
+    },
   },
-  utils::CommandExt,
+  utils::{
+    http_utils::{download_and_verify, extract_zip, verify_file_hash, HashAlgorithm},
+    CommandExt,
+  },
   Settings,
 };
 use tauri_utils::display_path;
@@ -106,7 +112,7 @@ fn get_and_extract_nsis(nsis_toolset_path: &Path, _tauri_tools_path: &Path) -> c
   {
     let data = download_and_verify(NSIS_URL, NSIS_SHA1, HashAlgorithm::Sha1)?;
     log::info!("extracting NSIS");
-    crate::bundle::windows::util::extract_zip(&data, _tauri_tools_path)?;
+    extract_zip(&data, _tauri_tools_path)?;
     fs::rename(_tauri_tools_path.join("nsis-3.08"), nsis_toolset_path)?;
   }
 
