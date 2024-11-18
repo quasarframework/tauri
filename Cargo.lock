@@ -4274,15 +4274,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "instant"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0242819d153cba4b4b05a5a8f2a7e9bbf97b6055b2a002b395c96b5ff3c0222"
-dependencies = [
- "cfg-if",
-]
-
-[[package]]
 name = "interpolate_name"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8921,9 +8912,8 @@ dependencies = [
 
 [[package]]
 name = "tao"
-version = "0.30.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "833b4d43383d76d5078d72f3acd977f47eb5b6751eb40baa665d13828e7b79df"
+version = "0.30.8"
+source = "git+https://github.com/sgammon/tao.git?rev=11854b206d1eb32aa88d542bb2f8e3f20eebbb4c#11854b206d1eb32aa88d542bb2f8e3f20eebbb4c"
 dependencies = [
  "bitflags 2.6.0",
  "cocoa 0.26.0",
@@ -8936,7 +8926,6 @@ dependencies = [
  "gdkwayland-sys",
  "gdkx11-sys",
  "gtk",
- "instant",
  "jni",
  "lazy_static",
  "libc",
@@ -8949,7 +8938,7 @@ dependencies = [
  "parking_lot",
  "raw-window-handle",
  "scopeguard",
- "tao-macros",
+ "tao-macros 0.1.3 (git+https://github.com/sgammon/tao.git?rev=11854b206d1eb32aa88d542bb2f8e3f20eebbb4c)",
  "unicode-segmentation",
  "url",
  "windows",
@@ -8963,6 +8952,16 @@ name = "tao-macros"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4e16beb8b2ac17db28eab8bca40e62dbfbb34c0fcdc6d9826b11b7b5d047dfd"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.87",
+]
+
+[[package]]
+name = "tao-macros"
+version = "0.1.3"
+source = "git+https://github.com/sgammon/tao.git?rev=11854b206d1eb32aa88d542bb2f8e3f20eebbb4c#11854b206d1eb32aa88d542bb2f8e3f20eebbb4c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -11310,7 +11309,7 @@ dependencies = [
  "raw-window-handle",
  "sha2",
  "soup3",
- "tao-macros",
+ "tao-macros 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror 1.0.68",
  "tracing",
  "url",

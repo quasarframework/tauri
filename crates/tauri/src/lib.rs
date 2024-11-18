@@ -37,6 +37,7 @@
 //! - **image-png**: Adds support to parse `.png` image, see [`Image`].
 //! - **macos-proxy**: Adds support for [`WebviewBuilder::proxy_url`] on macOS. Requires macOS 14+.
 //! - **specta**: Add support for [`specta::specta`](https://docs.rs/specta/%5E2.0.0-rc.9/specta/attr.specta.html) with Tauri arguments such as [`State`](crate::State), [`Window`](crate::Window) and [`AppHandle`](crate::AppHandle)
+//! - **push-notifications**: Add support for [Apple APNS](https://developer.apple.com/notifications/), [Windows WNS](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/notifications/push-notifications/), and similar systems
 //!
 //! ## Cargo allowlist features
 //!
@@ -78,6 +79,9 @@ pub use tauri_macros::{command, generate_handler};
 
 use tauri_utils::assets::AssetsIter;
 pub use url::Url;
+
+#[cfg(feature = "push-notifications")]
+pub use app::PushToken;
 
 pub(crate) mod app;
 pub mod async_runtime;

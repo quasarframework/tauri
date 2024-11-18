@@ -47,6 +47,7 @@ pub use dpi;
 
 pub type WindowEventId = u32;
 pub type WebviewEventId = u32;
+pub type PushToken = Vec<u8>;
 
 /// A rectangular region.
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -248,6 +249,12 @@ pub enum RunEvent<T: UserEvent> {
     /// Indicates whether the NSApplication object found any visible windows in your application.
     has_visible_windows: bool,
   },
+  /// Push token was registered.
+  #[cfg(feature = "push-notifications")]
+  PushRegistration(PushToken),
+  /// Push token failure.
+  #[cfg(feature = "push-notifications")]
+  PushRegistrationFailed(String),
   /// A custom event defined by the user.
   UserEvent(T),
 }

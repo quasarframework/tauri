@@ -51,3 +51,4 @@ url = "2"
 [features]
 devtools = []
 macos-private-api = []
+push-notifications = []
