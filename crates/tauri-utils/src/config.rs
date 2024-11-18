@@ -2431,7 +2431,11 @@ pub struct TrayIconConfig {
   /// A Boolean value that determines whether the image represents a [template](https://developer.apple.com/documentation/appkit/nsimage/1520017-template?language=objc) image on macOS.
   #[serde(default, alias = "icon-as-template")]
   pub icon_as_template: bool,
-  /// A Boolean value that determines whether the menu should appear when the tray icon receives a left click on macOS.
+  /// A Boolean value that determines whether the menu should appear when the tray icon receives a left click.
+  ///
+  /// ## Platform-specific:
+  ///
+  /// - **Linux**: Unsupported.
   #[serde(default = "default_true", alias = "menu-on-left-click")]
   pub menu_on_left_click: bool,
   /// Title for MacOS tray
