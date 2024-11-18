@@ -697,6 +697,7 @@ fn get_lang_data(lang: &str) -> Option<(String, &[u8])> {
     "persian" => include_bytes!("./languages/Persian.nsh"),
     "turkish" => include_bytes!("./languages/Turkish.nsh"),
     "swedish" => include_bytes!("./languages/Swedish.nsh"),
+    "portuguese" => include_bytes!("./languages/Portuguese.nsh"),
     _ => return None,
   };
   Some((path, content))
