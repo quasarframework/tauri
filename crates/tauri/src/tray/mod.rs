@@ -307,7 +307,7 @@ impl<R: Runtime> TrayIconBuilder<R> {
     self
   }
 
-  /// Whether to show the tray menu on left click or not, default is `true`. **macOS only**.
+  /// Whether to show the tray menu on left click or not, default is `true`. **macOS & Windows only**.
   pub fn menu_on_left_click(mut self, enable: bool) -> Self {
     self.inner = self.inner.with_menu_on_left_click(enable);
     self
@@ -549,9 +549,9 @@ impl<R: Runtime> TrayIcon<R> {
     Ok(())
   }
 
-  /// Disable or enable showing the tray menu on left click. **macOS only**.
+  /// Disable or enable showing the tray menu on left click. **macOS & Windows only**.
   pub fn set_show_menu_on_left_click(&self, #[allow(unused)] enable: bool) -> crate::Result<()> {
-    #[cfg(target_os = "macos")]
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
     run_item_main_thread!(self, |self_: Self| self_
       .inner
       .set_show_menu_on_left_click(enable))?;

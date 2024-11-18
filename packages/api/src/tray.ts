@@ -113,7 +113,7 @@ export interface TrayIconOptions {
    * Use the icon as a [template](https://developer.apple.com/documentation/appkit/nsimage/1520017-template?language=objc). **macOS only**.
    */
   iconAsTemplate?: boolean
-  /** Whether to show the tray menu on left click or not, default is `true`. **macOS only**. */
+  /** Whether to show the tray menu on left click or not, default is `true`. **macOS & Windows only**. */
   menuOnLeftClick?: boolean
   /** A handler for an event on the tray icon. */
   action?: (event: TrayIconEvent) => void
@@ -278,7 +278,7 @@ export class TrayIcon extends Resource {
     })
   }
 
-  /** Disable or enable showing the tray menu on left click. **macOS only**. */
+  /** Disable or enable showing the tray menu on left click. **macOS & Windows only**. */
   async setMenuOnLeftClick(onLeft: boolean): Promise<void> {
     return invoke('plugin:tray|set_show_menu_on_left_click', {
       rid: this.rid,
