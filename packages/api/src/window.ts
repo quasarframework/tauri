@@ -1618,7 +1618,7 @@ class Window {
    * await getCurrentWindow().setBadgeCount(5);
    * ```
    *
-   * @param count The badge count. Set undefined to remove the badge.
+   * @param count The badge count. Use `undefined` to remove the badge.
    * @return A promise indicating the success or failure of the operation.
    */
   async setBadgeCount(count?: number): Promise<void> {
@@ -1637,7 +1637,7 @@ class Window {
    * await getCurrentWindow().setBadgeLabel("Hello");
    * ```
    *
-   * @param label The badge label. Set undefined to remove the badge.
+   * @param label The badge label. Use `undefined` to remove the badge.
    * @return A promise indicating the success or failure of the operation.
    */
   async setBadgeLabel(label?: string): Promise<void> {
@@ -1666,7 +1666,7 @@ class Window {
    * await getCurrentWindow().setOverlayIcon("/tauri/awesome.png");
    * ```
    *
-   * @param icon Icon bytes or path to the icon file. Set undefined to remove the overlay icon.
+   * @param icon Icon bytes or path to the icon file. Use `undefined` to remove the overlay icon.
    * @return A promise indicating the success or failure of the operation.
    */
   async setOverlayIcon(
@@ -2344,11 +2344,11 @@ function mapMonitor(m: Monitor | null): Monitor | null {
   return m === null
     ? null
     : {
-        name: m.name,
-        scaleFactor: m.scaleFactor,
-        position: new PhysicalPosition(m.position),
-        size: new PhysicalSize(m.size)
-      }
+      name: m.name,
+      scaleFactor: m.scaleFactor,
+      position: new PhysicalPosition(m.position),
+      size: new PhysicalSize(m.size)
+    }
 }
 
 /**

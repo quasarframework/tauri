@@ -2014,8 +2014,7 @@ tauri::Builder::default()
       .map_err(Into::into)
   }
 
-  /// Sets the overlay icon on the taskbar **Windows only**
-  /// Setting the icon to None will remove the overlay icon
+  /// Sets the overlay icon on the taskbar **Windows only**. Using `None` to remove the overlay icon
   ///
   /// The overlay icon can be unique for each window.
   #[cfg(target_os = "windows")]
@@ -2028,8 +2027,7 @@ tauri::Builder::default()
       .map_err(Into::into)
   }
 
-  /// Sets the taskbar badge count
-  /// Setting the count to `0``will remove the badge
+  /// Sets the taskbar badge count. Using `0` or `None` will remove the badge
   ///
   /// ## Platform-specific
   /// - **Windows:** Unsupported, use [`Window::set_overlay_icon`] instead.
@@ -2043,8 +2041,7 @@ tauri::Builder::default()
       .map_err(Into::into)
   }
 
-  /// Sets the taskbar badge label **macOS only**
-  /// Setting the label to `0``will remove the badge
+  /// Sets the taskbar badge label **macOS only**. Using `None` will remove the badge
   #[cfg(target_os = "macos")]
   #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
   pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {

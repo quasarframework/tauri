@@ -1716,8 +1716,7 @@ impl<R: Runtime> WebviewWindow<R> {
     self.window.start_dragging()
   }
 
-  /// Sets the overlay icon on the taskbar **Windows only**
-  /// Setting the icon to None will remove the overlay icon
+  /// Sets the overlay icon on the taskbar **Windows only**. Using `None` will remove the icon
   ///
   /// The overlay icon can be unique for each window.
   #[cfg(target_os = "windows")]
@@ -1726,8 +1725,7 @@ impl<R: Runtime> WebviewWindow<R> {
     self.window.set_overlay_icon(icon)
   }
 
-  /// Sets the taskbar badge count
-  /// Setting the count to `0``will remove the badge
+  /// Sets the taskbar badge count. Using `0` or `None` will remove the badge
   ///
   /// ## Platform-specific
   /// - **Windows:** Unsupported, use [`WebviewWindow::set_overlay_icon`] instead.
@@ -1737,8 +1735,7 @@ impl<R: Runtime> WebviewWindow<R> {
     self.window.set_badge_count(count)
   }
 
-  /// Sets the taskbar badge label **macOS only**
-  /// Setting the label to `0``will remove the badge
+  /// Sets the taskbar badge label **macOS only**. Using `None` will remove the badge
   #[cfg(target_os = "macos")]
   #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
   pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {
