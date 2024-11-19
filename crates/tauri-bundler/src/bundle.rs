@@ -4,12 +4,10 @@
 // SPDX-License-Identifier: MIT
 
 mod category;
-mod common;
 #[cfg(target_os = "linux")]
 mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
-mod path_utils;
 mod platform;
 mod settings;
 mod updater_bundle;

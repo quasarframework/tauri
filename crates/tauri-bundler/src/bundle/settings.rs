@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 use super::category::AppCategory;
-use crate::bundle::{common, platform::target_triple};
+use crate::{bundle::platform::target_triple, utils::fs_utils};
 use anyhow::Context;
 pub use tauri_utils::config::WebviewInstallMode;
 use tauri_utils::{
@@ -235,7 +235,7 @@ pub struct RpmSettings {
   /// in order for the package to be installed.
   pub conflicts: Option<Vec<String>>,
   /// The list of RPM dependencies your application supersedes - if this package is installed,
-  /// packages listed as “obsoletes” will be automatically removed (if they are present).
+  /// packages listed as "obsoletes" will be automatically removed (if they are present).
   pub obsoletes: Option<Vec<String>>,
   /// The RPM release tag.
   pub release: String,
@@ -1064,7 +1064,7 @@ impl Settings {
           .to_string_lossy()
           .replace(&format!("-{}", self.target), ""),
       );
-      common::copy_file(&src, &dest)?;
+      fs_utils::copy_file(&src, &dest)?;
       paths.push(dest);
     }
     Ok(paths)
@@ -1075,7 +1075,7 @@ impl Settings {
     for resource in self.resource_files().iter() {
       let resource = resource?;
       let dest = path.join(resource.target());
-      common::copy_file(resource.path(), dest)?;
+      fs_utils::copy_file(resource.path(), &dest)?;
     }
     Ok(())
   }

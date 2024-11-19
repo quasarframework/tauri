@@ -2,16 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::settings::Arch;
-use crate::bundle::windows::sign::{sign_command, try_sign};
-
 use crate::{
   bundle::{
-    common::CommandExt,
-    windows::util::{
-      download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-      verify_file_hash, HashAlgorithm, NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
+    settings::Arch,
+    windows::{
+      sign::{sign_command, try_sign},
+      util::{
+        download_webview2_bootstrapper, download_webview2_offline_installer,
+        NSIS_OUTPUT_FOLDER_NAME, NSIS_UPDATER_OUTPUT_FOLDER_NAME,
+      },
     },
+  },
+  utils::{
+    http_utils::{download_and_verify, verify_file_hash, HashAlgorithm},
+    CommandExt,
   },
   Settings,
 };
@@ -108,7 +112,7 @@ fn get_and_extract_nsis(nsis_toolset_path: &Path, _tauri_tools_path: &Path) -> c
   {
     let data = download_and_verify(NSIS_URL, NSIS_SHA1, HashAlgorithm::Sha1)?;
     log::info!("extracting NSIS");
-    crate::bundle::windows::util::extract_zip(&data, _tauri_tools_path)?;
+    crate::utils::http_utils::extract_zip(&data, _tauri_tools_path)?;
     fs::rename(_tauri_tools_path.join("nsis-3.08"), nsis_toolset_path)?;
   }
 
@@ -697,6 +701,7 @@ fn get_lang_data(lang: &str) -> Option<(String, &[u8])> {
     "persian" => include_bytes!("./languages/Persian.nsh"),
     "turkish" => include_bytes!("./languages/Turkish.nsh"),
     "swedish" => include_bytes!("./languages/Swedish.nsh"),
+    "portuguese" => include_bytes!("./languages/Portuguese.nsh"),
     _ => return None,
   };
   Some((path, content))
