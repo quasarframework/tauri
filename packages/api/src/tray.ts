@@ -119,8 +119,20 @@ export interface TrayIconOptions {
    * #### Platform-specific:
    *
    * - **Linux**: Unsupported.
+   *
+   * @deprecated use {@linkcode TrayIconOptions.showMenuOnLeftClick} instead.
    */
   menuOnLeftClick?: boolean
+  /**
+   * Whether to show the tray menu on left click or not, default is `true`.
+   *
+   * #### Platform-specific:
+   *
+   * - **Linux**: Unsupported.
+   *
+   * @since 2.2.0
+   */
+  showMenuOnLeftClick?: boolean
   /** A handler for an event on the tray icon. */
   action?: (event: TrayIconEvent) => void
 }
