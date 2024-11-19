@@ -17,7 +17,8 @@ import { type ItemKind, MenuItemBase, newMenu } from './base'
 import { type MenuOptions } from './menu'
 import { Position } from '../dpi'
 
-function itemFromKind([rid, id, kind]: [number, string, ItemKind]):
+/** @ignore */
+export function itemFromKind([rid, id, kind]: [number, string, ItemKind]):
   | Submenu
   | MenuItem
   | PredefinedMenuItem
