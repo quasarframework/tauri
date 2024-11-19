@@ -312,7 +312,10 @@ impl<R: Runtime> TrayIconBuilder<R> {
   /// ## Platform-specific:
   ///
   /// - **Linux:** Unsupported.
-  #[deprecated(since = "2.2.0", note = "Use `TrayIconBuiler::show_menu_on_left_click` instead.")]
+  #[deprecated(
+    since = "2.2.0",
+    note = "Use `TrayIconBuiler::show_menu_on_left_click` instead."
+  )]
   pub fn menu_on_left_click(mut self, enable: bool) -> Self {
     self.inner = self.inner.with_menu_on_left_click(enable);
     self

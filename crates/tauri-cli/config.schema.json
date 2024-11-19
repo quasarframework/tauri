@@ -1626,6 +1626,12 @@
         "menuOnLeftClick": {
           "description": "A Boolean value that determines whether the menu should appear when the tray icon receives a left click.\n\n ## Platform-specific:\n\n - **Linux**: Unsupported.",
           "default": true,
+          "deprecated": true,
+          "type": "boolean"
+        },
+        "showMenuOnLeftClick": {
+          "description": "A Boolean value that determines whether the menu should appear when the tray icon receives a left click.\n\n ## Platform-specific:\n\n - **Linux**: Unsupported.",
+          "default": true,
           "type": "boolean"
         },
         "title": {
