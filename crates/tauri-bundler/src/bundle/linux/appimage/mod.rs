@@ -6,23 +6,22 @@
 use super::debian;
 use crate::{
   bundle::settings::Arch,
-  utils::{fs_utils, CommandExt},
+  utils::{fs_utils, http_utils::download, CommandExt},
   Settings,
 };
 use anyhow::Context;
-use handlebars::Handlebars;
 use std::{
-  collections::BTreeMap,
   fs,
-  path::PathBuf,
-  process::{Command, Stdio},
+  io::Write,
+  path::{Path, PathBuf},
+  process::Command,
 };
 
 /// Bundles the project.
 /// Returns a vector of PathBuf that shows where the AppImage was created.
 pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   // generate the deb binary name
-  let arch: &str = match settings.binary_arch() {
+  let appimage_arch: &str = match settings.binary_arch() {
     Arch::X86_64 => "amd64",
     Arch::X86 => "i386",
     Arch::AArch64 => "aarch64",
@@ -34,9 +33,26 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
       )));
     }
   };
+
+  let tools_arch = settings.target().split('-').next().unwrap();
+  let output_path = settings.project_out_directory().join("bundle/appimage");
+  if output_path.exists() {
+    fs::remove_dir_all(&output_path)?;
+  }
+
+  let tools_path = settings
+    .local_tools_directory()
+    .map(|d| d.join(".tauri"))
+    .unwrap_or_else(|| {
+      dirs::cache_dir().map_or_else(|| output_path.to_path_buf(), |p| p.join("tauri"))
+    });
+
+  let linuxdeploy_path = prepare_tools(&tools_path, tools_arch)?;
+
   let package_dir = settings.project_out_directory().join("bundle/appimage_deb");
 
   let main_binary = settings.main_binary()?;
+  let product_name = settings.product_name();
 
   let mut settings = settings.clone();
   if main_binary.name().contains(" ") {
@@ -57,37 +73,18 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   fs_utils::copy_custom_files(&settings.appimage().files, &data_dir)
     .with_context(|| "Failed to copy custom files")?;
 
-  let output_path = settings.project_out_directory().join("bundle/appimage");
-  if output_path.exists() {
-    fs::remove_dir_all(&output_path)?;
-  }
   fs::create_dir_all(output_path.clone())?;
   let app_dir_path = output_path.join(format!("{}.AppDir", settings.product_name()));
   let appimage_filename = format!(
     "{}_{}_{}.AppImage",
     settings.product_name(),
     settings.version_string(),
-    arch
+    appimage_arch
   );
   let appimage_path = output_path.join(&appimage_filename);
   fs_utils::create_dir(&app_dir_path, true)?;
 
-  // setup data to insert into shell script
-  let mut sh_map = BTreeMap::new();
-  sh_map.insert("arch", settings.target().split('-').next().unwrap());
-  sh_map.insert("product_name", settings.product_name());
-  sh_map.insert("appimage_filename", &appimage_filename);
-
-  let tauri_tools_path = settings
-    .local_tools_directory()
-    .map(|d| d.join(".tauri"))
-    .unwrap_or_else(|| {
-      dirs::cache_dir().map_or_else(|| output_path.to_path_buf(), |p| p.join("tauri"))
-    });
-
-  std::fs::create_dir_all(&tauri_tools_path)?;
-  let tauri_tools_path_str = tauri_tools_path.to_string_lossy();
-  sh_map.insert("tauri_tools_path", &tauri_tools_path_str);
+  fs::create_dir_all(&tools_path)?;
   let larger_icon = icons
     .iter()
     .filter(|i| i.width == i.height)
@@ -99,36 +96,160 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     .unwrap()
     .to_string_lossy()
     .to_string();
-  sh_map.insert("icon_path", &larger_icon_path);
-
-  // initialize shell script template.
-  let mut handlebars = Handlebars::new();
-  handlebars.register_escape_fn(handlebars::no_escape);
-  let temp = handlebars.render_template(include_str!("./appimage"), &sh_map)?;
-
-  // create the shell script file in the target/ folder.
-  let sh_file = output_path.join("build_appimage.sh");
 
   log::info!(action = "Bundling"; "{} ({})", appimage_filename, appimage_path.display());
 
-  fs::write(&sh_file, temp)?;
+  let app_dir_usr = app_dir_path.join("usr/");
+  let app_dir_usr_bin = app_dir_usr.join("bin/");
+  let app_dir_usr_lib = app_dir_usr.join("lib/");
 
-  // chmod script for execution
-  Command::new("chmod")
-    .arg("777")
-    .arg(&sh_file)
-    .current_dir(output_path.clone())
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped())
-    .output()
-    .expect("Failed to chmod script");
+  fs_utils::copy_dir(&data_dir.join("usr/"), &app_dir_usr)?;
 
-  // execute the shell script to build the appimage.
-  Command::new(&sh_file)
-    .current_dir(output_path)
-    .output_ok()
-    .context("error running build_appimage.sh")?;
+  // Using create_dir_all for a single dir so we don't get errors if the path already exists
+  fs::create_dir_all(&app_dir_usr_bin)?;
+  fs::create_dir_all(&app_dir_usr_lib)?;
+
+  // Copy bins and libs that linuxdeploy doesn't know about
+  if settings.deep_link_protocols().is_some() {
+    fs::copy("/usr/bin/xdg-mime", app_dir_usr_bin.join("xdg-mime"))?;
+  }
+
+  // TODO: don't rely on env vars
+  let gstreamer = std::env::var("APPIMAGE_BUNDLE_GSTREAMER")
+    .map(|x| x == "1")
+    .unwrap_or(false);
+
+  if let Ok(path) = std::env::var("TAURI_TRAY_LIBRARY_PATH") {
+    let path = PathBuf::from(path);
+    if let Some(file_name) = path.file_name() {
+      fs::copy(&path, app_dir_usr_lib.join(file_name))?;
+    }
+  }
+
+  if std::env::var("APPIMAGE_BUNDLE_XDG_OPEN")
+    .map(|x| x == "1")
+    .unwrap_or(false)
+  {
+    fs::copy("/usr/bin/xdg-open", app_dir_usr_bin.join("xdg-open"))?;
+  }
+
+  let search_dirs = [
+    match settings.binary_arch() {
+      Arch::X86_64 => "/usr/lib/x86_64-linux-gnu/",
+      Arch::X86 => "/usr/lib/i386-linux-gnu/",
+      Arch::AArch64 => "/usr/lib/aarch64-linux-gnu/",
+      Arch::Armhf => "/usr/lib/arm-linux-gnueabihf/",
+      _ => unreachable!(),
+    },
+    "/usr/lib64",
+    "/usr/lib",
+    "/usr/libexec",
+  ];
+
+  for file in [
+    "WebKitNetworkProcess",
+    "WebKitWebProcess",
+    "libwebkit2gtkinjectedbundle.so",
+  ] {
+    for source in search_dirs.map(PathBuf::from) {
+      // TODO: Check if it's the same dir name on all systems
+      let source = source.join("webkit2gtk-4.1").join(file);
+      if source.exists() {
+        fs_utils::copy_file(
+          &source,
+          &app_dir_path.join(source.strip_prefix("/").unwrap()),
+        )?;
+      }
+    }
+  }
+
+  fs::copy(
+    tools_path.join(format!("AppRun-{tools_arch}")),
+    app_dir_path.join("AppRun"),
+  )?;
+  fs::copy(
+    app_dir_path.join(larger_icon_path),
+    app_dir_path.join(format!("{product_name}.png")),
+  )?;
+  std::os::unix::fs::symlink(
+    app_dir_path.join(format!("{product_name}.png")),
+    app_dir_path.join(".DirIcon"),
+  )?;
+  std::os::unix::fs::symlink(
+    app_dir_path.join(format!("usr/share/applications/{product_name}.desktop")),
+    app_dir_path.join(format!("{product_name}.desktop")),
+  )?;
+
+  // TODO: linuxdeploy is so spammy
+  let log_level = match dbg!(settings.log_level()) {
+    log::Level::Error => "3",
+    log::Level::Warn => "2",
+    log::Level::Info => "1",
+    _ => "0",
+  };
+
+  let mut cmd = Command::new(linuxdeploy_path);
+  cmd.env("OUTPUT", &appimage_path);
+  cmd.args([
+    "--appimage-extract-and-run",
+    "--verbosity",
+    log_level,
+    "--appdir",
+    &app_dir_path.display().to_string(),
+    "--plugin",
+    "gtk",
+  ]);
+  if gstreamer {
+    cmd.args(["--plugin", "gstreamer"]);
+  }
+  cmd.args(["--output", "appimage"]);
+
+  cmd.piped()?;
 
   fs::remove_dir_all(&package_dir)?;
   Ok(vec![appimage_path])
+}
+
+// returns the linuxdeploy path to keep linuxdeploy_arch contained
+fn prepare_tools(tools_path: &Path, arch: &str) -> crate::Result<PathBuf> {
+  let apprun = tools_path.join(format!("AppRun-{arch}"));
+  if !apprun.exists() {
+    let data = download(&format!(
+      "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-{arch}"
+    ))?;
+    save(&apprun, data)?;
+  }
+
+  let linuxdeploy_arch = if arch == "i686" { "i383" } else { arch };
+  let linuxdeploy = tools_path.join(format!("linuxdeploy-{linuxdeploy_arch}.AppImage"));
+  if !linuxdeploy.exists() {
+    let data = download(&format!("https://github.com/tauri-apps/binary-releases/releases/download/linuxdeploy/linuxdeploy-{linuxdeploy_arch}.AppImage"))?;
+    save(&linuxdeploy, data)?;
+  }
+
+  let gtk = tools_path.join("linuxdeploy-plugin-gtk.sh");
+  if !gtk.exists() {
+    let data = download("https://raw.githubusercontent.com/tauri-apps/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh")?;
+    save(&gtk, data)?;
+  }
+
+  let gstreamer = tools_path.join("linuxdeploy-plugin-gstreamer.sh");
+  if !gstreamer.exists() {
+    let data = download("https://raw.githubusercontent.com/tauri-apps/linuxdeploy-plugin-gstreamer/master/linuxdeploy-plugin-gstreamer.sh")?;
+    save(&gstreamer, data)?;
+  }
+
+  // TODO: dd if=/dev/zero bs=1 count=3 seek=8 conv=notrunc of="{{tauri_tools_path}}/linuxdeploy-${linuxdeploy_arch}.AppImage"
+
+  Ok(linuxdeploy)
+}
+
+fn save(path: &Path, data: Vec<u8>) -> std::io::Result<()> {
+  use std::os::unix::fs::PermissionsExt;
+
+  let mut file = fs::File::create(path)?;
+  file.write_all(&data)?;
+  let mut perms = file.metadata()?.permissions();
+  perms.set_mode(0o770);
+  Ok(())
 }
