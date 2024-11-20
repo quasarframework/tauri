@@ -56,7 +56,6 @@
     "globals": "^15.4.0",
     "rollup": "4.27.3",
     "tslib": "^2.6.3",
-    "typescript": "^5.4.5",
     "typescript-eslint": "^8.1.0"
   }
 }
