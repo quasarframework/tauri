@@ -1695,7 +1695,7 @@ tauri::Builder::default()
   /// use tauri::Manager;
   ///
   /// tauri::Builder::default()
-  ///   .on_menu_event(|app, event| {
+  ///   .on_tray_icon_event(|app, event| {
   ///      let tray = app.tray_by_id(event.id()).expect("can't find tray icon");
   ///      let _ = tray.set_visible(false);
   ///   });
