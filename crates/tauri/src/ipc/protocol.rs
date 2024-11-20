@@ -586,6 +586,7 @@ mod tests {
       Default::default(),
       StateManager::new(),
       Default::default(),
+      #[cfg(all(desktop, feature = "tray-icon"))]
       Default::default(),
       Default::default(),
       Default::default(),
@@ -702,6 +703,7 @@ mod tests {
       Default::default(),
       StateManager::new(),
       Default::default(),
+      #[cfg(all(desktop, feature = "tray-icon"))]
       Default::default(),
       Default::default(),
       Default::default(),
