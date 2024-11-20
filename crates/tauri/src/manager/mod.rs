@@ -376,7 +376,7 @@ impl<R: Runtime> AppManager<R> {
   pub fn get_asset(
     &self,
     mut path: String,
-    use_https_schema: bool,
+    _use_https_schema: bool,
   ) -> Result<Asset, Box<dyn std::error::Error>> {
     let assets = &self.assets;
     if path.ends_with('/') {
@@ -440,7 +440,10 @@ impl<R: Runtime> AppManager<R> {
               let default_src = csp_map
                 .entry("default-src".into())
                 .or_insert_with(Default::default);
-              default_src.push(crate::pattern::format_real_schema(schema, use_https_schema));
+              default_src.push(crate::pattern::format_real_schema(
+                schema,
+                _use_https_schema,
+              ));
             }
 
             csp_header.replace(Csp::DirectiveMap(csp_map).to_string());
