@@ -1702,6 +1702,7 @@ tauri::Builder::default()
   /// ```
   #[must_use]
   #[cfg(all(desktop, feature = "tray-icon"))]
+  #[cfg_attr(docsrs, doc(cfg(all(desktop, feature = "tray-icon"))))]
   pub fn on_tray_icon_event<F: Fn(&AppHandle<R>, TrayIconEvent) + Send + Sync + 'static>(
     mut self,
     f: F,
