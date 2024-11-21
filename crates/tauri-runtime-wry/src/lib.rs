@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-//! [![](https://github.com/tauri-apps/tauri/raw/dev/.github/splash.png)](https://tauri.app)
-//!
 //! The [`wry`] Tauri [`Runtime`].
 //!
 //! None of the exposed API of this crate is stable, and it may break semver
