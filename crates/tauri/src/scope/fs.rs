@@ -396,10 +396,7 @@ impl Scope {
 fn verify_path<P: AsRef<Path>>(path: P) -> crate::Result<PathBuf> {
   let path = path.as_ref();
   let path = if path.is_symlink() {
-    match std::fs::read_link(path) {
-      Ok(p) => p,
-      Err(_) => return Err(crate::Error::UnknownPath),
-    }
+    std::fs::read_link(path)?
   } else {
     path.to_path_buf()
   };
