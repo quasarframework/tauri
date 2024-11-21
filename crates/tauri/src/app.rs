@@ -1249,7 +1249,7 @@ pub struct Builder<R: Runtime> {
   #[cfg(desktop)]
   menu_event_listeners: Vec<GlobalMenuEventListener<AppHandle<R>>>,
 
-  /// Tray event listeners for any menu event.
+  /// Tray event listeners for any tray icon event.
   #[cfg(all(desktop, feature = "tray-icon"))]
   tray_icon_event_listeners: Vec<GlobalTrayIconEventListener<AppHandle<R>>>,
 
