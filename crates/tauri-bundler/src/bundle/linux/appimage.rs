@@ -110,14 +110,18 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   fs::create_dir_all(&app_dir_usr_lib)?;
 
   // Copy bins and libs that linuxdeploy doesn't know about
-  if settings.deep_link_protocols().is_some() {
-    fs::copy("/usr/bin/xdg-mime", app_dir_usr_bin.join("xdg-mime"))?;
+  if settings.deep_link_protocols().is_some()
+    && fs::copy("/usr/bin/xdg-mime", app_dir_usr_bin.join("xdg-mime")).is_err()
+  {
+    log::error!("xdg-mime binary not found!");
   }
 
   // xdg-open is only 50kb (in a 80mb+ appimage) and quite commonly used so we just always add it
   // we do however check if the user may have provided their own copy already
-  if !app_dir_usr_bin.join("xdg-open").exists() {
-    fs::copy("/usr/bin/xdg-open", app_dir_usr_bin.join("xdg-open"))?;
+  if !app_dir_usr_bin.join("xdg-open").exists()
+    && fs::copy("/usr/bin/xdg-open", app_dir_usr_bin.join("xdg-open")).is_err()
+  {
+    log::error!("xdg-open binary not found!");
   }
 
   let search_dirs = [
@@ -167,8 +171,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     app_dir_path.join(format!("{product_name}.desktop")),
   )?;
 
-  // TODO: linuxdeploy is so spammy
-  let log_level = match dbg!(settings.log_level()) {
+  let log_level = match settings.log_level() {
     log::Level::Error => "3",
     log::Level::Warn => "2",
     log::Level::Info => "1",
@@ -182,10 +185,10 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
       "bs=1",
       "count=3",
       "seek=8",
-      "conf=notrunc",
+      "conv=notrunc",
       &format!("of={}", linuxdeploy_path.display()),
     ])
-    .piped();
+    .output();
 
   let mut cmd = Command::new(linuxdeploy_path);
   cmd.env("OUTPUT", &appimage_path);
@@ -203,7 +206,17 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   }
   cmd.args(["--output", "appimage"]);
 
-  cmd.piped()?;
+  // Linuxdeploy logs everything into stderr so we have to ignore the output ourselves here
+  if settings.log_level() == log::Level::Error {
+    log::debug!(action = "Running"; "Command `linuxdeploy {}`", cmd.get_args().map(|arg| arg.to_string_lossy()).fold(String::new(), |acc, arg| format!("{acc} {arg}")));
+    if !cmd.output()?.status.success() {
+      return Err(crate::Error::GenericError(
+        "failed to run linuxdeploy".to_string(),
+      ));
+    }
+  } else {
+    cmd.output_ok()?;
+  }
 
   fs::remove_dir_all(&package_dir)?;
   Ok(vec![appimage_path])

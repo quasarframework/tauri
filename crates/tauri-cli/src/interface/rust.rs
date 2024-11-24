@@ -1283,7 +1283,7 @@ fn tauri_config_to_bundle_settings(
       let path = PathBuf::from(path);
       if !appimage_files.contains_key(&path) {
         // manually construct target path, just in case the source path is something unexpected
-        appimage_files.insert(Path::new("/usr/lib").join(path.file_name().unwrap()), path);
+        appimage_files.insert(Path::new("/usr/lib/").join(path.file_name().unwrap()), path);
       }
     }
 
