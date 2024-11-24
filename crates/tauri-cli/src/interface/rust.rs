@@ -1234,6 +1234,9 @@ fn tauri_config_to_bundle_settings(
   #[allow(unused_mut)]
   let mut depends_rpm = config.linux.rpm.depends.unwrap_or_default();
 
+  #[allow(unused_mut)]
+  let mut appimage_files = config.linux.appimage.files;
+
   // set env vars used by the bundler and inject dependencies
   #[cfg(target_os = "linux")]
   {
@@ -1276,7 +1279,12 @@ fn tauri_config_to_bundle_settings(
         }
       }
 
-      std::env::set_var("TAURI_TRAY_LIBRARY_PATH", path);
+      // conditionally setting it in case the user provided its own version for some reason
+      let path = PathBuf::from(path);
+      if !appimage_files.contains_key(&path) {
+        // manually construct target path, just in case the source path is something unexpected
+        appimage_files.insert(Path::new("/usr/lib").join(path.file_name().unwrap()), path);
+      }
     }
 
     depends_deb.push("libwebkit2gtk-4.1-0".to_string());
@@ -1368,7 +1376,8 @@ fn tauri_config_to_bundle_settings(
       post_remove_script: config.linux.deb.post_remove_script,
     },
     appimage: AppImageSettings {
-      files: config.linux.appimage.files,
+      files: appimage_files,
+      bundle_media_framework: config.linux.appimage.bundle_media_framework,
     },
     rpm: RpmSettings {
       depends: if depends_rpm.is_empty() {

@@ -114,22 +114,9 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     fs::copy("/usr/bin/xdg-mime", app_dir_usr_bin.join("xdg-mime"))?;
   }
 
-  // TODO: don't rely on env vars
-  let gstreamer = std::env::var("APPIMAGE_BUNDLE_GSTREAMER")
-    .map(|x| x == "1")
-    .unwrap_or(false);
-
-  if let Ok(path) = std::env::var("TAURI_TRAY_LIBRARY_PATH") {
-    let path = PathBuf::from(path);
-    if let Some(file_name) = path.file_name() {
-      fs::copy(&path, app_dir_usr_lib.join(file_name))?;
-    }
-  }
-
-  if std::env::var("APPIMAGE_BUNDLE_XDG_OPEN")
-    .map(|x| x == "1")
-    .unwrap_or(false)
-  {
+  // xdg-open is only 50kb (in a 80mb+ appimage) and quite commonly used so we just always add it
+  // we do however check if the user may have provided their own copy already
+  if !app_dir_usr_bin.join("xdg-open").exists() {
     fs::copy("/usr/bin/xdg-open", app_dir_usr_bin.join("xdg-open"))?;
   }
 
@@ -188,6 +175,18 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     _ => "0",
   };
 
+  // This should prevent linuxdeploy to be detected by appimage integration tools
+  let _ = Command::new("dd")
+    .args([
+      "if=/dev/zero",
+      "bs=1",
+      "count=3",
+      "seek=8",
+      "conf=notrunc",
+      &format!("of={}", linuxdeploy_path.display()),
+    ])
+    .piped();
+
   let mut cmd = Command::new(linuxdeploy_path);
   cmd.env("OUTPUT", &appimage_path);
   cmd.args([
@@ -199,7 +198,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     "--plugin",
     "gtk",
   ]);
-  if gstreamer {
+  if settings.appimage().bundle_media_framework {
     cmd.args(["--plugin", "gstreamer"]);
   }
   cmd.args(["--output", "appimage"]);

@@ -220,6 +220,8 @@ pub struct DebianSettings {
 pub struct AppImageSettings {
   /// The files to include in the Appimage Binary.
   pub files: HashMap<PathBuf, PathBuf>,
+  /// Whether to include gstreamer plugins for audio/media support.
+  pub bundle_media_framework: bool,
 }
 
 /// The RPM bundle settings.
