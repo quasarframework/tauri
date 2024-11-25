@@ -1,5 +1,5 @@
 ---
-tauri: 'patch:fix'
+tauri: 'patch:bug'
 ---
 
 Fix panic when a plugin command is run with a capability added at runtime (via `add_capability`).
