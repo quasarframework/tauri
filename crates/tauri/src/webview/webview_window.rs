@@ -918,6 +918,20 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
     self
   }
 
+  /// Initialize the WebView with a custom data store identifier.
+  /// Can be used as a replacement for data_directory not being available in WKWebView.
+  ///
+  /// - **macOS / iOS**: Available on macOS >= 14 and iOS >= 17
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
+  #[must_use]
+  pub fn data_store_identifier(mut self, data_store_identifier: [u8; 16]) -> Self {
+    self.webview_builder = self
+      .webview_builder
+      .data_store_identifier(data_store_identifier);
+    self
+  }
+
   /// Sets whether the custom protocols should use `https://<scheme>.localhost` instead of the default `http://<scheme>.localhost` on Windows and Android. Defaults to `false`.
   ///
   /// ## Note

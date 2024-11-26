@@ -70,7 +70,7 @@ use tauri_utils::{
 use url::Url;
 use wry::{
   DragDropEvent as WryDragDropEvent, ProxyConfig, ProxyEndpoint, WebContext as WryWebContext,
-  WebView, WebViewBuilder,
+  WebView, WebViewBuilder, WebViewBuilderExtDarwin,
 };
 
 pub use tao;
@@ -4348,6 +4348,13 @@ fn create_webview<T: UserEvent>(
   {
     if let Some(path) = &webview_attributes.extensions_path {
       webview_builder = webview_builder.with_extension_path(path);
+    }
+  }
+
+  #[cfg(target_os = "macos")]
+  {
+    if let Some(data_store_identifier) = &webview_attributes.data_store_identifier {
+      webview_builder = webview_builder.with_data_store_identifier(*data_store_identifier);
     }
   }
 
