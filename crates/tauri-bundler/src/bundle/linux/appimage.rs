@@ -178,18 +178,6 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     _ => "0",
   };
 
-  // This should prevent linuxdeploy to be detected by appimage integration tools
-  let _ = Command::new("dd")
-    .args([
-      "if=/dev/zero",
-      "bs=1",
-      "count=3",
-      "seek=8",
-      "conv=notrunc",
-      &format!("of={}", linuxdeploy_path.display()),
-    ])
-    .output();
-
   let mut cmd = Command::new(linuxdeploy_path);
   cmd.env("OUTPUT", &appimage_path);
   cmd.args([
@@ -251,7 +239,17 @@ fn prepare_tools(tools_path: &Path, arch: &str) -> crate::Result<PathBuf> {
     save(&gstreamer, data)?;
   }
 
-  // TODO: dd if=/dev/zero bs=1 count=3 seek=8 conv=notrunc of="{{tauri_tools_path}}/linuxdeploy-${linuxdeploy_arch}.AppImage"
+  // This should prevent linuxdeploy to be detected by appimage integration tools
+  let _ = Command::new("dd")
+    .args([
+      "if=/dev/zero",
+      "bs=1",
+      "count=3",
+      "seek=8",
+      "conv=notrunc",
+      &format!("of={}", linuxdeploy.display()),
+    ])
+    .output();
 
   Ok(linuxdeploy)
 }
