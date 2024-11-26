@@ -73,7 +73,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   fs_utils::copy_custom_files(&settings.appimage().files, &data_dir)
     .with_context(|| "Failed to copy custom files")?;
 
-  fs::create_dir_all(output_path.clone())?;
+  fs::create_dir_all(&output_path)?;
   let app_dir_path = output_path.join(format!("{}.AppDir", settings.product_name()));
   let appimage_filename = format!(
     "{}_{}_{}.AppImage",
