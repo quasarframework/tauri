@@ -174,7 +174,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 
   // Issue #592 - Building MacOS dmg files on CI
   // https://github.com/tauri-apps/tauri/issues/592
-  if !env::var_os("TAURI_BUNDLER_DMG_IGNORE_CI").unwrap_or_default() != "true" {
+  if env::var_os("TAURI_BUNDLER_DMG_IGNORE_CI").unwrap_or_default() != "true" {
     eprintln!("IGNORE_CI TRUE");
     if let Some(value) = env::var_os("CI") {
       if value == "true" {
