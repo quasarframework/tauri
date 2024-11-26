@@ -110,14 +110,16 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
   fs::create_dir_all(&app_dir_usr_lib)?;
 
   // Copy bins and libs that linuxdeploy doesn't know about
-  if settings.deep_link_protocols().is_some() {
+
+  // we also check if the user may have provided their own copy already
+  // xdg-open will be handled by the `files` config instead
+  if settings.deep_link_protocols().is_some() && !app_dir_usr_bin.join("xdg-open").exists() {
     fs::copy("/usr/bin/xdg-mime", app_dir_usr_bin.join("xdg-mime"))
       .context("xdg-mime binary not found")?;
   }
 
-  // xdg-open is only 50kb (in a 80mb+ appimage) and quite commonly used so we just always add it
-  // we do however check if the user may have provided their own copy already
-  if !app_dir_usr_bin.join("xdg-open").exists() {
+  // we also check if the user may have provided their own copy already
+  if settings.appimage().bundle_xdg_open && !app_dir_usr_bin.join("xdg-open").exists() {
     fs::copy("/usr/bin/xdg-open", app_dir_usr_bin.join("xdg-open"))
       .context("xdg-open binary not found")?;
   }

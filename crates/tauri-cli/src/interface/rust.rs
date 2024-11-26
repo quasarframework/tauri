@@ -867,6 +867,12 @@ impl AppSettings for RustAppSettings {
       });
     }
 
+    if let Some(open) = config.plugins.0.get("shell").and_then(|v| v.get("open")) {
+      if open.as_bool().is_some_and(|x| x) || open.is_string() {
+        settings.appimage.bundle_xdg_open = true;
+      }
+    }
+
     Ok(settings)
   }
 
@@ -1378,6 +1384,7 @@ fn tauri_config_to_bundle_settings(
     appimage: AppImageSettings {
       files: appimage_files,
       bundle_media_framework: config.linux.appimage.bundle_media_framework,
+      bundle_xdg_open: false,
     },
     rpm: RpmSettings {
       depends: if depends_rpm.is_empty() {
