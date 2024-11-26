@@ -217,26 +217,26 @@ fn prepare_tools(tools_path: &Path, arch: &str) -> crate::Result<PathBuf> {
     let data = download(&format!(
       "https://github.com/AppImage/AppImageKit/releases/download/continuous/AppRun-{arch}"
     ))?;
-    save(&apprun, data)?;
+    write_and_make_executable(&apprun, data)?;
   }
 
   let linuxdeploy_arch = if arch == "i686" { "i383" } else { arch };
   let linuxdeploy = tools_path.join(format!("linuxdeploy-{linuxdeploy_arch}.AppImage"));
   if !linuxdeploy.exists() {
     let data = download(&format!("https://github.com/tauri-apps/binary-releases/releases/download/linuxdeploy/linuxdeploy-{linuxdeploy_arch}.AppImage"))?;
-    save(&linuxdeploy, data)?;
+    write_and_make_executable(&linuxdeploy, data)?;
   }
 
   let gtk = tools_path.join("linuxdeploy-plugin-gtk.sh");
   if !gtk.exists() {
     let data = download("https://raw.githubusercontent.com/tauri-apps/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh")?;
-    save(&gtk, data)?;
+    write_and_make_executable(&gtk, data)?;
   }
 
   let gstreamer = tools_path.join("linuxdeploy-plugin-gstreamer.sh");
   if !gstreamer.exists() {
     let data = download("https://raw.githubusercontent.com/tauri-apps/linuxdeploy-plugin-gstreamer/master/linuxdeploy-plugin-gstreamer.sh")?;
-    save(&gstreamer, data)?;
+    write_and_make_executable(&gstreamer, data)?;
   }
 
   // This should prevent linuxdeploy to be detected by appimage integration tools
@@ -254,7 +254,7 @@ fn prepare_tools(tools_path: &Path, arch: &str) -> crate::Result<PathBuf> {
   Ok(linuxdeploy)
 }
 
-fn save(path: &Path, data: Vec<u8>) -> std::io::Result<()> {
+fn write_and_make_executable(path: &Path, data: Vec<u8>) -> std::io::Result<()> {
   use std::os::unix::fs::PermissionsExt;
 
   let mut file = fs::File::create(path)?;
