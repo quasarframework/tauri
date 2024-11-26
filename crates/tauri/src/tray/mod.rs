@@ -574,7 +574,7 @@ impl<R: Runtime> TrayIcon<R> {
   ///
   /// - **Linux**: Unsupported.
   pub fn set_show_menu_on_left_click(&self, #[allow(unused)] enable: bool) -> crate::Result<()> {
-    #[cfg(any(target_os = "macos", windows))]
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
     run_item_main_thread!(self, |self_: Self| {
       self_.inner.set_show_menu_on_left_click(enable)
     })?;
