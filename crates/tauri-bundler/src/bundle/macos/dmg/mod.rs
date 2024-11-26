@@ -175,7 +175,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
   // Issue #592 - Building MacOS dmg files on CI
   // https://github.com/tauri-apps/tauri/issues/592
   if let Some(value) = env::var_os("CI") {
-    if value == "true" {
+    if value == "true" && !env::var_os("GITHUB_RUN_ID").unwrap_or_default().is_empty() {
       bundle_dmg_cmd.arg("--skip-jenkins");
     }
   }
