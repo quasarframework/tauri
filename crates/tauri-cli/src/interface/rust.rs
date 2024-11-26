@@ -873,6 +873,20 @@ impl AppSettings for RustAppSettings {
       }
     }
 
+    if let Some(deps) = self
+      .manifest
+      .lock()
+      .unwrap()
+      .inner
+      .as_table()
+      .get("dependencies")
+      .and_then(|f| f.as_table())
+    {
+      if deps.contains_key("tauri-plugin-opener") {
+        settings.appimage.bundle_xdg_open = true;
+      };
+    }
+
     Ok(settings)
   }
 
