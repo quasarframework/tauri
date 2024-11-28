@@ -818,8 +818,7 @@ fn main() {
   /// Can be used as a replacement for data_directory not being available in WKWebView.
   ///
   /// - **macOS / iOS**: Available on macOS >= 14 and iOS >= 17
-  #[cfg(any(target_os = "macos", target_os = "ios"))]
-  #[cfg_attr(docsrs, doc(any(target_os = "macos", target_os = "ios")))]
+  /// - **Windows / LinUx \ Android**: Unsupported.
   #[must_use]
   pub fn data_store_identifier(mut self, data_store_identifier: [u8; 16]) -> Self {
     self.webview_attributes.data_store_identifier = Some(data_store_identifier);
