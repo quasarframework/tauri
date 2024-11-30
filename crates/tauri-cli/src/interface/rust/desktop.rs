@@ -135,7 +135,7 @@ pub fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
     }
   });
 
-  // TODO:
+  // TODO: remove this and DevChild (requires refactor for code shared between mobile and desktop)
   let manually_killed_app = Arc::new(AtomicBool::default());
 
   Ok(DevChild {
