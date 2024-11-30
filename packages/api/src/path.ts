@@ -661,7 +661,7 @@ async function basename(path: string, ext?: string): Promise<string> {
  * @since 1.0.0
  */
 async function isAbsolute(path: string): Promise<boolean> {
-  return invoke('plugin:path|isAbsolute', { path })
+  return invoke('plugin:path|is_absolute', { path })
 }
 
 export {
