@@ -112,6 +112,7 @@ const PLUGINS: &[(&str, &[(&str, bool)])] = &[
       ("set_title_bar_style", false),
       ("set_theme", false),
       ("toggle_maximize", false),
+      ("set_background_color", false),
       // internal
       ("internal_toggle_maximize", true),
     ],
@@ -136,6 +137,7 @@ const PLUGINS: &[(&str, &[(&str, bool)])] = &[
       ("print", false),
       ("reparent", false),
       ("clear_all_browsing_data", false),
+      ("set_webview_background_color", false),
       // internal
       ("internal_toggle_devtools", true),
     ],

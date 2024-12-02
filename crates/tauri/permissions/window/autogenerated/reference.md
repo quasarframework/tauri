@@ -898,6 +898,32 @@ Denies the set_always_on_top command without any pre-configured scope.
 <tr>
 <td>
 
+`core:window:allow-set-background-color`
+
+</td>
+<td>
+
+Enables the set_background_color command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`core:window:deny-set-background-color`
+
+</td>
+<td>
+
+Denies the set_background_color command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `core:window:allow-set-badge-count`
 
 </td>
