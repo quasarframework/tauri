@@ -743,7 +743,7 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
 }
 
 /// Webview attributes.
-impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   /// Sets whether clicking an inactive window also clicks through to the webview.
   #[must_use]
   pub fn accept_first_mouse(mut self, accept: bool) -> Self {

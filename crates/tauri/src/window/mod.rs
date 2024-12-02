@@ -125,7 +125,7 @@ unstable_struct!(
   }
 );
 
-impl<'a, R: Runtime, M: Manager<R>> fmt::Debug for WindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> fmt::Debug for WindowBuilder<'_, R, M> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("WindowBuilder")
       .field("label", &self.label)
@@ -846,7 +846,7 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   }
 }
 
-impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> WindowBuilder<'_, R, M> {
   /// Set the window and webview background color.
   ///
   /// ## Platform-specific:
