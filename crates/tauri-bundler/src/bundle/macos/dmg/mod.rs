@@ -178,7 +178,6 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
     if let Some(value) = env::var_os("CI") {
       if value == "true" {
         bundle_dmg_cmd.arg("--skip-jenkins");
-      } else {
       }
     }
   }
