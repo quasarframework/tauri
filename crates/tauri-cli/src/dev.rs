@@ -10,7 +10,7 @@ use crate::{
       get as get_config, reload as reload_config, BeforeDevCommand, ConfigHandle, FrontendDist,
     },
   },
-  interface::{AppInterface, DevProcess, ExitReason, Interface},
+  interface::{AppInterface, ExitReason, Interface},
   CommandExt, ConfigValue, Result,
 };
 
