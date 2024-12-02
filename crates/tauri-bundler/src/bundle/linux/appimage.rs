@@ -47,6 +47,8 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
       dirs::cache_dir().map_or_else(|| output_path.to_path_buf(), |p| p.join("tauri"))
     });
 
+  fs::create_dir_all(&tools_path)?;
+
   let linuxdeploy_path = prepare_tools(&tools_path, tools_arch)?;
 
   let package_dir = settings.project_out_directory().join("bundle/appimage_deb");
