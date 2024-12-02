@@ -1624,7 +1624,13 @@
           "type": "boolean"
         },
         "menuOnLeftClick": {
-          "description": "A Boolean value that determines whether the menu should appear when the tray icon receives a left click on macOS.",
+          "description": "A Boolean value that determines whether the menu should appear when the tray icon receives a left click.\n\n ## Platform-specific:\n\n - **Linux**: Unsupported.",
+          "default": true,
+          "deprecated": true,
+          "type": "boolean"
+        },
+        "showMenuOnLeftClick": {
+          "description": "A Boolean value that determines whether the menu should appear when the tray icon receives a left click.\n\n ## Platform-specific:\n\n - **Linux**: Unsupported.",
           "default": true,
           "type": "boolean"
         },
@@ -2529,7 +2535,7 @@
           ]
         },
         "dialogImagePath": {
-          "description": "Path to a bitmap file to use on the installation user interface dialogs.\n It is used on the welcome and completion dialogs.\n The required dimensions are 493px × 312px.",
+          "description": "Path to a bitmap file to use on the installation user interface dialogs.\n It is used on the welcome and completion dialogs.\n\n The required dimensions are 493px × 312px.",
           "type": [
             "string",
             "null"

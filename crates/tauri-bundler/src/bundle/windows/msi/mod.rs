@@ -3,16 +3,21 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use crate::bundle::{
-  common::CommandExt,
-  path_utils::{copy_file, FileOpts},
-  settings::{Arch, Settings},
-  windows::{
-    sign::try_sign,
-    util::{
-      download_and_verify, download_webview2_bootstrapper, download_webview2_offline_installer,
-      extract_zip, HashAlgorithm, WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
+use crate::{
+  bundle::{
+    settings::{Arch, Settings},
+    windows::{
+      sign::try_sign,
+      util::{
+        download_webview2_bootstrapper, download_webview2_offline_installer,
+        WIX_OUTPUT_FOLDER_NAME, WIX_UPDATER_OUTPUT_FOLDER_NAME,
+      },
     },
+  },
+  utils::{
+    fs_utils::copy_file,
+    http_utils::{download_and_verify, extract_zip, HashAlgorithm},
+    CommandExt,
   },
 };
 use anyhow::{bail, Context};
@@ -198,14 +203,7 @@ fn copy_icon(settings: &Settings, filename: &str, path: &Path) -> crate::Result<
 
   let icon_path = std::env::current_dir()?.join(path);
 
-  copy_file(
-    icon_path,
-    &icon_target_path,
-    &FileOpts {
-      overwrite: true,
-      ..Default::default()
-    },
-  )?;
+  copy_file(&icon_path, &icon_target_path)?;
 
   Ok(icon_target_path)
 }

@@ -322,7 +322,10 @@ impl RuntimeAuthority {
             .extend(command_scope.allow.clone());
           command_scope_entry.deny.extend(command_scope.deny.clone());
 
-          self.scope_manager.command_cache.remove(&scope_id);
+          self
+            .scope_manager
+            .command_cache
+            .insert(scope_id, StateManager::new());
         }
       }
 

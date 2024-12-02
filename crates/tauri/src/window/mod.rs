@@ -125,7 +125,7 @@ unstable_struct!(
   }
 );
 
-impl<'a, R: Runtime, M: Manager<R>> fmt::Debug for WindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> fmt::Debug for WindowBuilder<'_, R, M> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("WindowBuilder")
       .field("label", &self.label)
@@ -846,7 +846,7 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   }
 }
 
-impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> WindowBuilder<'_, R, M> {
   /// Set the window and webview background color.
   ///
   /// ## Platform-specific:
@@ -2011,6 +2011,44 @@ tauri::Builder::default()
       .window
       .dispatcher
       .start_resize_dragging(direction)
+      .map_err(Into::into)
+  }
+
+  /// Sets the overlay icon on the taskbar **Windows only**. Using `None` to remove the overlay icon
+  ///
+  /// The overlay icon can be unique for each window.
+  #[cfg(target_os = "windows")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "windows")))]
+  pub fn set_overlay_icon(&self, icon: Option<Image<'_>>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_overlay_icon(icon.map(|x| x.into()))
+      .map_err(Into::into)
+  }
+
+  /// Sets the taskbar badge count. Using `0` or `None` will remove the badge
+  ///
+  /// ## Platform-specific
+  /// - **Windows:** Unsupported, use [`Window::set_overlay_icon`] instead.
+  /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
+  /// - **Android:** Unsupported.
+  pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_badge_count(count, Some(format!("{}.desktop", self.package_info().name)))
+      .map_err(Into::into)
+  }
+
+  /// Sets the taskbar badge label **macOS only**. Using `None` will remove the badge
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
+  pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {
+    self
+      .window
+      .dispatcher
+      .set_badge_label(label)
       .map_err(Into::into)
   }
 

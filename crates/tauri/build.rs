@@ -105,10 +105,14 @@ const PLUGINS: &[(&str, &[(&str, bool)])] = &[
       ("start_dragging", false),
       ("start_resize_dragging", false),
       ("set_progress_bar", false),
+      ("set_badge_count", false),
+      ("set_overlay_icon", false),
+      ("set_badge_label", false),
       ("set_icon", false),
       ("set_title_bar_style", false),
       ("set_theme", false),
       ("toggle_maximize", false),
+      ("set_background_color", false),
       // internal
       ("internal_toggle_maximize", true),
     ],
@@ -133,6 +137,7 @@ const PLUGINS: &[(&str, &[(&str, bool)])] = &[
       ("print", false),
       ("reparent", false),
       ("clear_all_browsing_data", false),
+      ("set_webview_background_color", false),
       // internal
       ("internal_toggle_devtools", true),
     ],
