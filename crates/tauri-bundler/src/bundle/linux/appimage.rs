@@ -259,9 +259,8 @@ fn prepare_tools(tools_path: &Path, arch: &str) -> crate::Result<PathBuf> {
 fn write_and_make_executable(path: &Path, data: Vec<u8>) -> std::io::Result<()> {
   use std::os::unix::fs::PermissionsExt;
 
-  let mut file = fs::File::create(path)?;
-  file.write_all(&data)?;
-  let mut perms = file.metadata()?.permissions();
-  perms.set_mode(0o770);
+  fs::write(path, &data)?;
+  fs::set_permissions(path, fs::Permissions::from_mode(0o770))?;
+
   Ok(())
 }
