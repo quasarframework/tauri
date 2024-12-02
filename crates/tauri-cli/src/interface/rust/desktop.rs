@@ -50,7 +50,7 @@ pub fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
   config_features: Vec<String>,
   on_exit: F,
 ) -> crate::Result<impl DevProcess> {
-  let mut dev_cmd = build_command(true, options, available_targets, config_features)?;
+  let mut dev_cmd = cargo_command(true, options, available_targets, config_features)?;
   let runner = dev_cmd.get_program().to_string_lossy().into_owned();
 
   dev_cmd
@@ -201,7 +201,7 @@ fn build_production_app(
   available_targets: &mut Option<Vec<RustupTarget>>,
   config_features: Vec<String>,
 ) -> crate::Result<()> {
-  let mut build_cmd = build_command(false, options, available_targets, config_features)?;
+  let mut build_cmd = cargo_command(false, options, available_targets, config_features)?;
   let runner = build_cmd.get_program().to_string_lossy().into_owned();
   match build_cmd.piped() {
     Ok(status) if status.success() => Ok(()),
@@ -219,13 +219,16 @@ fn build_production_app(
   }
 }
 
-fn build_command(
+fn cargo_command(
   dev: bool,
   options: Options,
   available_targets: &mut Option<Vec<RustupTarget>>,
   config_features: Vec<String>,
 ) -> crate::Result<Command> {
   let runner = options.runner.unwrap_or_else(|| "cargo".into());
+
+  let mut build_cmd = Command::new(runner);
+  build_cmd.arg(if dev { "run" } else { "build" });
 
   if let Some(target) = &options.target {
     if available_targets.is_none() {
@@ -234,32 +237,25 @@ fn build_command(
     validate_target(available_targets, target)?;
   }
 
-  let mut args = Vec::new();
-  if !options.args.is_empty() {
-    args.extend(options.args);
-  }
+  build_cmd.args(&options.args);
 
   let mut features = config_features;
   if let Some(f) = options.features {
     features.extend(f);
   }
   if !features.is_empty() {
-    args.push("--features".into());
-    args.push(features.join(","));
+    build_cmd.arg("--features");
+    build_cmd.arg(features.join(","));
   }
 
-  if !options.debug && !args.contains(&"--profile".to_string()) {
-    args.push("--release".into());
+  if !options.debug && !options.args.contains(&"--profile".to_string()) {
+    build_cmd.arg("--release");
   }
 
   if let Some(target) = options.target {
-    args.push("--target".into());
-    args.push(target);
+    build_cmd.arg("--target");
+    build_cmd.arg(target);
   }
-
-  let mut build_cmd = Command::new(runner);
-  build_cmd.arg(if dev { "run" } else { "build" });
-  build_cmd.args(args);
 
   Ok(build_cmd)
 }
