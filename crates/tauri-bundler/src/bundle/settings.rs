@@ -408,7 +408,7 @@ pub struct WixSettings {
   pub banner_path: Option<PathBuf>,
   /// Path to a bitmap file to use on the installation user interface dialogs.
   /// It is used on the welcome and completion dialogs.
-
+  ///
   /// The required dimensions are 493px × 312px.
   pub dialog_image_path: Option<PathBuf>,
   /// Enables FIPS compliant algorithms.

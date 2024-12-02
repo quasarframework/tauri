@@ -1044,7 +1044,7 @@ pub mod test;
 const _: () = {
   use specta::{datatype::DataType, function::FunctionArg, TypeMap};
 
-  impl<'r, T: Send + Sync + 'static> FunctionArg for crate::State<'r, T> {
+  impl<T: Send + Sync + 'static> FunctionArg for crate::State<'_, T> {
     fn to_datatype(_: &mut TypeMap) -> Option<DataType> {
       None
     }
