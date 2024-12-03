@@ -12,7 +12,6 @@ use crate::{
 use anyhow::Context;
 use std::{
   fs,
-  io::Write,
   path::{Path, PathBuf},
   process::Command,
 };
