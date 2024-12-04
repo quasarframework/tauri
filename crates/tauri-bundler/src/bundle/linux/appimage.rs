@@ -10,6 +10,7 @@ use crate::{
   Settings,
 };
 use anyhow::Context;
+#[allow(unused_imports)]
 use std::{
   fs,
   io::Write,
