@@ -8,6 +8,6 @@ use tao::{dpi::PhysicalSize, platform::unix::MonitorHandleExtUnix};
 impl super::MonitorExt for tao::monitor::MonitorHandle {
   fn work_area(&self) -> PhysicalSize<u32> {
     let rect = self.gdk_monitor().workarea();
-    PhysicalSize::new(rect.width(), rect.height())
+    PhysicalSize::new(rect.width() as u32, rect.height() as u32)
   }
 }
