@@ -17,7 +17,6 @@ mod macos;
 #[cfg(windows)]
 mod windows;
 
-#[cfg(desktop)]
 pub trait MonitorExt {
   /// Enable or disable the window
   ///
