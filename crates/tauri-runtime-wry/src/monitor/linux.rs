@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-use tao::platform::unix::MonitorHandleExtUnix;
+use tao::{dpi::PhysicalSize, platform::unix::MonitorHandleExtUnix};
 
 impl super::MonitorExt for tao::monitor::MonitorHandle {
-  fn work_area(&self) -> tao::dpi::PhysicalSize<u32> {
-    self.gdk_monitor().workarea()
+  fn work_area(&self) -> PhysicalSize<u32> {
+    let rect = self.gdk_monitor().workarea();
+    PhysicalSize::new(rect.width(), rect.height())
   }
 }
