@@ -476,7 +476,6 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   pub fn prevent_overflow(mut self) -> Self {
@@ -489,7 +488,6 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   pub fn prevent_overflow_with_margin(mut self, margin: Size) -> Self {

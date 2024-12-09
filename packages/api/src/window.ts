@@ -2231,7 +2231,6 @@ interface WindowOptions {
    *
    * #### Platform-specific
    *
-   * - **Linux:** Prevent overflowing the monitor instead of workarea
    * - **iOS / Android:** Unsupported.
    */
   preventOverflow?: boolean | PreventOverflowMargin

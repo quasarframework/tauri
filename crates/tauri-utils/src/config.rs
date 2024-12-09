@@ -1519,7 +1519,6 @@ pub struct WindowConfig {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[serde(alias = "prevent-overflow")]
   pub prevent_overflow: Option<PreventOverflowConfig>,

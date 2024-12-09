@@ -318,7 +318,7 @@
           "format": "double"
         },
         "preventOverflow": {
-          "description": "Whether or not to prevent the window from overflowing the workarea\n\n ## Platform-specific\n\n - **Linux:** Prevent overflowing the monitor instead of workarea\n - **iOS / Android:** Unsupported.",
+          "description": "Whether or not to prevent the window from overflowing the workarea\n\n ## Platform-specific\n\n - **iOS / Android:** Unsupported.",
           "anyOf": [
             {
               "$ref": "#/definitions/PreventOverflowConfig"
