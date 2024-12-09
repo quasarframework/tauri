@@ -30,6 +30,18 @@
       "../.icons/128x128@2x.png",
       "../.icons/icon.icns",
       "../.icons/icon.ico"
-    ]
+    ],
+    "macOS": {
+      "dmg": {
+        "files": [
+          {
+            "name": "aa.md",
+            "path": "./README.md",
+            "x": 200,
+            "y": 200
+          }
+        ]
+      }
+    }
   }
 }

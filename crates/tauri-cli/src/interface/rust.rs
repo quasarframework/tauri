@@ -1443,6 +1443,7 @@ fn tauri_config_to_bundle_settings(
         x: config.macos.dmg.application_folder_position.x,
         y: config.macos.dmg.application_folder_position.y,
       },
+      files: config.macos.dmg.files,
     },
     macos: MacOsSettings {
       frameworks: config.macos.frameworks,

@@ -112,6 +112,7 @@
               "x": 480,
               "y": 170
             },
+            "files": [],
             "windowSize": {
               "height": 400,
               "width": 660
@@ -1994,6 +1995,7 @@
                 "x": 480,
                 "y": 170
               },
+              "files": [],
               "windowSize": {
                 "height": 400,
                 "width": 660
@@ -3263,6 +3265,7 @@
               "x": 480,
               "y": 170
             },
+            "files": [],
             "windowSize": {
               "height": 400,
               "width": 660
@@ -3334,6 +3337,13 @@
               "$ref": "#/definitions/Position"
             }
           ]
+        },
+        "files": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DmgFile"
+          }
         }
       },
       "additionalProperties": false
@@ -3377,6 +3387,34 @@
         },
         "height": {
           "description": "Height of the window.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "DmgFile": {
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "x",
+        "y"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "x": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "y": {
           "type": "integer",
           "format": "uint32",
           "minimum": 0.0

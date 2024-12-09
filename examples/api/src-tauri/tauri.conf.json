@@ -74,6 +74,19 @@
     }
   },
   "bundle": {
+    "macOS": {
+      "dmg": {
+        "files": [
+          {
+            "x": 200,
+            "y": 200,
+            "name": "111",
+            "path": "./info.plist"
+          }
+        ]
+
+      }
+    },
     "active": true,
     "icon": [
       "../../.icons/32x32.png",
