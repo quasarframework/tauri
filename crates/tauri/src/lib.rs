@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-//! [![](https://github.com/tauri-apps/tauri/raw/dev/.github/splash.png)](https://tauri.app)
-//!
 //! Tauri is a framework for building tiny, blazing fast binaries for all major desktop platforms.
 //! Developers can integrate any front-end framework that compiles to HTML, JS and CSS for building their user interface.
 //! The backend of the application is a rust-sourced binary with an API that the front-end can interact with.
@@ -1046,7 +1044,7 @@ pub mod test;
 const _: () = {
   use specta::{datatype::DataType, function::FunctionArg, TypeMap};
 
-  impl<'r, T: Send + Sync + 'static> FunctionArg for crate::State<'r, T> {
+  impl<T: Send + Sync + 'static> FunctionArg for crate::State<'_, T> {
     fn to_datatype(_: &mut TypeMap) -> Option<DataType> {
       None
     }

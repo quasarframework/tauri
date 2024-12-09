@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
-//! [![](https://github.com/tauri-apps/tauri/raw/dev/.github/splash.png)](https://tauri.app)
-//!
 //! The [`wry`] Tauri [`Runtime`].
 //!
 //! None of the exposed API of this crate is stable, and it may break semver
@@ -44,6 +42,8 @@ use tao::platform::windows::{WindowBuilderExtWindows, WindowExtWindows};
 use webview2_com::FocusChangedEventHandler;
 #[cfg(windows)]
 use windows::Win32::{Foundation::HWND, System::WinRT::EventRegistrationToken};
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+use wry::WebViewBuilderExtDarwin;
 #[cfg(windows)]
 use wry::WebViewBuilderExtWindows;
 
@@ -97,6 +97,8 @@ use wry::{
 )))]
 use wry::{WebViewBuilderExtUnix, WebViewExtUnix};
 
+#[cfg(target_os = "ios")]
+pub use tao::platform::ios::WindowExtIOS;
 #[cfg(target_os = "macos")]
 pub use tao::platform::macos::{
   ActivationPolicy as TaoActivationPolicy, EventLoopExtMacOS, WindowExtMacOS,
@@ -1305,6 +1307,9 @@ pub enum WindowMessage {
   SetCursorIcon(CursorIcon),
   SetCursorPosition(Position),
   SetIgnoreCursorEvents(bool),
+  SetBadgeCount(Option<i64>, Option<String>),
+  SetBadgeLabel(Option<String>),
+  SetOverlayIcon(Option<TaoIcon>),
   SetProgressBar(ProgressBarState),
   SetTitleBarStyle(tauri_utils::TitleBarStyle),
   SetTheme(Option<Theme>),
@@ -2164,6 +2169,32 @@ impl<T: UserEvent> WindowDispatch<T> for WryWindowDispatcher<T> {
     send_user_message(
       &self.context,
       Message::Window(self.window_id, WindowMessage::ResizeDragWindow(direction)),
+    )
+  }
+
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) -> Result<()> {
+    send_user_message(
+      &self.context,
+      Message::Window(
+        self.window_id,
+        WindowMessage::SetBadgeCount(count, desktop_filename),
+      ),
+    )
+  }
+
+  fn set_badge_label(&self, label: Option<String>) -> Result<()> {
+    send_user_message(
+      &self.context,
+      Message::Window(self.window_id, WindowMessage::SetBadgeLabel(label)),
+    )
+  }
+
+  fn set_overlay_icon(&self, icon: Option<Icon>) -> Result<()> {
+    let icon: Result<Option<TaoIcon>> = icon.map_or(Ok(None), |x| Ok(Some(TaoIcon::try_from(x)?)));
+
+    send_user_message(
+      &self.context,
+      Message::Window(self.window_id, WindowMessage::SetOverlayIcon(icon?)),
     )
   }
 
@@ -3138,6 +3169,32 @@ fn handle_user_message<T: UserEvent>(
           WindowMessage::RequestRedraw => {
             window.request_redraw();
           }
+          WindowMessage::SetBadgeCount(_count, _desktop_filename) => {
+            #[cfg(target_os = "ios")]
+            window.set_badge_count(
+              _count.map_or(0, |x| x.clamp(i32::MIN as i64, i32::MAX as i64) as i32),
+            );
+
+            #[cfg(target_os = "macos")]
+            window.set_badge_label(_count.map(|x| x.to_string()));
+
+            #[cfg(any(
+              target_os = "linux",
+              target_os = "dragonfly",
+              target_os = "freebsd",
+              target_os = "netbsd",
+              target_os = "openbsd"
+            ))]
+            window.set_badge_count(_count, _desktop_filename);
+          }
+          WindowMessage::SetBadgeLabel(_label) => {
+            #[cfg(target_os = "macos")]
+            window.set_badge_label(_label);
+          }
+          WindowMessage::SetOverlayIcon(_icon) => {
+            #[cfg(windows)]
+            window.set_overlay_icon(_icon.map(|x| x.0).as_ref());
+          }
           WindowMessage::SetProgressBar(progress_state) => {
             window.set_progress_bar(ProgressBarStateWrapper::from(progress_state).0);
           }
@@ -3473,7 +3530,6 @@ fn handle_user_message<T: UserEvent>(
             }
             #[cfg(target_os = "ios")]
             {
-              use tao::platform::ios::WindowExtIOS;
               use wry::WebViewExtIOS;
 
               f(Webview {
@@ -4362,6 +4418,13 @@ fn create_webview<T: UserEvent>(
   {
     if let Some(path) = &webview_attributes.extensions_path {
       webview_builder = webview_builder.with_extension_path(path);
+    }
+  }
+
+  #[cfg(any(target_os = "macos", target_os = "ios"))]
+  {
+    if let Some(data_store_identifier) = &webview_attributes.data_store_identifier {
+      webview_builder = webview_builder.with_data_store_identifier(*data_store_identifier);
     }
   }
 

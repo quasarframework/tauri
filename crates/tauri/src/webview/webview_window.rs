@@ -768,7 +768,7 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
 }
 
 /// Webview attributes.
-impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
+impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   /// Sets whether clicking an inactive window also clicks through to the webview.
   #[must_use]
   pub fn accept_first_mouse(mut self, accept: bool) -> Self {
@@ -940,6 +940,19 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn extensions_path(mut self, path: impl AsRef<Path>) -> Self {
     self.webview_builder = self.webview_builder.extensions_path(path);
+    self
+  }
+
+  /// Initialize the WebView with a custom data store identifier.
+  /// Can be used as a replacement for data_directory not being available in WKWebView.
+  ///
+  /// - **macOS / iOS**: Available on macOS >= 14 and iOS >= 17
+  /// - **Windows / Linux / Android**: Unsupported.
+  #[must_use]
+  pub fn data_store_identifier(mut self, data_store_identifier: [u8; 16]) -> Self {
+    self.webview_builder = self
+      .webview_builder
+      .data_store_identifier(data_store_identifier);
     self
   }
 
@@ -1739,6 +1752,32 @@ impl<R: Runtime> WebviewWindow<R> {
   /// Starts dragging the window.
   pub fn start_dragging(&self) -> crate::Result<()> {
     self.window.start_dragging()
+  }
+
+  /// Sets the overlay icon on the taskbar **Windows only**. Using `None` will remove the icon
+  ///
+  /// The overlay icon can be unique for each window.
+  #[cfg(target_os = "windows")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "windows")))]
+  pub fn set_overlay_icon(&self, icon: Option<Image<'_>>) -> crate::Result<()> {
+    self.window.set_overlay_icon(icon)
+  }
+
+  /// Sets the taskbar badge count. Using `0` or `None` will remove the badge
+  ///
+  /// ## Platform-specific
+  /// - **Windows:** Unsupported, use [`WebviewWindow::set_overlay_icon`] instead.
+  /// - **iOS:** iOS expects i32, the value will be clamped to i32::MIN, i32::MAX.
+  /// - **Android:** Unsupported.
+  pub fn set_badge_count(&self, count: Option<i64>) -> crate::Result<()> {
+    self.window.set_badge_count(count)
+  }
+
+  /// Sets the taskbar badge label **macOS only**. Using `None` will remove the badge
+  #[cfg(target_os = "macos")]
+  #[cfg_attr(docsrs, doc(cfg(target_os = "macos")))]
+  pub fn set_badge_label(&self, label: Option<String>) -> crate::Result<()> {
+    self.window.set_badge_label(label)
   }
 
   /// Sets the taskbar progress state.

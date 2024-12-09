@@ -579,6 +579,9 @@ class Webview {
    * unlisten();
    * ```
    *
+   * When the debugger panel is open, the drop position of this event may be inaccurate due to a known limitation.
+   * To retrieve the correct drop position, please detach the debugger.
+   *
    * @returns A promise resolving to a function to unlisten to the event.
    * Note that removing the listener is required if your listener goes out of scope e.g. the component is unmounted.
    */

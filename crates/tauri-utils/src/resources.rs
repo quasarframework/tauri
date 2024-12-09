@@ -142,7 +142,7 @@ pub struct ResourcePathsIter<'a> {
   glob_iter: Option<glob::Paths>,
 }
 
-impl<'a> ResourcePathsIter<'a> {
+impl ResourcePathsIter<'_> {
   fn next_glob_iter(&mut self) -> Option<crate::Result<Resource>> {
     let entry = self.glob_iter.as_mut().unwrap().next()?;
 
@@ -270,7 +270,7 @@ impl<'a> ResourcePathsIter<'a> {
   }
 }
 
-impl<'a> Iterator for ResourcePaths<'a> {
+impl Iterator for ResourcePaths<'_> {
   type Item = crate::Result<PathBuf>;
 
   fn next(&mut self) -> Option<crate::Result<PathBuf>> {
@@ -278,7 +278,7 @@ impl<'a> Iterator for ResourcePaths<'a> {
   }
 }
 
-impl<'a> Iterator for ResourcePathsIter<'a> {
+impl Iterator for ResourcePathsIter<'_> {
   type Item = crate::Result<Resource>;
 
   fn next(&mut self) -> Option<crate::Result<Resource>> {

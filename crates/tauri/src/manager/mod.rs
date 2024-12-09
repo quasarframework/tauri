@@ -254,6 +254,9 @@ impl<R: Runtime> AppManager<R> {
     uri_scheme_protocols: HashMap<String, Arc<webview::UriSchemeProtocol<R>>>,
     state: StateManager,
     #[cfg(desktop)] menu_event_listener: Vec<crate::app::GlobalMenuEventListener<AppHandle<R>>>,
+    #[cfg(all(desktop, feature = "tray-icon"))] tray_icon_event_listeners: Vec<
+      crate::app::GlobalTrayIconEventListener<AppHandle<R>>,
+    >,
     window_event_listeners: Vec<GlobalWindowEventListener<R>>,
     webiew_event_listeners: Vec<GlobalWebviewEventListener<R>>,
     #[cfg(desktop)] window_menu_event_listeners: HashMap<
@@ -290,7 +293,7 @@ impl<R: Runtime> AppManager<R> {
       tray: tray::TrayManager {
         icon: context.tray_icon,
         icons: Default::default(),
-        global_event_listeners: Default::default(),
+        global_event_listeners: Mutex::new(tray_icon_event_listeners),
         event_listeners: Default::default(),
       },
       #[cfg(desktop)]
@@ -376,7 +379,7 @@ impl<R: Runtime> AppManager<R> {
   pub fn get_asset(
     &self,
     mut path: String,
-    use_https_schema: bool,
+    _use_https_schema: bool,
   ) -> Result<Asset, Box<dyn std::error::Error>> {
     let assets = &self.assets;
     if path.ends_with('/') {
@@ -440,7 +443,10 @@ impl<R: Runtime> AppManager<R> {
               let default_src = csp_map
                 .entry("default-src".into())
                 .or_insert_with(Default::default);
-              default_src.push(crate::pattern::format_real_schema(schema, use_https_schema));
+              default_src.push(crate::pattern::format_real_schema(
+                schema,
+                _use_https_schema,
+              ));
             }
 
             csp_header.replace(Csp::DirectiveMap(csp_map).to_string());
@@ -764,6 +770,8 @@ mod test {
       None,
       Default::default(),
       StateManager::new(),
+      Default::default(),
+      #[cfg(all(desktop, feature = "tray-icon"))]
       Default::default(),
       Default::default(),
       Default::default(),

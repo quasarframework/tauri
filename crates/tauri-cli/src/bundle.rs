@@ -181,24 +181,6 @@ pub fn bundle<A: AppSettings>(
     _ => log::Level::Trace,
   });
 
-  // set env vars used by the bundler
-  #[cfg(target_os = "linux")]
-  {
-    if config.bundle.linux.appimage.bundle_media_framework {
-      std::env::set_var("APPIMAGE_BUNDLE_GSTREAMER", "1");
-    }
-
-    if let Some(open) = config.plugins.0.get("shell").and_then(|v| v.get("open")) {
-      if open.as_bool().is_some_and(|x| x) || open.is_string() {
-        std::env::set_var("APPIMAGE_BUNDLE_XDG_OPEN", "1");
-      }
-    }
-
-    if settings.deep_link_protocols().is_some() {
-      std::env::set_var("APPIMAGE_BUNDLE_XDG_MIME", "1");
-    }
-  }
-
   let bundles = tauri_bundler::bundle_project(&settings)
     .map_err(|e| match e {
       tauri_bundler::Error::BundlerError(e) => e,

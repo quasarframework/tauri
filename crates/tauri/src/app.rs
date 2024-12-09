@@ -1249,6 +1249,10 @@ pub struct Builder<R: Runtime> {
   #[cfg(desktop)]
   menu_event_listeners: Vec<GlobalMenuEventListener<AppHandle<R>>>,
 
+  /// Tray event listeners for any tray icon event.
+  #[cfg(all(desktop, feature = "tray-icon"))]
+  tray_icon_event_listeners: Vec<GlobalTrayIconEventListener<AppHandle<R>>>,
+
   /// Enable macOS default menu creation.
   #[allow(unused)]
   enable_macos_default_menu: bool,
@@ -1321,6 +1325,8 @@ impl<R: Runtime> Builder<R> {
       menu: None,
       #[cfg(desktop)]
       menu_event_listeners: Vec::new(),
+      #[cfg(all(desktop, feature = "tray-icon"))]
+      tray_icon_event_listeners: Vec::new(),
       enable_macos_default_menu: true,
       window_event_listeners: Vec::new(),
       webview_event_listeners: Vec::new(),
@@ -1682,6 +1688,29 @@ tauri::Builder::default()
     self
   }
 
+  /// Registers an event handler for any tray icon event.
+  ///
+  /// # Examples
+  /// ```
+  /// use tauri::Manager;
+  ///
+  /// tauri::Builder::default()
+  ///   .on_tray_icon_event(|app, event| {
+  ///      let tray = app.tray_by_id(event.id()).expect("can't find tray icon");
+  ///      let _ = tray.set_visible(false);
+  ///   });
+  /// ```
+  #[must_use]
+  #[cfg(all(desktop, feature = "tray-icon"))]
+  #[cfg_attr(docsrs, doc(cfg(all(desktop, feature = "tray-icon"))))]
+  pub fn on_tray_icon_event<F: Fn(&AppHandle<R>, TrayIconEvent) + Send + Sync + 'static>(
+    mut self,
+    f: F,
+  ) -> Self {
+    self.tray_icon_event_listeners.push(Box::new(f));
+    self
+  }
+
   /// Enable or disable the default menu on macOS. Enabled by default.
   ///
   /// # Examples
@@ -1889,6 +1918,8 @@ tauri::Builder::default()
       self.state,
       #[cfg(desktop)]
       self.menu_event_listeners,
+      #[cfg(all(desktop, feature = "tray-icon"))]
+      self.tray_icon_event_listeners,
       self.window_event_listeners,
       self.webview_event_listeners,
       #[cfg(desktop)]
@@ -2042,10 +2073,12 @@ tauri::Builder::default()
     {
       let config = app.config();
       if let Some(tray_config) = &config.app.tray_icon {
+        #[allow(deprecated)]
         let mut tray =
           TrayIconBuilder::with_id(tray_config.id.clone().unwrap_or_else(|| "main".into()))
             .icon_as_template(tray_config.icon_as_template)
-            .menu_on_left_click(tray_config.menu_on_left_click);
+            .menu_on_left_click(tray_config.menu_on_left_click)
+            .show_menu_on_left_click(tray_config.show_menu_on_left_click);
         if let Some(icon) = &app.manager.tray.icon {
           tray = tray.icon(icon.clone());
         }

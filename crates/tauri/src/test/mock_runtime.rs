@@ -985,6 +985,18 @@ impl<T: UserEvent> WindowDispatch<T> for MockWindowDispatcher {
     Ok(())
   }
 
+  fn set_badge_count(&self, count: Option<i64>, desktop_filename: Option<String>) -> Result<()> {
+    Ok(())
+  }
+
+  fn set_badge_label(&self, label: Option<String>) -> Result<()> {
+    Ok(())
+  }
+
+  fn set_overlay_icon(&self, icon: Option<Icon<'_>>) -> Result<()> {
+    Ok(())
+  }
+
   fn set_title_bar_style(&self, style: tauri_utils::TitleBarStyle) -> Result<()> {
     Ok(())
   }

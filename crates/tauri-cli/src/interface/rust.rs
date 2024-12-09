@@ -363,6 +363,7 @@ fn lookup<F: FnMut(FileType, PathBuf)>(dir: &Path, mut f: F) {
 }
 
 fn shared_options(
+  desktop_dev: bool,
   mobile: bool,
   args: &mut Vec<String>,
   features: &mut Option<Vec<String>>,
@@ -374,7 +375,9 @@ fn shared_options(
       .get_or_insert(Vec::new())
       .push("tauri/rustls-tls".into());
   } else {
-    args.push("--bins".into());
+    if !desktop_dev {
+      args.push("--bins".into());
+    }
     let all_features = app_settings
       .manifest
       .lock()
@@ -408,7 +411,7 @@ fn dev_options(
   }
   *args = dev_args;
 
-  shared_options(mobile, args, features, app_settings);
+  shared_options(true, mobile, args, features, app_settings);
 
   if !args.contains(&"--no-default-features".into()) {
     let manifest_features = app_settings.manifest.lock().unwrap().features();
@@ -488,7 +491,7 @@ impl Rust {
     features
       .get_or_insert(Vec::new())
       .push("tauri/custom-protocol".into());
-    shared_options(mobile, args, features, &self.app_settings);
+    shared_options(false, mobile, args, features, &self.app_settings);
   }
 
   fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
@@ -502,8 +505,6 @@ impl Rust {
       run_args,
       &mut self.available_targets,
       self.config_features.clone(),
-      &self.app_settings,
-      self.main_binary_name.clone(),
       on_exit,
     )
     .map(|c| Box::new(c) as Box<dyn DevProcess + Send>)
@@ -865,6 +866,26 @@ impl AppSettings for RustAppSettings {
         DesktopDeepLinks::One(p) => vec![p],
         DesktopDeepLinks::List(p) => p,
       });
+    }
+
+    if let Some(open) = config.plugins.0.get("shell").and_then(|v| v.get("open")) {
+      if open.as_bool().is_some_and(|x| x) || open.is_string() {
+        settings.appimage.bundle_xdg_open = true;
+      }
+    }
+
+    if let Some(deps) = self
+      .manifest
+      .lock()
+      .unwrap()
+      .inner
+      .as_table()
+      .get("dependencies")
+      .and_then(|f| f.as_table())
+    {
+      if deps.contains_key("tauri-plugin-opener") {
+        settings.appimage.bundle_xdg_open = true;
+      };
     }
 
     Ok(settings)
@@ -1234,6 +1255,9 @@ fn tauri_config_to_bundle_settings(
   #[allow(unused_mut)]
   let mut depends_rpm = config.linux.rpm.depends.unwrap_or_default();
 
+  #[allow(unused_mut)]
+  let mut appimage_files = config.linux.appimage.files;
+
   // set env vars used by the bundler and inject dependencies
   #[cfg(target_os = "linux")]
   {
@@ -1276,7 +1300,12 @@ fn tauri_config_to_bundle_settings(
         }
       }
 
-      std::env::set_var("TAURI_TRAY_LIBRARY_PATH", path);
+      // conditionally setting it in case the user provided its own version for some reason
+      let path = PathBuf::from(path);
+      if !appimage_files.contains_key(&path) {
+        // manually construct target path, just in case the source path is something unexpected
+        appimage_files.insert(Path::new("/usr/lib/").join(path.file_name().unwrap()), path);
+      }
     }
 
     depends_deb.push("libwebkit2gtk-4.1-0".to_string());
@@ -1368,7 +1397,9 @@ fn tauri_config_to_bundle_settings(
       post_remove_script: config.linux.deb.post_remove_script,
     },
     appimage: AppImageSettings {
-      files: config.linux.appimage.files,
+      files: appimage_files,
+      bundle_media_framework: config.linux.appimage.bundle_media_framework,
+      bundle_xdg_open: false,
     },
     rpm: RpmSettings {
       depends: if depends_rpm.is_empty() {
@@ -1503,7 +1534,7 @@ mod pkgconfig_utils {
       if !output.stdout.is_empty() {
         // output would be "-L/path/to/library\n"
         let word = output.stdout[2..].to_vec();
-        return Some(String::from_utf8_lossy(&word).trim().to_string());
+        Some(String::from_utf8_lossy(&word).trim().to_string())
       } else {
         None
       }
