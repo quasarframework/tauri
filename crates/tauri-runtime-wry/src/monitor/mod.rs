@@ -18,7 +18,7 @@ mod macos;
 mod windows;
 
 pub trait MonitorExt {
-  /// Enable or disable the window
+  /// Get the work area of this monitor
   ///
   /// ## Platform-specific:
   ///
