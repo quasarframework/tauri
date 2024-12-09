@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
+use gtk::prelude::MonitorExt;
 use tao::{dpi::PhysicalSize, platform::unix::MonitorHandleExtUnix};
 
 impl super::MonitorExt for tao::monitor::MonitorHandle {
