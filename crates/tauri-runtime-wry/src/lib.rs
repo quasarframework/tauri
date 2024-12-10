@@ -127,6 +127,7 @@ use std::{
 pub type WebviewId = u32;
 type IpcHandler = dyn Fn(Request<String>) + 'static;
 
+#[cfg(desktop)]
 mod monitor;
 #[cfg(any(
   windows,
@@ -928,7 +929,6 @@ impl WindowBuilder for WindowBuilderWrapper {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   fn prevent_overflow(mut self) -> Self {
@@ -943,7 +943,6 @@ impl WindowBuilder for WindowBuilderWrapper {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   fn prevent_overflow_with_margin(mut self, margin: Size) -> Self {

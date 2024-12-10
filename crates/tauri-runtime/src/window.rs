@@ -271,7 +271,6 @@ pub trait WindowBuilder: WindowBuilderBase {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   fn prevent_overflow(self) -> Self;
@@ -281,7 +280,6 @@ pub trait WindowBuilder: WindowBuilderBase {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux:** Prevent overflowing the monitor instead of workarea
   /// - **iOS / Android:** Unsupported.
   #[must_use]
   fn prevent_overflow_with_margin(self, margin: dpi::Size) -> Self;
