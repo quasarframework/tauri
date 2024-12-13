@@ -376,10 +376,12 @@ permissions = [{default_permissions}]
       .unwrap_or_else(|_| panic!("unable to autogenerate default permissions"));
 
     let permissions = tauri_utils::acl::build::define_permissions(
-      &permissions_out_dir
-        .join("**")
-        .join("*.toml")
-        .to_string_lossy(),
+      &PathBuf::from(glob::Pattern::escape(
+        &permissions_out_dir.to_string_lossy(),
+      ))
+      .join("**")
+      .join("*.toml")
+      .to_string_lossy(),
       &format!("tauri:{plugin}"),
       out_dir,
       |_| true,
@@ -432,7 +434,11 @@ permissions = [{}]
     .unwrap_or_else(|_| panic!("unable to autogenerate core:default set"));
 
   let _ = tauri_utils::acl::build::define_permissions(
-    &permissions_out_dir.join("*.toml").to_string_lossy(),
+    &PathBuf::from(glob::Pattern::escape(
+      &permissions_out_dir.to_string_lossy(),
+    ))
+    .join("*.toml")
+    .to_string_lossy(),
     "tauri:core",
     out_dir,
     |_| true,
