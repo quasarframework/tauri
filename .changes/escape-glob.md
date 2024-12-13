@@ -4,4 +4,4 @@
 "tauri-bundler": "patch:bug"
 ---
 
-Fix tauri doesn't work if the project path contains glob characters
+Fix tauri fails to build if the project path contains glob characters
