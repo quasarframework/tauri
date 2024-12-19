@@ -135,13 +135,12 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 
   for item in &dmg_settings.files {
     let _arg = format!("{} {:?} {} {}", item.name, item.path, item.x, item.y);
-    bundle_dmg_cmd.arg("--add-file" );
+    bundle_dmg_cmd.arg("--add-file");
     bundle_dmg_cmd.arg(&item.name);
 
     if item.path.is_absolute() {
       bundle_dmg_cmd.arg(&item.path);
-    }
-    else {
+    } else {
       bundle_dmg_cmd.arg(env::current_dir()?.join(&item.path));
     }
 

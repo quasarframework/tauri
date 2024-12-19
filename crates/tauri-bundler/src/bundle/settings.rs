@@ -306,7 +306,7 @@ pub struct DmgSettings {
   /// Position of application folder on window.
   pub application_folder_position: Position,
   /// Need to add files to the dmg collection
-  pub files: Vec<DmgFile>
+  pub files: Vec<DmgFile>,
 }
 
 /// The macOS bundle settings.

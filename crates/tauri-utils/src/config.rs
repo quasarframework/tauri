@@ -547,40 +547,26 @@ pub struct DmgConfig {
   )]
   pub application_folder_position: Position,
   /// Need to add files to the dmg collection
-  #[serde(
-    default = "files_default",
-    alias = "files"
-  )]
+  #[serde(default = "files_default", alias = "files")]
   pub files: Vec<DmgFile>,
-
 }
-
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DmgFile {
-   #[serde(
-    alias = "path"
-  )]
-   /// The path to the file.
-   pub path: PathBuf,
-   #[serde(
-    alias = "name"
-  )]
-   /// The name of the file.
-   pub name: String,
-   #[serde(
-    alias = "x"
-  )]
-   /// The x-coordinate associated with the file.
-   pub x: u32,
-   #[serde(
-    alias = "y"
-  )]
-   /// The y-coordinate associated with the file.
-   pub y: u32,
-
+  #[serde(alias = "path")]
+  /// The path to the file.
+  pub path: PathBuf,
+  #[serde(alias = "name")]
+  /// The name of the file.
+  pub name: String,
+  #[serde(alias = "x")]
+  /// The x-coordinate associated with the file.
+  pub x: u32,
+  #[serde(alias = "y")]
+  /// The y-coordinate associated with the file.
+  pub y: u32,
 }
 
 impl Default for DmgConfig {

@@ -3339,6 +3339,7 @@
           ]
         },
         "files": {
+          "description": "Need to add files to the dmg collection",
           "default": [],
           "type": "array",
           "items": {
@@ -3404,17 +3405,21 @@
       ],
       "properties": {
         "path": {
+          "description": "The path to the file.",
           "type": "string"
         },
         "name": {
+          "description": "The name of the file.",
           "type": "string"
         },
         "x": {
+          "description": "The x-coordinate associated with the file.",
           "type": "integer",
           "format": "uint32",
           "minimum": 0.0
         },
         "y": {
+          "description": "The y-coordinate associated with the file.",
           "type": "integer",
           "format": "uint32",
           "minimum": 0.0
