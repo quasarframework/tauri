@@ -13,7 +13,7 @@
 
 | Component   | Version                                                                                              |
 | ----------- | ---------------------------------------------------------------------------------------------------- |
-| tauri-utils | [![](https://img.shields.io/crates/v/tauri-utils?style=flat-square)](https://crates.io/crates/utils) |
+| tauri-utils | [![](https://img.shields.io/crates/v/tauri-utils?style=flat-square)](https://crates.io/crates/tauri-utils) |
 
 ## About Tauri
 
