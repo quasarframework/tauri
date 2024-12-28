@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 use serde::{Deserialize, Serialize};
-use tauri::{command, ipc::CommandScope};
+use tauri::{
+  command,
+  ipc::{Channel, CommandScope},
+};
 
 #[derive(Debug, Deserialize)]
 #[allow(unused)]
@@ -49,4 +52,11 @@ pub fn perform_request(endpoint: String, body: RequestBody) -> ApiResponse {
 #[command]
 pub fn echo(request: tauri::ipc::Request<'_>) -> tauri::ipc::Response {
   tauri::ipc::Response::new(request.body().clone())
+}
+
+#[command]
+pub fn spam(channel: Channel<i32>) {
+  for i in 1..1_000 {
+    channel.send(i).unwrap()
+  }
 }

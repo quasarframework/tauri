@@ -17,6 +17,7 @@ fn main() {
         "log_operation",
         "perform_request",
         "echo",
+        "spam",
       ])),
   )
   .expect("failed to run tauri-build");

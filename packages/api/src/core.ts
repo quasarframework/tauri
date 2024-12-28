@@ -81,42 +81,31 @@ class Channel<T = unknown> {
   #onmessage: (response: T) => void = () => {
     // no-op
   }
+  // the id is used as a mechanism to preserve message order
   #nextMessageId = 0
-  #pendingMessages: Record<string, T> = {}
+  #pendingMessages: T[] = []
 
   constructor() {
     this.id = transformCallback(
       ({ message, id }: { message: T; id: number }) => {
-        // the id is used as a mechanism to preserve message order
-        if (id === this.#nextMessageId) {
-          this.#nextMessageId = id + 1
+        // Process the message if we're at the right order
+        if (id == this.#nextMessageId) {
           this.#onmessage(message)
+          this.#nextMessageId += 1
 
           // process pending messages
-          const pendingMessageIds = Object.keys(this.#pendingMessages)
-          if (pendingMessageIds.length > 0) {
-            let nextId = id + 1
-            for (const pendingId of pendingMessageIds.sort()) {
-              // if we have the next message, process it
-              if (parseInt(pendingId) === nextId) {
-                // eslint-disable-next-line security/detect-object-injection
-                const message = this.#pendingMessages[pendingId]
-                // eslint-disable-next-line security/detect-object-injection
-                delete this.#pendingMessages[pendingId]
-
-                this.#onmessage(message)
-
-                // move the id counter to the next message to check
-                nextId += 1
-              } else {
-                // we do not have the next message, let's wait
-                break
-              }
-            }
-            this.#nextMessageId = nextId
+          while (this.#nextMessageId in this.#pendingMessages) {
+            const message = this.#pendingMessages[this.#nextMessageId]
+            this.#onmessage(message)
+            // eslint-disable-next-line @typescript-eslint/no-array-delete
+            delete this.#pendingMessages[this.#nextMessageId]
+            this.#nextMessageId += 1
           }
-        } else {
-          this.#pendingMessages[id.toString()] = message
+        }
+        // Queue the message if we're not
+        else {
+          // eslint-disable-next-line security/detect-object-injection
+          this.#pendingMessages[id] = message
         }
       }
     )
