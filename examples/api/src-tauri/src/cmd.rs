@@ -31,7 +31,7 @@ pub fn log_operation(
   } else if !command_scope.allows().iter().any(|s| s.event == event) {
     Err("not allowed")
   } else {
-    log::info!("{} {:?}", event, payload);
+    log::info!("{event} {payload:?}");
     Ok(())
   }
 }
@@ -43,7 +43,7 @@ pub struct ApiResponse {
 
 #[command]
 pub fn perform_request(endpoint: String, body: RequestBody) -> ApiResponse {
-  println!("{} {:?}", endpoint, body);
+  println!("{endpoint} {body:?}");
   ApiResponse {
     message: "message response".into(),
   }
@@ -55,8 +55,9 @@ pub fn echo(request: tauri::ipc::Request<'_>) -> tauri::ipc::Response {
 }
 
 #[command]
-pub fn spam(channel: Channel<i32>) {
-  for i in 1..1_000 {
-    channel.send(i).unwrap()
+pub fn spam(channel: Channel<i32>) -> tauri::Result<()> {
+  for i in 1..=1_000 {
+    channel.send(i)?;
   }
+  Ok(())
 }
