@@ -7550,6 +7550,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1630639f4dbc1c71ad7b704cda2171584c80735c502efae94804d02763fc6f7d"
 dependencies = [
  "bitflags 2.6.0",
+ "bzip2",
  "chrono",
  "cpio",
  "digest",
