@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // SPDX-License-Identifier: MIT
 
+use itertools::Itertools;
 use json_patch::merge;
 use serde_json::Value as JsonValue;
 
@@ -172,20 +173,20 @@ fn get_internal(
     || config_path.extension() == Some(OsStr::new("json5"))
   {
     let schema: JsonValue = serde_json::from_str(include_str!("../../config.schema.json"))?;
-    let schema = jsonschema::JSONSchema::compile(&schema).unwrap();
-    let result = schema.validate(&config);
-    if let Err(errors) = result {
-      for error in errors {
-        let path = error.instance_path.clone().into_vec().join(" > ");
-        if path.is_empty() {
-          log::error!("`{}` error: {}", config_file_name, error);
-        } else {
-          log::error!("`{}` error on `{}`: {}", config_file_name, path, error);
-        }
+    let validator = jsonschema::validator_for(&schema).expect("Invalid schema");
+    let mut has_errors = false;
+    let errors = validator.iter_errors(&config).peekable();
+    for error in errors {
+      has_errors = true;
+      let path = error.instance_path.into_iter().join(" > ");
+      if path.is_empty() {
+        log::error!("`{}` error: {}", config_file_name, error);
+      } else {
+        log::error!("`{}` error on `{}`: {}", config_file_name, path, error);
       }
-      if !reload {
-        exit(1);
-      }
+    }
+    if has_errors && !reload {
+      exit(1);
     }
   }
 
