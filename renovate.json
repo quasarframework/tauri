@@ -1,131 +1,16 @@
 {
   "extends": ["config:recommended"],
   "baseBranches": ["dev", "1.x"],
-  "schedule": "after 3am on Wednesday",
-  "ignorePaths": [],
   "labels": ["type: chore"],
+  "semanticCommitType": "chore",
   "enabledManagers": ["cargo", "npm"],
-  "cargo": {
-    "enabled": true
-  },
   "packageRules": [
     {
-      "enabled": false,
-      "matchPackageNames": ["*"]
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri/**"],
-      "groupName": "Tauri Core",
-      "groupSlug": "allTauriCore",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never",
-      "ignoreDeps": ["cargo_toml", "toml"]
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-build/**"],
-      "groupName": "Tauri Build",
-      "groupSlug": "allTauriBuild",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never",
-      "ignoreDeps": ["cargo_toml"]
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-codegen/**"],
-      "groupName": "Tauri Codegen",
-      "groupSlug": "allTauriCodegen",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-macros/**"],
-      "groupName": "Tauri Macros",
-      "groupSlug": "allTauriMacros",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-utils/**"],
-      "groupName": "Tauri Utils",
-      "groupSlug": "allTauriUtils",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-cli/**"],
-      "groupName": "Tauri CLI",
-      "groupSlug": "allTauriCLI",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never",
-      "matchManagers": ["cargo"],
-      "ignoreDeps": ["minisign"]
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-bundler/**"],
-      "groupName": "Tauri Bundler",
-      "groupSlug": "allTauriBundler",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["crates/tauri-macos-sign/**"],
-      "groupName": "Tauri macOSSign",
-      "groupSlug": "allTauriMacOSSign",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["packages/cli"],
-      "groupName": "Tauri JS CLI",
-      "groupSlug": "allTauriJSCLI",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
-    },
-    {
-      "enabled": true,
-      "matchFileNames": ["packages/api/**"],
-      "groupName": "Tauri API Definitions",
-      "groupSlug": "allTauriAPIDefinitions",
-      "commitMessagePrefix": "chore(deps)",
-      "lockFileMaintenance": {
-        "enabled": true
-      },
-      "rebaseWhen": "never"
+      "description": "Disable node/pnpm version updates",
+      "matchPackageNames": ["node", "pnpm"],
+      "matchDepTypes": ["engines", "packageManager"],
+      "enabled": false
     }
-  ]
+  ],
+  "postUpdateOptions": ["pnpmDedupe"]
 }
