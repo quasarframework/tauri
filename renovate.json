@@ -5,8 +5,8 @@
   "enabledManagers": ["cargo", "npm"],
   "packageRules": [
     {
-      "matchPackagePatterns": ["*"],
-      "semanticCommitType": "chore"
+      "semanticCommitType": "chore",
+      "matchPackageNames": ["*"]
     },
     {
       "description": "Disable node/pnpm version updates",
