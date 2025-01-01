@@ -65,7 +65,7 @@ tauri-macos-sign = { version = "2.0.1", path = "../tauri-macos-sign" }
 heck = "0.5"
 ar = "0.9.0"
 md5 = "0.7.0"
-rpm = "0.15.0"
+rpm = "0.16.0"
 
 [lib]
 name = "tauri_bundler"
