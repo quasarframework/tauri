@@ -6,7 +6,7 @@
   "packageRules": [
     {
       "matchPackagePatterns": ["*"],
-      "semanticCommitType": "chore",
+      "semanticCommitType": "chore"
     },
     {
       "description": "Disable node/pnpm version updates",
