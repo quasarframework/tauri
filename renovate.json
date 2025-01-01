@@ -3,6 +3,7 @@
   "baseBranches": ["dev", "1.x"],
   "labels": ["type: chore"],
   "enabledManagers": ["cargo", "npm"],
+  "rangeStrategy": "replace",
   "packageRules": [
     {
       "semanticCommitType": "chore",
