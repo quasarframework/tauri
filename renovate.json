@@ -2,9 +2,12 @@
   "extends": ["config:recommended"],
   "baseBranches": ["dev", "1.x"],
   "labels": ["type: chore"],
-  "semanticCommitType": "chore",
   "enabledManagers": ["cargo", "npm"],
   "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "semanticCommitType": "chore", 
+    }, 
     {
       "description": "Disable node/pnpm version updates",
       "matchPackageNames": ["node", "pnpm"],
