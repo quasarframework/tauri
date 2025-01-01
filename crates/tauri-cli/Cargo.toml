@@ -74,7 +74,7 @@ jsonschema = "0.18"
 handlebars = "6.0"
 include_dir = "0.7"
 minisign = "=0.7.3"
-base64 = "0.22.0"
+base64 = "0.22.1"
 ureq = { version = "2.9.6", default-features = false, features = ["gzip"] }
 os_info = "3"
 semver = "1.0"
