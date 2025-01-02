@@ -174,19 +174,19 @@ fn get_internal(
   {
     let schema: JsonValue = serde_json::from_str(include_str!("../../config.schema.json"))?;
     let validator = jsonschema::validator_for(&schema).expect("Invalid schema");
-    let mut has_errors = false;
-    let errors = validator.iter_errors(&config).peekable();
-    for error in errors {
-      has_errors = true;
-      let path = error.instance_path.into_iter().join(" > ");
-      if path.is_empty() {
-        log::error!("`{}` error: {}", config_file_name, error);
-      } else {
-        log::error!("`{}` error on `{}`: {}", config_file_name, path, error);
+    let mut errors = validator.iter_errors(&config).peekable();
+    if errors.peek().is_some() {
+      for error in errors {
+        let path = error.instance_path.into_iter().join(" > ");
+        if path.is_empty() {
+          log::error!("`{}` error: {}", config_file_name, error);
+        } else {
+          log::error!("`{}` error on `{}`: {}", config_file_name, path, error);
+        }
       }
-    }
-    if has_errors && !reload {
-      exit(1);
+      if !reload {
+        exit(1);
+      }
     }
   }
 
