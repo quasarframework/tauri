@@ -3421,7 +3421,7 @@
       "additionalProperties": false
     },
     "AndroidConfig": {
-      "description": "General configuration for the iOS target.",
+      "description": "General configuration for the Android target.",
       "type": "object",
       "properties": {
         "minSdkVersion": {
