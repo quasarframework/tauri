@@ -4208,15 +4208,6 @@ dependencies = [
 
 [[package]]
 name = "infer"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f551f8c3a39f68f986517db0d1759de85881894fdc7db798bd2a9df9cb04b7fc"
-dependencies = [
- "cfb",
-]
-
-[[package]]
-name = "infer"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc150e5ce2330295b8616ce0e3f53250e53af31759a9dbedad1621ba29151847"
@@ -4458,17 +4449,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1868808506b929d7b0cfa8f75951347aa71bb21144b7791bae35d9bccfcfe37a"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "json-patch"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec9ad60d674508f3ca8f380a928cfe7b096bc729c4e2dbfe3852bc45da3ab30b"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror 1.0.68",
 ]
 
 [[package]]
@@ -9064,7 +9044,7 @@ dependencies = [
  "dirs",
  "glob",
  "heck 0.5.0",
- "json-patch 3.0.1",
+ "json-patch",
  "quote",
  "schemars",
  "semver",
@@ -9150,7 +9130,7 @@ dependencies = [
  "include_dir",
  "insta",
  "itertools 0.13.0",
- "json-patch 3.0.1",
+ "json-patch",
  "jsonrpsee",
  "jsonrpsee-client-transport",
  "jsonrpsee-core",
@@ -9187,8 +9167,8 @@ dependencies = [
  "tauri-bundler",
  "tauri-icns",
  "tauri-macos-sign",
- "tauri-utils 1.6.0",
  "tauri-utils 2.1.0",
+ "tauri-utils 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempfile",
  "tokio",
  "toml 0.8.19",
@@ -9218,7 +9198,7 @@ dependencies = [
  "base64 0.22.1",
  "brotli",
  "ico",
- "json-patch 3.0.1",
+ "json-patch",
  "plist",
  "png",
  "proc-macro2",
@@ -9441,37 +9421,6 @@ dependencies = [
 
 [[package]]
 name = "tauri-utils"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2826db448309d382dac14d520f0c0a40839b87b57b977e59cf5f296b3ace6a93"
-dependencies = [
- "aes-gcm",
- "ctor",
- "dunce",
- "getrandom 0.2.15",
- "heck 0.5.0",
- "html5ever",
- "infer 0.13.0",
- "json-patch 1.4.0",
- "json5",
- "kuchikiki",
- "log",
- "memchr",
- "phf 0.11.2",
- "schemars",
- "semver",
- "serde",
- "serde_json",
- "serde_with",
- "serialize-to-javascript",
- "thiserror 1.0.68",
- "toml 0.7.8",
- "url",
- "windows-version",
-]
-
-[[package]]
-name = "tauri-utils"
 version = "2.1.0"
 dependencies = [
  "aes-gcm",
@@ -9483,8 +9432,8 @@ dependencies = [
  "glob",
  "html5ever",
  "http 1.1.0",
- "infer 0.16.0",
- "json-patch 3.0.1",
+ "infer",
+ "json-patch",
  "json5",
  "kuchikiki",
  "log",
@@ -9516,14 +9465,17 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9271a88f99b4adea0dc71d0baca4505475a0bbd139fb135f62958721aaa8fe54"
 dependencies = [
+ "aes-gcm",
  "cargo_metadata",
  "ctor",
  "dunce",
+ "getrandom 0.2.15",
  "glob",
  "html5ever",
  "http 1.1.0",
- "infer 0.16.0",
- "json-patch 3.0.1",
+ "infer",
+ "json-patch",
+ "json5",
  "kuchikiki",
  "log",
  "memchr",
@@ -9537,6 +9489,7 @@ dependencies = [
  "serde-untagged",
  "serde_json",
  "serde_with",
+ "serialize-to-javascript",
  "swift-rs",
  "thiserror 2.0.9",
  "toml 0.8.19",
