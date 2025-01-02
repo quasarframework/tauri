@@ -85,7 +85,7 @@ url = { version = "2", features = ["serde"] }
 os_pipe = "1"
 ignore = "0.4"
 ctrlc = "3"
-log = { version = "0.4.21", features = ["kv", "kv_std"] }
+log = { version = "0.4.22", features = ["kv", "kv_std"] }
 env_logger = "0.11"
 icns = { package = "tauri-icns", version = "0.1" }
 image = { version = "0.25", default-features = false, features = ["ico"] }

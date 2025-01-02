@@ -20,7 +20,7 @@ os_pipe = "1"
 plist = "1"
 rand = "0.8"
 dirs-next = "2"
-log = { version = "0.4.21", features = ["kv"] }
+log = { version = "0.4.22", features = ["kv"] }
 apple-codesign = "0.27"
 chrono = "0.4"
 p12 = "0.6"
