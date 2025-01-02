@@ -546,6 +546,27 @@ pub struct DmgConfig {
     alias = "application-folder-position"
   )]
   pub application_folder_position: Position,
+  /// Need to add files to the dmg collection
+  #[serde(default = "files_default", alias = "files")]
+  pub files: Vec<DmgFile>,
+}
+
+#[derive(Default, Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct DmgFile {
+  #[serde(alias = "path")]
+  /// The path to the file.
+  pub path: PathBuf,
+  #[serde(alias = "name")]
+  /// The name of the file.
+  pub name: String,
+  #[serde(alias = "x")]
+  /// The x-coordinate associated with the file.
+  pub x: u32,
+  #[serde(alias = "y")]
+  /// The y-coordinate associated with the file.
+  pub y: u32,
 }
 
 impl Default for DmgConfig {
@@ -556,6 +577,7 @@ impl Default for DmgConfig {
       window_size: dmg_window_size(),
       app_position: dmg_app_position(),
       application_folder_position: dmg_application_folder_position(),
+      files: files_default(),
     }
   }
 }
@@ -573,6 +595,10 @@ fn dmg_app_position() -> Position {
 
 fn dmg_application_folder_position() -> Position {
   Position { x: 480, y: 170 }
+}
+
+fn files_default() -> Vec<DmgFile> {
+  Vec::new()
 }
 
 fn de_macos_minimum_system_version<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>

@@ -112,6 +112,7 @@
               "x": 480,
               "y": 170
             },
+            "files": [],
             "windowSize": {
               "height": 400,
               "width": 660
@@ -1994,6 +1995,7 @@
                 "x": 480,
                 "y": 170
               },
+              "files": [],
               "windowSize": {
                 "height": 400,
                 "width": 660
@@ -3263,6 +3265,7 @@
               "x": 480,
               "y": 170
             },
+            "files": [],
             "windowSize": {
               "height": 400,
               "width": 660
@@ -3334,6 +3337,14 @@
               "$ref": "#/definitions/Position"
             }
           ]
+        },
+        "files": {
+          "description": "Need to add files to the dmg collection",
+          "default": [],
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DmgFile"
+          }
         }
       },
       "additionalProperties": false
@@ -3377,6 +3388,38 @@
         },
         "height": {
           "description": "Height of the window.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
+    },
+    "DmgFile": {
+      "type": "object",
+      "required": [
+        "name",
+        "path",
+        "x",
+        "y"
+      ],
+      "properties": {
+        "path": {
+          "description": "The path to the file.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the file.",
+          "type": "string"
+        },
+        "x": {
+          "description": "The x-coordinate associated with the file.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "y": {
+          "description": "The y-coordinate associated with the file.",
           "type": "integer",
           "format": "uint32",
           "minimum": 0.0

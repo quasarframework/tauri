@@ -19,6 +19,7 @@ use std::{
   collections::HashMap,
   path::{Path, PathBuf},
 };
+use tauri_utils::config::DmgFile;
 
 /// The type of the package we're bundling.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -304,6 +305,8 @@ pub struct DmgSettings {
   pub app_position: Position,
   /// Position of application folder on window.
   pub application_folder_position: Position,
+  /// Need to add files to the dmg collection
+  pub files: Vec<DmgFile>,
 }
 
 /// The macOS bundle settings.
