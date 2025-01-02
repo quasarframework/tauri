@@ -133,23 +133,19 @@ fn get_and_extract_nsis(nsis_toolset_path: &Path, _tauri_tools_path: &Path) -> c
 
 fn add_build_number_if_needed(version_str: &str) -> anyhow::Result<String> {
   let version = semver::Version::parse(version_str).context("invalid app version")?;
-  if !version.build.is_empty() {
-    let build = version.build.parse::<u64>();
-    if build.is_ok() {
-      return Ok(format!(
-        "{}.{}.{}.{}",
-        version.major, version.minor, version.patch, version.build
-      ));
-    } else {
-      anyhow::bail!("optional build metadata in app version must be numeric-only");
-    }
+  if version.build.is_empty() {
+    Ok(format!(
+      "{}.{}.{}.0",
+      version.major, version.minor, version.patch,
+    ))
   }
 
-  Ok(format!(
-    "{}.{}.{}.0",
-    version.major, version.minor, version.patch,
-  ))
+  return Ok(format!(
+    "{}.{}.{}.{}",
+    version.major, version.minor, version.patch, version.build
+  ));
 }
+
 fn build_nsis_app_installer(
   settings: &Settings,
   _nsis_toolset_path: &Path,
