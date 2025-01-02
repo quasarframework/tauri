@@ -54,7 +54,7 @@ swift-rs = { version = "1", optional = true, features = ["build"] }
 
 [dev-dependencies]
 getrandom = { version = "0.2", features = ["std"] }
-serial_test = "3.2"
+serial_test = "3"
 
 [features]
 build = ["proc-macro2", "quote", "cargo_metadata", "schema", "swift-rs"]

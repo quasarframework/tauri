@@ -1546,6 +1546,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "cargo_metadata"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afc309ed89476c8957c50fb818f56fe894db857866c3e163335faa91dc34eb85"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.68",
+]
+
+[[package]]
 name = "cargo_toml"
 version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9534,7 +9548,7 @@ version = "2.1.0"
 dependencies = [
  "aes-gcm",
  "brotli",
- "cargo_metadata",
+ "cargo_metadata 0.19.0",
  "ctor",
  "dunce",
  "getrandom 0.2.15",
@@ -9574,7 +9588,7 @@ version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9271a88f99b4adea0dc71d0baca4505475a0bbd139fb135f62958721aaa8fe54"
 dependencies = [
- "cargo_metadata",
+ "cargo_metadata 0.18.1",
  "ctor",
  "dunce",
  "glob",
