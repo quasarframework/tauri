@@ -139,9 +139,9 @@ dependencies = [
 
 [[package]]
 name = "allocator-api2"
-version = "0.2.18"
+version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c6cb57a04249c6480766f7f7cef5467412af1490f8d1e243141daddada3264f"
+checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "android-tzdata"
@@ -1823,7 +1823,7 @@ dependencies = [
  "encode_unicode",
  "lazy_static",
  "libc",
- "unicode-width",
+ "unicode-width 0.1.14",
  "windows-sys 0.52.0",
 ]
 
@@ -1941,6 +1941,12 @@ checksum = "e3b02505ccb8c50b0aa21ace0fc08c3e53adebd4e58caa18a36152803c7709a3"
 dependencies = [
  "libm",
 ]
+
+[[package]]
+name = "cow-utils"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "417bef24afe1460300965a25ff4a24b8b45ad011948302ec221e8a0a81eb2c79"
 
 [[package]]
 name = "cpio"
@@ -5074,31 +5080,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "miette"
-version = "7.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4edc8853320c2a0dab800fbda86253c8938f6ea88510dc92c5f1ed20e794afc1"
-dependencies = [
- "cfg-if",
- "miette-derive",
- "owo-colors",
- "textwrap",
- "thiserror 1.0.68",
- "unicode-width",
-]
-
-[[package]]
-name = "miette-derive"
-version = "7.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcf09caffaac8068c346b6df2a7fc27a177fd20b39421a39ce0a211bde679a6c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.94",
-]
-
-[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5986,10 +5967,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb37767f6569cd834a413442455e0f066d0d522de8630436e2a1761d9726ba56"
 
 [[package]]
-name = "oxc_allocator"
-version = "0.25.0"
+name = "oxc-miette"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "466379b9ab2e05996bfedfae9c96753a633bb5a53aaf0898eb0e0ab09e169514"
+checksum = "e03e63fd113c068b82d07c9c614b0b146c08a3ac0a4dface3ea1d1a9d14d549e"
+dependencies = [
+ "cfg-if",
+ "owo-colors",
+ "oxc-miette-derive",
+ "textwrap",
+ "thiserror 1.0.68",
+ "unicode-width 0.2.0",
+]
+
+[[package]]
+name = "oxc-miette-derive"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e21f680e8c5f1900297d394627d495351b9e37761f7bbf90116bd5eeb6e80967"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.94",
+]
+
+[[package]]
+name = "oxc_allocator"
+version = "0.38.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a1afabad345ed80523cadfc68b8c55c2279f4ab543a8d735d9557d8c45caf7e"
 dependencies = [
  "allocator-api2",
  "bumpalo",
@@ -5997,23 +6003,27 @@ dependencies = [
 
 [[package]]
 name = "oxc_ast"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34bd4f56fe32adea489153f6d681d9ee01f0336b9b6a89f062611488d8f80797"
+checksum = "77dbccabf2209cf7f8e27c94fae9f0d16b0f7605dd68e1833fed52679c9a2264"
 dependencies = [
  "bitflags 2.6.0",
+ "cow-utils",
  "num-bigint",
+ "num-traits",
  "oxc_allocator",
  "oxc_ast_macros",
+ "oxc_estree",
+ "oxc_regular_expression",
  "oxc_span",
  "oxc_syntax",
 ]
 
 [[package]]
 name = "oxc_ast_macros"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "197b36739db0e80919e19a90785233eea5664697d4cd829bd49af34838ec43d2"
+checksum = "2ef533198801374faad66d3ffa6f9f7b333f4e05d8f1c6a6c11211974655cfd6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6022,30 +6032,35 @@ dependencies = [
 
 [[package]]
 name = "oxc_diagnostics"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cd4bb48b9527f5825c84acb688ec1485df4a5edadc17b3582626bb49736752b"
+checksum = "4c94f8b67b5ea708e10498cf7c4e4ee8ec724982851edca2dd0d20d2ad99d47b"
 dependencies = [
- "miette",
- "owo-colors",
- "textwrap",
- "unicode-width",
+ "oxc-miette",
+ "rustc-hash",
 ]
 
 [[package]]
-name = "oxc_index"
-version = "0.25.0"
+name = "oxc_estree"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc9aa9446f6d2a64d0baa02fe20dc3d64e3e112083854b84fdacb82261be2b84"
+checksum = "f58834a7016eae5f5f8491d094fdb6410275df1574be1cc8f9ef6bc7d58f328b"
+
+[[package]]
+name = "oxc_index"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f004e73d346bec03a428ca26cf2df245d08563f1d3268b7bcbd5554fc1db05c5"
 
 [[package]]
 name = "oxc_parser"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f3432e80a58cfb38f9a138203e64d0f9a621d4c4e9d18e3e3bd870b51ce1f0e"
+checksum = "bef1057d0a2c32b146ea26913027b483eab4753b68d327f38fe58ce3a09fa2f6"
 dependencies = [
  "assert-unchecked",
  "bitflags 2.6.0",
+ "cow-utils",
  "memchr",
  "num-bigint",
  "num-traits",
@@ -6061,12 +6076,14 @@ dependencies = [
 
 [[package]]
 name = "oxc_regular_expression"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fc6d05fec98ad6cc864ba8cfe7ece2e258106059a9a57e35b02450650b06979"
+checksum = "068b0588d755c111916a6d73679497bffc5c2eb870b560806ba2273399ba31ca"
 dependencies = [
  "oxc_allocator",
+ "oxc_ast_macros",
  "oxc_diagnostics",
+ "oxc_estree",
  "oxc_span",
  "phf 0.11.2",
  "rustc-hash",
@@ -6075,27 +6092,30 @@ dependencies = [
 
 [[package]]
 name = "oxc_span"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a862a896ac3abd269863a19d4f77302b019458d90513705c7a017b138c8449b"
+checksum = "d72caf27921cc5eabe03b4b67f5e2c11ee68d633e94cde1f5007fb703d12b656"
 dependencies = [
  "compact_str",
- "miette",
+ "oxc-miette",
  "oxc_allocator",
  "oxc_ast_macros",
+ "oxc_estree",
 ]
 
 [[package]]
 name = "oxc_syntax"
-version = "0.25.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d50c7ea034fb12f65376cfffc8ae4bfde3cda0a1e14407f82ffba1d26431703d"
+checksum = "56cac23361174e1a7863e03aef81c9ce2221ee181f14e6c0283755882f24c31b"
 dependencies = [
+ "assert-unchecked",
  "bitflags 2.6.0",
  "dashmap",
  "nonmax",
  "oxc_allocator",
  "oxc_ast_macros",
+ "oxc_estree",
  "oxc_index",
  "oxc_span",
  "phf 0.11.2",
@@ -9656,7 +9676,7 @@ dependencies = [
  "smawk",
  "terminal_size",
  "unicode-linebreak",
- "unicode-width",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -10315,6 +10335,12 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fc81956842c57dac11422a97c3b8195a1ff727f06e85c84ed2e8aa277c9a0fd"
 
 [[package]]
 name = "unicode-xid"
