@@ -18,7 +18,7 @@ exclude = ["CHANGELOG.md", "/target", "rustfmt.toml"]
 tauri-utils = { version = "2.1.0", path = "../tauri-utils", features = [
   "resources",
 ] }
-image = "0.25.0"
+image = "0.25.5"
 flate2 = "1"
 anyhow = "1"
 thiserror = "2"
