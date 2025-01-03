@@ -26,7 +26,7 @@ mod desktop_commands {
   };
 
   #[command(root = "crate")]
-  pub async fn get_all_windows<R: Runtime>(app: AppHandle<R>) -> Vec<String> {
+  pub fn get_all_windows<R: Runtime>(app: AppHandle<R>) -> Vec<String> {
     app.manager().windows().keys().cloned().collect()
   }
 
@@ -49,7 +49,7 @@ mod desktop_commands {
   macro_rules! getter {
     ($cmd: ident, $ret: ty) => {
       #[command(root = "crate")]
-      pub async fn $cmd<R: Runtime>(
+      pub fn $cmd<R: Runtime>(
         window: Window<R>,
         label: Option<String>,
       ) -> crate::Result<$ret> {
@@ -209,7 +209,7 @@ mod desktop_commands {
   }
 
   #[command(root = "crate")]
-  pub async fn monitor_from_point<R: Runtime>(
+  pub fn monitor_from_point<R: Runtime>(
     window: Window<R>,
     label: Option<String>,
     x: f64,
