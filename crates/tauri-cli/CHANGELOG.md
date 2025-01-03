@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.2.1]
+
+### Bug Fixes
+
+- [`881729448`](https://www.github.com/tauri-apps/tauri/commit/881729448c9abd0d0c7941a8a31c94119ce827af) ([#12164](https://www.github.com/tauri-apps/tauri/pull/12164) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed an issue that caused `tauri dev` to crash before showing the app on Linux.
+
 ## \[2.2.0]
 
 ### New Features
