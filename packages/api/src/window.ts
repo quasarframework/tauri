@@ -1533,6 +1533,28 @@ class Window {
     return invoke('plugin:window|set_background_color', { color })
   }
 
+  /** Set whether background throttling should be disabled.
+   *
+   * By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
+   * a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+   * changes back from hidden to visible by bringing the view back to the foreground.
+   *
+   ## Platform-specific
+   *
+   * - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+   * 
+   * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+   * 
+   * @since 2.2.0
+   * 
+   */
+  async setDisableBackgroundThrottling(disable: boolean): Promise<void> {
+    return invoke('plugin:window|set_disable_background_throttling', {
+      label: this.label,
+      value: disable
+    })
+  }
+
   /**
    * Changes the position of the cursor in window coordinates.
    * @example
@@ -2338,6 +2360,17 @@ interface WindowOptions {
    * @since 2.1.0
    */
   backgroundColor?: Color
+  /**
+   * Set whether background throttling should be disabled
+   *
+   * #### Platform-specific
+   * - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+   *
+   * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+   *
+   * @since 2.2.0
+   */
+  disableBackgroundThrottling?: boolean
 }
 
 function mapMonitor(m: Monitor | null): Monitor | null {

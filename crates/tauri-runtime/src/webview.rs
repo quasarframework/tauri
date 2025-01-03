@@ -215,6 +215,7 @@ pub struct WebviewAttributes {
   pub use_https_scheme: bool,
   pub devtools: Option<bool>,
   pub background_color: Option<Color>,
+  pub disable_background_throttling: bool,
 }
 
 impl From<&WindowConfig> for WebviewAttributes {
@@ -225,7 +226,9 @@ impl From<&WindowConfig> for WebviewAttributes {
       .zoom_hotkeys_enabled(config.zoom_hotkeys_enabled)
       .use_https_scheme(config.use_https_scheme)
       .browser_extensions_enabled(config.browser_extensions_enabled)
+      .disable_background_throttling(config.disable_background_throttling)
       .devtools(config.devtools);
+
     #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
     {
       builder = builder.transparent(config.transparent);
@@ -279,6 +282,7 @@ impl WebviewAttributes {
       use_https_scheme: false,
       devtools: None,
       background_color: None,
+      disable_background_throttling: false,
     }
   }
 
@@ -442,6 +446,23 @@ impl WebviewAttributes {
   #[must_use]
   pub fn background_color(mut self, color: Color) -> Self {
     self.background_color = Some(color);
+    self
+  }
+
+  /// Set whether background throttling should be disabled.
+  ///
+  /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
+  /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+  /// changes back from hidden to visible by bringing the view back to the foreground.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+  ///
+  /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+  #[must_use]
+  pub fn disable_background_throttling(mut self, disable: bool) -> Self {
+    self.disable_background_throttling = disable;
     self
   }
 }

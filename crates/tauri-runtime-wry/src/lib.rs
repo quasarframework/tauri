@@ -4180,6 +4180,7 @@ fn create_webview<T: UserEvent>(
     .with_accept_first_mouse(webview_attributes.accept_first_mouse)
     .with_incognito(webview_attributes.incognito)
     .with_clipboard(webview_attributes.clipboard)
+    .with_disable_background_throttling(webview_attributes.disable_background_throttling)
     .with_hotkeys_zoom(webview_attributes.zoom_hotkeys_enabled);
 
   #[cfg(any(target_os = "windows", target_os = "android"))]

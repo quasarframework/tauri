@@ -767,6 +767,23 @@ interface WebviewOptions {
    * @since 2.1.0
    */
   backgroundColor?: Color
+
+  /** Set whether background throttling should be disabled.
+   *
+   * By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
+   * a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+   * changes back from hidden to visible by bringing the view back to the foreground.
+   *
+   ## Platform-specific
+   *
+   * - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+   * 
+   * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+   * 
+   * @since 2.2.0
+   * 
+   */
+  disableBackgroundThrottling?: boolean
 }
 
 export { Webview, getCurrentWebview, getAllWebviews }

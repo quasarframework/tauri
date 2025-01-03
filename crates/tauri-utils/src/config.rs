@@ -1687,6 +1687,20 @@ pub struct WindowConfig {
   /// - **Windows**: On Windows 8 and newer, if alpha channel is not `0`, it will be ignored for the webview layer.
   #[serde(alias = "background-color")]
   pub background_color: Option<Color>,
+
+  /// Set whether background throttling should be disabled.
+  ///
+  /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
+  /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+  /// changes back from hidden to visible by bringing the view back to the foreground.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+  ///
+  /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+  #[serde(default, alias = "disable-background-throttling")]
+  pub disable_background_throttling: bool,
 }
 
 impl Default for WindowConfig {
@@ -1739,6 +1753,7 @@ impl Default for WindowConfig {
       use_https_scheme: false,
       devtools: None,
       background_color: None,
+      disable_background_throttling: false,
     }
   }
 }
@@ -3004,6 +3019,7 @@ mod build {
       let use_https_scheme = self.use_https_scheme;
       let devtools = opt_lit(self.devtools.as_ref());
       let background_color = opt_lit(self.background_color.as_ref());
+      let disable_background_throttling = self.disable_background_throttling;
 
       literal_struct!(
         tokens,
@@ -3054,7 +3070,8 @@ mod build {
         browser_extensions_enabled,
         use_https_scheme,
         devtools,
-        background_color
+        background_color,
+        disable_background_throttling
       );
     }
   }

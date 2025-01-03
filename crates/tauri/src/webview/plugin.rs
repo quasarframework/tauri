@@ -48,6 +48,8 @@ mod desktop_commands {
     incognito: bool,
     #[serde(default)]
     zoom_hotkeys_enabled: bool,
+    #[serde(default)]
+    disable_background_throttling: bool,
   }
 
   #[cfg(feature = "unstable")]
@@ -63,6 +65,8 @@ mod desktop_commands {
       builder.webview_attributes.window_effects = config.window_effects;
       builder.webview_attributes.incognito = config.incognito;
       builder.webview_attributes.zoom_hotkeys_enabled = config.zoom_hotkeys_enabled;
+      builder.webview_attributes.disable_background_throttling =
+        config.disable_background_throttling;
       builder
     }
   }

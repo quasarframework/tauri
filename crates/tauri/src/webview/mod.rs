@@ -867,6 +867,23 @@ fn main() {
     self.webview_attributes.background_color = Some(color);
     self
   }
+
+  /// Set whether background throttling should be disabled.
+  ///
+  /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
+  /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+  /// changes back from hidden to visible by bringing the view back to the foreground.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+  ///
+  /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+  #[must_use]
+  pub fn disable_background_throttling(mut self, disabled: bool) -> Self {
+    self.webview_attributes.disable_background_throttling = disabled;
+    self
+  }
 }
 
 /// Webview.
