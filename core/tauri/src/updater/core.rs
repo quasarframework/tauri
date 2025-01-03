@@ -998,7 +998,7 @@ fn copy_files_and_run(
             if output.status.success() {
               // Rename the MSI to the match file name the Skip UAC task is expecting it to be
               let temp_msi = temp_dir.with_file_name(bin_name).with_extension("msi");
-              Move::from_source(&path)
+              Move::from_source(path)
                 .to_dest(&temp_msi)
                 .expect("Unable to move update MSI");
               let exit_status = Command::new("schtasks")

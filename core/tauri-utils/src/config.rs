@@ -579,7 +579,7 @@ pub struct WixConfig {
   pub banner_path: Option<PathBuf>,
   /// Path to a bitmap file to use on the installation user interface dialogs.
   /// It is used on the welcome and completion dialogs.
-
+  ///
   /// The required dimensions are 493px × 312px.
   #[serde(alias = "dialog-image-path")]
   pub dialog_image_path: Option<PathBuf>,
@@ -3073,7 +3073,7 @@ impl<'d> serde::Deserialize<'d> for PackageVersion {
   fn deserialize<D: Deserializer<'d>>(deserializer: D) -> Result<PackageVersion, D::Error> {
     struct PackageVersionVisitor;
 
-    impl<'d> Visitor<'d> for PackageVersionVisitor {
+    impl Visitor<'_> for PackageVersionVisitor {
       type Value = PackageVersion;
 
       fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
