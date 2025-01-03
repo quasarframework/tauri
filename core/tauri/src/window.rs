@@ -1556,8 +1556,8 @@ impl<R: Runtime> Window<R> {
     self.window.dispatcher.url().unwrap()
   }
 
-  #[cfg(test)]
   /// Returns the current url of the webview.
+  #[cfg(test)]
   pub fn url(&self) -> Url {
     self.current_url.clone()
   }
