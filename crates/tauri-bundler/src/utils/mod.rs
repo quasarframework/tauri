@@ -103,7 +103,7 @@ impl CommandExt for Command {
       Ok(output)
     } else {
       Err(crate::Error::GenericError(format!(
-        "failed to run {program}"
+        "failed to run {program}. {output:?}"
       )))
     }
   }

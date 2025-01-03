@@ -380,7 +380,7 @@ impl CommandExt for Command {
     if output.status.success() {
       Ok(output)
     } else {
-      Err(anyhow::anyhow!("failed to run {}", program))
+      Err(anyhow::anyhow!("failed to run {program}. {output:?}"))
     }
   }
 }
