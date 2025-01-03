@@ -66,6 +66,8 @@
     "yarn": ">= 1.19.1"
   },
   "resolutions": {
-    "braces": "3.0.3"
-  }
+    "braces": "3.0.3",
+    "cross-spawn": ">=7.0.6"
+  },
+  "dependencies": {}
 }
