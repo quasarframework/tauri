@@ -277,7 +277,7 @@ fn update_app_v1() {
       },
     };
     build_app(
-      &options.cli_bin_path,
+      options.cli_bin_path,
       &fixture_dir,
       vec![("TAURI_PRIVATE_KEY", UPDATER_PRIVATE_KEY_NEXT)],
       &config,
@@ -585,7 +585,7 @@ fn start_updater_server(
                 let stream = FramedRead::new(file, BytesCodec::new());
                 let body = Body::wrap_stream(stream);
                 println!("sending updater response");
-                return Ok(Response::new(body));
+                Ok(Response::new(body))
               }
               _ => Response::builder()
                 .status(StatusCode::NOT_FOUND)

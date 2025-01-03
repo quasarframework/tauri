@@ -653,7 +653,7 @@ impl<R: Runtime> PluginStore<R> {
       invoke.message.command = tokens
         .next()
         .map(|c| c.to_string())
-        .unwrap_or_else(String::new);
+        .unwrap_or_default();
       #[cfg(feature = "tracing")]
       let _span = tracing::trace_span!("plugin::hooks::ipc", name = plugin.name()).entered();
       plugin.extend_api(invoke);
