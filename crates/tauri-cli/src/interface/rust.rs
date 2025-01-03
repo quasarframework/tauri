@@ -553,7 +553,6 @@ impl Rust {
     loop {
       if let Ok(events) = rx.recv() {
         for event in events {
-          #[cfg(target_os = "linux")]
           if event.kind.is_access() {
             continue;
           }
