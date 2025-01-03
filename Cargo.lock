@@ -2955,6 +2955,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "file-id"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6bc904b9bbefcadbd8e3a9fb0d464a9b979de6324c03b3c663e8994f46a5be36"
+dependencies = [
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "filetime"
 version = "0.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5384,15 +5393,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "notify-debouncer-mini"
-version = "0.5.0"
+name = "notify-debouncer-full"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aaa5a66d07ed97dce782be94dcf5ab4d1b457f4243f7566c7557f15cabc8c799"
+checksum = "9dcf855483228259b2353f89e99df35fc639b2b2510d1166e4858e3f67ec1afb"
 dependencies = [
+ "file-id",
  "log",
  "notify",
  "notify-types",
- "tempfile",
+ "walkdir",
 ]
 
 [[package]]
@@ -9230,7 +9240,7 @@ dependencies = [
  "memchr",
  "minisign",
  "notify",
- "notify-debouncer-mini",
+ "notify-debouncer-full",
  "object 0.36.5",
  "os_info",
  "os_pipe",
