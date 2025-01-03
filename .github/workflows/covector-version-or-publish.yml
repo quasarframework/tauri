@@ -124,7 +124,7 @@ jobs:
         if: |
           steps.covector.outputs.successfulPublish == 'true' &&
           steps.covector.outputs.packagesPublished != ''
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # 3.0.0
         with:
           token: ${{ secrets.ORG_TAURI_BOT_PAT }}
           repository: tauri-apps/tauri-docs
