@@ -135,7 +135,7 @@ pub struct WindowBuilder<'a, R: Runtime> {
   navigation_handler: Option<Box<NavigationHandler>>,
 }
 
-impl<'a, R: Runtime> fmt::Debug for WindowBuilder<'a, R> {
+impl<R: Runtime> fmt::Debug for WindowBuilder<'_, R> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.debug_struct("WindowBuilder")
       .field("manager", &self.manager)
@@ -1101,17 +1101,17 @@ impl<R: Runtime> Window<R> {
     self.window.dispatcher.is_focused().map_err(Into::into)
   }
 
-  /// Gets the window’s current decoration state.
+  /// Gets the window's current decoration state.
   pub fn is_decorated(&self) -> crate::Result<bool> {
     self.window.dispatcher.is_decorated().map_err(Into::into)
   }
 
-  /// Gets the window’s current resizable state.
+  /// Gets the window's current resizable state.
   pub fn is_resizable(&self) -> crate::Result<bool> {
     self.window.dispatcher.is_resizable().map_err(Into::into)
   }
 
-  /// Gets the window’s native maximize button state
+  /// Gets the window's native maximize button state
   ///
   /// ## Platform-specific
   ///
@@ -1120,7 +1120,7 @@ impl<R: Runtime> Window<R> {
     self.window.dispatcher.is_maximizable().map_err(Into::into)
   }
 
-  /// Gets the window’s native minimize button state
+  /// Gets the window's native minimize button state
   ///
   /// ## Platform-specific
   ///
@@ -1129,7 +1129,7 @@ impl<R: Runtime> Window<R> {
     self.window.dispatcher.is_minimizable().map_err(Into::into)
   }
 
-  /// Gets the window’s native close button state
+  /// Gets the window's native close button state
   ///
   /// ## Platform-specific
   ///
@@ -1556,6 +1556,7 @@ impl<R: Runtime> Window<R> {
     self.window.dispatcher.url().unwrap()
   }
 
+  /// Returns the current url of the webview.
   #[cfg(test)]
   pub fn url(&self) -> Url {
     self.current_url.clone()
