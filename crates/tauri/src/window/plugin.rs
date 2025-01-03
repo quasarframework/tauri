@@ -49,10 +49,7 @@ mod desktop_commands {
   macro_rules! getter {
     ($cmd: ident, $ret: ty) => {
       #[command(root = "crate")]
-      pub fn $cmd<R: Runtime>(
-        window: Window<R>,
-        label: Option<String>,
-      ) -> crate::Result<$ret> {
+      pub fn $cmd<R: Runtime>(window: Window<R>, label: Option<String>) -> crate::Result<$ret> {
         get_window(window, label)?.$cmd().map_err(Into::into)
       }
     };

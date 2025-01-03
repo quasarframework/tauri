@@ -148,10 +148,7 @@ mod desktop_commands {
     };
     ($fn: ident, $cmd: ident, $ret: ty) => {
       #[command(root = "crate")]
-      pub fn $fn<R: Runtime>(
-        webview: Webview<R>,
-        label: Option<String>,
-      ) -> crate::Result<$ret> {
+      pub fn $fn<R: Runtime>(webview: Webview<R>, label: Option<String>) -> crate::Result<$ret> {
         get_webview(webview, label)?.$cmd().map_err(Into::into)
       }
     };
