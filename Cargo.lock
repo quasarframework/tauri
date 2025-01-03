@@ -125,7 +125,7 @@ dependencies = [
  "objc-foundation",
  "objc_id",
  "parking_lot",
- "thiserror 1.0.59",
+ "thiserror",
  "winapi",
  "wl-clipboard-rs",
  "x11rb",
@@ -498,7 +498,7 @@ dependencies = [
  "freetype",
  "glib",
  "libc",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -1488,7 +1488,7 @@ dependencies = [
  "glib",
  "libc",
  "once_cell",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -1522,7 +1522,7 @@ dependencies = [
  "log",
  "once_cell",
  "smallvec",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -1996,7 +1996,7 @@ dependencies = [
  "combine",
  "jni-sys",
  "log",
- "thiserror 1.0.59",
+ "thiserror",
  "walkdir",
 ]
 
@@ -2030,7 +2030,7 @@ dependencies = [
  "jsonptr",
  "serde",
  "serde_json",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -2361,7 +2361,7 @@ dependencies = [
  "jni-sys",
  "ndk-sys",
  "num_enum",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -2758,7 +2758,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "311fb059dee1a7b802f036316d790138c613a4e8b180c822e3925a662e9f0c95"
 dependencies = [
  "memchr",
- "thiserror 1.0.59",
+ "thiserror",
  "ucd-trie",
 ]
 
@@ -3276,7 +3276,7 @@ checksum = "bd283d9651eeda4b2a83a43c1c91b266c40fd76ecd39a50a8c630ae69dc72891"
 dependencies = [
  "getrandom 0.2.14",
  "libredox",
- "thiserror 1.0.59",
+ "thiserror",
 ]
 
 [[package]]
@@ -4116,7 +4116,7 @@ dependencies = [
  "tauri-runtime-wry",
  "tauri-utils",
  "tempfile",
- "thiserror 1.0.59",
+ "thiserror",
  "time",
  "tokio",
  "tokio-test",
@@ -4167,7 +4167,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "tauri-utils",
- "thiserror 1.0.59",
+ "thiserror",
  "time",
  "uuid",
  "walkdir",
@@ -4208,7 +4208,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tauri-utils",
- "thiserror 2.0.9",
+ "thiserror",
  "url",
  "uuid",
  "webview2-com",
@@ -4262,7 +4262,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "serialize-to-javascript",
- "thiserror 1.0.59",
+ "thiserror",
  "toml 0.7.3",
  "url",
  "walkdir",
@@ -4341,16 +4341,7 @@ version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0126ad08bff79f29fc3ae6a55cc72352056dfff61e3ff8bb7129476d44b23aa"
 dependencies = [
- "thiserror-impl 1.0.59",
-]
-
-[[package]]
-name = "thiserror"
-version = "2.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f072643fd0190df67a8bab670c20ef5d8737177d6ac6b2e9a236cb096206b2cc"
-dependencies = [
- "thiserror-impl 2.0.9",
+ "thiserror-impl",
 ]
 
 [[package]]
@@ -4358,17 +4349,6 @@ name = "thiserror-impl"
 version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d1cd413b5d558b4c5bf3680e324a6fa5014e7b7c067a51e69dbdf47eb7148b66"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.94",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "2.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b50fa271071aae2e6ee85f842e2e28ba8cd2c5fb67f11fcb1fd70b276f9e7d4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5065,7 +5045,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "thiserror 1.0.59",
+ "thiserror",
  "windows 0.39.0",
  "windows-bindgen",
  "windows-metadata",
@@ -5519,7 +5499,7 @@ dependencies = [
  "nix 0.24.3",
  "os_pipe",
  "tempfile",
- "thiserror 1.0.59",
+ "thiserror",
  "tree_magic_mini",
  "wayland-client",
  "wayland-protocols",
@@ -5554,7 +5534,7 @@ dependencies = [
  "sha2",
  "soup2",
  "tao",
- "thiserror 1.0.59",
+ "thiserror",
  "tracing",
  "url",
  "webkit2gtk",
