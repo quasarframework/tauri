@@ -130,7 +130,7 @@ impl Interface for Rust {
         }
       })
       .unwrap();
-      watcher.watch(&tauri_dir().join("Cargo.toml"), RecursiveMode::Recursive)?;
+      watcher.watch(tauri_dir().join("Cargo.toml"), RecursiveMode::Recursive)?;
       let (manifest, _modified) = rewrite_manifest(config)?;
       let now = Instant::now();
       let timeout = Duration::from_secs(2);
