@@ -62,7 +62,7 @@ base64 = "0.22.0"
 ureq = { version = "2.9.1", default-features = false, features = [ "gzip" ] }
 os_info = "3"
 semver = "1.0"
-regex = "1.10.2"
+regex = "1.11.1"
 unicode-width = "0.1"
 zeroize = "1.6"
 heck = "0.5"
