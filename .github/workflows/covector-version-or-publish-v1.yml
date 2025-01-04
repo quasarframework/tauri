@@ -146,7 +146,7 @@ jobs:
           cargo update -p libc --precise 0.2.163
           cargo update -p tracing-subscriber --precise 0.3.17
           cargo update -p tracing --precise 0.1.40
-          cargo update -p tracing-core --precise 0.1.33
+          cargo update -p tracing-core --precise 0.1.32
           cargo update -p tracing-attributes --precise 0.1.27
 
       - name: Downgrade crates with MSRV conflict (bundler)
