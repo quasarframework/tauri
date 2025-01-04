@@ -13,7 +13,7 @@ rust-version = "1.77.2"
 
 [dependencies]
 anyhow = "1"
-hyper = { version = "0.14", features = [
+hyper = { version = "1.0", features = [
   "client",
   "http1",
   "runtime",
