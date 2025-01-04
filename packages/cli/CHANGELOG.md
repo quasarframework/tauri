@@ -1,5 +1,15 @@
 # Changelog
 
+## \[2.2.2]
+
+### Bug Fixes
+
+- [`26fc9558f`](https://www.github.com/tauri-apps/tauri/commit/26fc9558fe7b2fe649f61926da88f36110dd5707) ([#12178](https://www.github.com/tauri-apps/tauri/pull/12178) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed an issue that caused the `tauri dev` file watcher to exit after detecting file changes.
+
+### Dependencies
+
+- Upgraded to `tauri-cli@2.2.2`
+
 ## \[2.2.1]
 
 ### Bug Fixes
