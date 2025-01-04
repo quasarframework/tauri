@@ -144,6 +144,7 @@ jobs:
           cargo update -p fdeflate --precise 0.3.5
           cargo update -p url --precise 2.5.2
           cargo update -p tracing-core --precise 0.1.33
+          cargo update -p libc --precise 0.2.163
 
       - name: Downgrade crates with MSRV conflict (bundler)
         # This is for the bundler but since cli depends on the bundler we enable it for the cli too
