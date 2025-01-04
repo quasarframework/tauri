@@ -83,7 +83,7 @@ jobs:
           cargo update -p serde_spanned --precise 0.6.1
           cargo update -p winnow --precise 0.4.1
           cargo update -p plist --precise 1.5.1
-          cargo update -p serde_with:3.11.0 --precise 3.0.0
+          cargo update -p serde_with:3.12.0 --precise 3.0.0
           cargo update -p time --precise 0.3.15
           cargo update -p ignore --precise 0.4.18
           cargo update -p raw-window-handle --precise 0.5.0
@@ -126,8 +126,12 @@ jobs:
           cargo update -p tokio-util --precise 0.7.10
           cargo update -p os_pipe --precise 1.1.5
           cargo update -p serde --precise 1.0.210
-          cargo update -p thiserror --precise 1.0.65
-          cargo update -p syn:2.0.87 --precise 2.0.67
+          cargo update -p pest_derive --precise 2.7.14
+          cargo update -p pest_generator --precise 2.7.14
+          cargo update -p pest_meta --precise 2.7.14
+          cargo update -p pest --precise 2.7.14
+          cargo update -p thiserror:1.0.69 --precise 1.0.65
+          cargo update -p syn:2.0.94 --precise 2.0.67
           cargo update -p derive_more --precise 0.99.17
           cargo update -p native-tls --precise 0.2.11
           cargo update -p ppv-lite86 --precise 0.2.17
@@ -138,6 +142,12 @@ jobs:
           cargo update -p openssl-sys --precise 0.9.103
           cargo update -p idna_adapter --precise 1.1.0
           cargo update -p fdeflate --precise 0.3.5
+          cargo update -p url --precise 2.5.2
+          cargo update -p libc --precise 0.2.163
+          cargo update -p tracing-subscriber --precise 0.3.17
+          cargo update -p tracing --precise 0.1.40
+          cargo update -p tracing-core --precise 0.1.32
+          cargo update -p tracing-attributes --precise 0.1.27
 
       - name: Downgrade crates with MSRV conflict (bundler)
         # This is for the bundler but since cli depends on the bundler we enable it for the cli too
@@ -146,6 +156,10 @@ jobs:
         run: |
           cd tooling/bundler
           cargo update -p bitstream-io --precise 2.3.0
+          cargo update -p yoke --precise 0.7.4
+          cargo update -p zerofrom --precise 0.1.4
+          cargo update -p litemap --precise 0.7.3
+          cargo update -p bstr --precise 1.10.0
 
       # Not really required since it's a binary
       - name: Downgrade crates with MSRV conflict (cli)
@@ -156,6 +170,10 @@ jobs:
           cargo update -p clap_complete --precise 4.4.10
           cargo update -p clap --precise 4.4.18
           cargo update -p bitstream-io --precise 2.3.0
+          cargo update -p yoke --precise 0.7.4
+          cargo update -p zerofrom --precise 0.1.4
+          cargo update -p litemap --precise 0.7.3
+          cargo update -p bstr --precise 1.10.0
 
       - name: test build
         run: cargo check --target ${{ matrix.platform.target }} ${{ matrix.project.flags }}
