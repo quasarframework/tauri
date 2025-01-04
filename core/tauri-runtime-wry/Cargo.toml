@@ -18,7 +18,7 @@ tauri-runtime = { version = "0.14.5", path = "../tauri-runtime" }
 tauri-utils = { version = "1.6.1", path = "../tauri-utils" }
 uuid = { version = "1", features = [ "v4" ] }
 rand = "0.8"
-raw-window-handle = "0.5"
+raw-window-handle = "0.6"
 tracing = { version = "0.1", optional = true }
 arboard = { version = "3", optional = true }
 
