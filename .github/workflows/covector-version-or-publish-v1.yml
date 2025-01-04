@@ -127,6 +127,8 @@ jobs:
           cargo update -p os_pipe --precise 1.1.5
           cargo update -p serde --precise 1.0.210
           cargo update -p pest_derive --precise 2.7.14
+          cargo update -p pest_generator --precise 2.7.14
+          cargo update -p pest_meta --precise 2.7.14
           cargo update -p pest --precise 2.7.14
           cargo update -p thiserror:1.0.69 --precise 1.0.65
           cargo update -p syn:2.0.94 --precise 2.0.67
