@@ -35,7 +35,7 @@ webkit2gtk = { version = "0.18.2", features = [ "v2_22" ] }
 percent-encoding = "2.1"
 
 [target."cfg(any(target_os = \"ios\", target_os = \"macos\"))".dependencies]
-cocoa = "0.24"
+cocoa = "0.26"
 
 [features]
 dox = [ "wry/dox" ]
