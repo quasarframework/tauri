@@ -81,7 +81,7 @@ kuchiki = { package = "kuchikiki", version = "0.8" }
 tokio = { version = "1", features = [ "macros", "sync" ] }
 common-path = "1"
 serde-value = "0.7.0"
-itertools = "0.13"
+itertools = "0.14"
 glob = "0.3"
 dunce = "1"
 
