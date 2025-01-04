@@ -1,6 +1,6 @@
 [package]
 name = "tauri-cli"
-version = "2.2.0"
+version = "2.2.2"
 authors = ["Tauri Programme within The Commons Conservancy"]
 edition = "2021"
 rust-version = "1.77.2"
@@ -52,7 +52,7 @@ colored = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 notify = "7"
-notify-debouncer-mini = "0.5"
+notify-debouncer-full = "0.4"
 shared_child = "1"
 duct = "0.13"
 toml_edit = { version = "0.22", features = ["serde"] }
