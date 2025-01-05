@@ -36,8 +36,8 @@ pub struct Options {
   #[clap(long)]
   pub no_fmt: bool,
   /// Use npm package tauri-plugin-{name}-api
-  #[clap(long)]
-  pub inofficial: bool,
+  #[clap(short, long)]
+  pub community: bool,
 }
 
 pub fn command(options: Options) -> Result<()> {
@@ -97,7 +97,7 @@ pub fn run(options: Options) -> Result<()> {
         options.tag,
         options.rev,
         options.branch,
-        options.inofficial,
+        options.community,
       ) {
         (Some(version_req), _, _, _, _) => format!("{npm_name}@{version_req}"),
         (None, Some(tag), None, None, _) => {
