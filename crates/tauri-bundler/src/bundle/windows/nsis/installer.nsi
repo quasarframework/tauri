@@ -77,12 +77,12 @@ OutFile "${OUTFILE}"
 !define PLACEHOLDER_INSTALL_DIR "placeholder\${PRODUCTNAME}"
 InstallDir "${PLACEHOLDER_INSTALL_DIR}"
 
-VIProductVersion "${VERSIONWITHBUILD}"
+VIProductVersion "${VERSION}"
 VIAddVersionKey "ProductName" "${PRODUCTNAME}"
 VIAddVersionKey "FileDescription" "${PRODUCTNAME}"
 VIAddVersionKey "LegalCopyright" "${COPYRIGHT}"
 VIAddVersionKey "FileVersion" "${VERSION}"
-VIAddVersionKey "ProductVersion" "${VERSION}"
+VIAddVersionKey "ProductVersion" "${VERSIONWITHBUILD}"
 
 ; Plugins path, currently exists for linux only
 !if "${PLUGINSPATH}" != ""
