@@ -131,7 +131,7 @@ jobs:
           cargo update -p pest_meta --precise 2.7.14
           cargo update -p pest --precise 2.7.14
           cargo update -p thiserror:1.0.69 --precise 1.0.65
-          cargo update -p syn:2.0.94 --precise 2.0.67
+          cargo update -p syn:2.0.95 --precise 2.0.67
           cargo update -p derive_more --precise 0.99.17
           cargo update -p native-tls --precise 0.2.11
           cargo update -p ppv-lite86 --precise 0.2.17
