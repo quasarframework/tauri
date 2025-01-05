@@ -55,7 +55,7 @@
     "eslint-plugin-n": "14.0.0",
     "eslint-plugin-promise": "6.6.0",
     "eslint-plugin-security": "1.7.1",
-    "fast-glob": "3.3.2",
+    "fast-glob": "3.3.3",
     "prettier": "3.3.3",
     "rollup": "3.29.5",
     "typescript": "5.5.4"
