@@ -104,7 +104,7 @@ getrandom = { version = "0.2", features = [ "std" ] }
 log = "0.4"
 
 [target."cfg(any(target_os = \"macos\", windows, target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
-rfd = { version = "0.10", optional = true, features = [ "gtk3", "common-controls-v6" ] } # 0.11 raised gtk version
+rfd = { version = "0.15", optional = true, features = [ "gtk3", "common-controls-v6" ] } # 0.11 raised gtk version
 notify-rust = { version = "4", optional = true }
 
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\"))".dependencies]
