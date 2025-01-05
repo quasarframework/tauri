@@ -63,7 +63,7 @@ ureq = { version = "2.10.1", default-features = false, features = [ "gzip" ] }
 os_info = "3"
 semver = "1.0"
 regex = "1.11.1"
-unicode-width = "0.1"
+unicode-width = "0.2"
 zeroize = "1.6"
 heck = "0.5"
 dialoguer = "0.11"
