@@ -35,6 +35,9 @@ pub struct Options {
   /// Don't format code with rustfmt
   #[clap(long)]
   pub no_fmt: bool,
+  /// Use npm package tauri-plugin-{name}-api
+  #[clap(long)]
+  pub inofficial: bool,
 }
 
 pub fn command(options: Options) -> Result<()> {
@@ -89,18 +92,27 @@ pub fn run(options: Options) -> Result<()> {
           _ => format!("~{v}"),
         }));
 
-      let npm_spec = match (npm_version_req, options.tag, options.rev, options.branch) {
-        (Some(version_req), _, _, _) => format!("{npm_name}@{version_req}"),
-        (None, Some(tag), None, None) => {
+      let npm_spec = match (
+        npm_version_req,
+        options.tag,
+        options.rev,
+        options.branch,
+        options.inofficial,
+      ) {
+        (Some(version_req), _, _, _, _) => format!("{npm_name}@{version_req}"),
+        (None, Some(tag), None, None, _) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{tag}")
         }
-        (None, None, Some(rev), None) => {
+        (None, None, Some(rev), None, _) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{rev}")
         }
-        (None, None, None, Some(branch)) => {
+        (None, None, None, Some(branch), _) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{branch}")
         }
-        (None, None, None, None) => npm_name,
+        (None, None, None, None, true) => {
+          format!("tauri-plugin-{plugin}-api")
+        }
+        (None, None, None, None, false) => npm_name,
         _ => anyhow::bail!("Only one of --tag, --rev and --branch can be specified"),
       };
       manager.install(&[npm_spec], tauri_dir)?;
