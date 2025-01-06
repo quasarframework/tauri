@@ -75,7 +75,7 @@ tempfile = "3"
 zip = { version = "0.6", default-features = false, optional = true } # 0.7(?) raised msrv
 ignore = "0.4"
 flate2 = "1"
-http = "0.2" # All other crates we use here are still on 0.2
+http = "1.0" # All other crates we use here are still on 0.2
 dirs-next = "2.0"
 percent-encoding = "2"
 base64 = { version = "0.22", optional = true }
