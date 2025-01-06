@@ -981,7 +981,16 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d67778784b508018359cbc8696edb3db78160bab2c2a28ba7f56ef6932997f8"
 dependencies = [
- "derive_builder_macro",
+ "derive_builder_macro 0.12.0",
+]
+
+[[package]]
+name = "derive_builder"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "507dfb09ea8b7fa618fcf76e953f4f5e192547945816d5358edffe39f6f94947"
+dependencies = [
+ "derive_builder_macro 0.20.2",
 ]
 
 [[package]]
@@ -997,13 +1006,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "derive_builder_core"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d5bcf7b024d6835cfb3d473887cd966994907effbe9227e8c8219824d06c4e8"
+dependencies = [
+ "darling 0.20.10",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.94",
+]
+
+[[package]]
 name = "derive_builder_macro"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebcda35c7a396850a55ffeac740804b40ffec779b98fffbb1738f4033f0ee79e"
 dependencies = [
- "derive_builder_core",
+ "derive_builder_core 0.12.0",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "derive_builder_macro"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab63b0e2bf4d5928aff72e83a7dace85d7bba5fe12dcc3c5a572d78caffd3f3c"
+dependencies = [
+ "derive_builder_core 0.20.2",
+ "syn 2.0.94",
 ]
 
 [[package]]
@@ -1037,7 +1068,7 @@ dependencies = [
  "console",
  "shell-words",
  "tempfile",
- "thiserror",
+ "thiserror 1.0.63",
  "zeroize",
 ]
 
@@ -1559,16 +1590,18 @@ dependencies = [
 
 [[package]]
 name = "handlebars"
-version = "4.5.0"
+version = "6.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "faa67bab9ff362228eb3d00bd024a4965d8231bbb7921167f0cfa66c6626b225"
+checksum = "3d6b224b95c1e668ac0270325ad563b2eef1469fbbb8959bc7c692c844b813d9"
 dependencies = [
+ "derive_builder 0.20.2",
  "log",
+ "num-order",
  "pest",
  "pest_derive",
  "serde",
  "serde_json",
- "thiserror",
+ "thiserror 2.0.9",
 ]
 
 [[package]]
@@ -2015,7 +2048,7 @@ dependencies = [
  "jsonptr",
  "serde",
  "serde_json",
- "thiserror",
+ "thiserror 1.0.63",
 ]
 
 [[package]]
@@ -2163,7 +2196,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4979f22fdb869068da03c9f7528f8297c6fd2606bc3a4affe42e6a823fdb8da4"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -2587,6 +2620,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-modular"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17bb261bf36fa7d83f4c294f834e91256769097b3cb505d44831e0a179ac647f"
+
+[[package]]
+name = "num-order"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "537b596b97c40fcf8056d153049eb22f481c17ebce72a513ec9286e4986d1bb6"
+dependencies = [
+ "num-modular",
+]
+
+[[package]]
 name = "num-rational"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2847,7 +2895,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd53dff83f26735fdc1ca837098ccf133605d794cdae66acfc2bfac3ec809d95"
 dependencies = [
  "memchr",
- "thiserror",
+ "thiserror 1.0.63",
  "ucd-trie",
 ]
 
@@ -2907,7 +2955,7 @@ dependencies = [
  "const-oid",
  "crc24",
  "curve25519-dalek",
- "derive_builder",
+ "derive_builder 0.12.0",
  "des",
  "digest",
  "dsa",
@@ -2935,7 +2983,7 @@ dependencies = [
  "sha3",
  "signature",
  "smallvec",
- "thiserror",
+ "thiserror 1.0.63",
  "twofish",
  "x25519-dalek",
  "zeroize",
@@ -3389,7 +3437,7 @@ dependencies = [
  "rand_chacha 0.3.1",
  "simd_helpers",
  "system-deps",
- "thiserror",
+ "thiserror 1.0.63",
  "v_frame",
  "wasm-bindgen",
 ]
@@ -3455,7 +3503,7 @@ checksum = "bd283d9651eeda4b2a83a43c1c91b266c40fd76ecd39a50a8c630ae69dc72891"
 dependencies = [
  "getrandom 0.2.15",
  "libredox",
- "thiserror",
+ "thiserror 1.0.63",
 ]
 
 [[package]]
@@ -3566,7 +3614,7 @@ dependencies = [
  "pgp",
  "sha1",
  "sha2",
- "thiserror",
+ "thiserror 1.0.63",
  "xz2",
  "zstd 0.13.2",
 ]
@@ -4323,7 +4371,7 @@ dependencies = [
  "tauri-icns",
  "tauri-utils",
  "tempfile",
- "thiserror",
+ "thiserror 1.0.63",
  "time",
  "ureq",
  "uuid",
@@ -4432,7 +4480,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "serialize-to-javascript",
- "thiserror",
+ "thiserror 1.0.63",
  "toml 0.7.8",
  "url",
  "walkdir",
@@ -4484,7 +4532,16 @@ version = "1.0.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0342370b38b6a11b6cc11d6a805569958d54cfa061a29969c3b5ce2ea405724"
 dependencies = [
- "thiserror-impl",
+ "thiserror-impl 1.0.63",
+]
+
+[[package]]
+name = "thiserror"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f072643fd0190df67a8bab670c20ef5d8737177d6ac6b2e9a236cb096206b2cc"
+dependencies = [
+ "thiserror-impl 2.0.9",
 ]
 
 [[package]]
@@ -4492,6 +4549,17 @@ name = "thiserror-impl"
 version = "1.0.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4558b58466b9ad7ca0f102865eccc95938dca1a74a856f2b57b6629050da261"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.94",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b50fa271071aae2e6ee85f842e2e28ba8cd2c5fb67f11fcb1fd70b276f9e7d4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4741,7 +4809,7 @@ dependencies = [
  "log",
  "rand 0.8.5",
  "sha1",
- "thiserror",
+ "thiserror 1.0.63",
  "utf-8",
 ]
 
