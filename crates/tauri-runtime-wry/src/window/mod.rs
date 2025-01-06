@@ -61,23 +61,23 @@ pub fn calculate_window_center_position(
   window_size: tao::dpi::PhysicalSize<u32>,
   target_monitor: tao::monitor::MonitorHandle,
 ) -> tao::dpi::PhysicalPosition<i32> {
-  let size: tao::dpi::PhysicalSize<u32>;
-  let position: tao::dpi::PhysicalPosition<i32>;
+  let monitor_size: tao::dpi::PhysicalSize<u32>;
+  let monitor_position: tao::dpi::PhysicalPosition<i32>;
   #[cfg(desktop)]
   {
     use crate::monitor::MonitorExt;
     let work_area = target_monitor.work_area();
-    size = work_area.size;
-    position = work_area.position;
+    monitor_size = work_area.size;
+    monitor_position = work_area.position;
   }
   #[cfg(mobile)]
   {
-    size = target_monitor.size();
-    position = target_monitor.position();
+    monitor_size = target_monitor.size();
+    monitor_position = target_monitor.position();
   }
 
   tao::dpi::PhysicalPosition::new(
-    (size.width - window_size.width) as i32 / 2 + position.x,
-    (size.height - window_size.height) as i32 / 2 + position.y,
+    (monitor_size.width - window_size.width) as i32 / 2 + monitor_position.x,
+    (monitor_size.height - window_size.height) as i32 / 2 + monitor_position.y,
   )
 }
