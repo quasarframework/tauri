@@ -21,6 +21,6 @@
     "prettier": "^2.5.1"
   },
   "dependencies": {
-    "typescript": "^4.5.4"
+    "typescript": "^5.0.0"
   }
 }
