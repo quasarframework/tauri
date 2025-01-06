@@ -65,10 +65,12 @@ use tao::{
     UserAttentionType as TaoUserAttentionType,
   },
 };
+#[cfg(desktop)]
+use tauri_utils::config::PreventOverflowConfig;
 #[cfg(target_os = "macos")]
 use tauri_utils::TitleBarStyle;
 use tauri_utils::{
-  config::{Color, PreventOverflowConfig, WindowConfig},
+  config::{Color, WindowConfig},
   Theme,
 };
 use url::Url;
