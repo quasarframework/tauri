@@ -1,6 +1,6 @@
 [package]
 name = "tauri"
-version = "2.1.1"
+version = "2.2.0"
 description = "Make tiny, secure apps for all desktop platforms with Tauri"
 exclude = ["/test", "/.scripts", "CHANGELOG.md", "/target"]
 readme = "README.md"
@@ -43,8 +43,8 @@ build = ["tauri-build"]
 development = ["quickcheck_macros"]
 
 [dependencies]
-serde_json = { version = "1.0", features = ["raw_value"] }
-serde = { version = "1.0", features = ["derive", "rc"] }
+serde_json = { version = "1", features = ["raw_value"] }
+serde = { version = "1", features = ["derive", "rc"] }
 tokio = { version = "1", features = [
   "rt",
   "rt-multi-thread",
@@ -55,19 +55,19 @@ tokio = { version = "1", features = [
 futures-util = "0.3"
 uuid = { version = "1", features = ["v4"], optional = true }
 url = "2"
-anyhow = "1.0"
+anyhow = "1"
 thiserror = "2"
-tauri-runtime = { version = "2.2.0", path = "../tauri-runtime" }
-tauri-macros = { version = "2.0.3", path = "../tauri-macros" }
-tauri-utils = { version = "2.1.0", features = [
+tauri-runtime = { version = "2.3.0", path = "../tauri-runtime" }
+tauri-macros = { version = "2.0.4", path = "../tauri-macros" }
+tauri-utils = { version = "2.1.1", features = [
   "resources",
 ], path = "../tauri-utils" }
-tauri-runtime-wry = { version = "2.2.0", path = "../tauri-runtime-wry", optional = true }
+tauri-runtime-wry = { version = "2.3.0", path = "../tauri-runtime-wry", optional = true }
 getrandom = "0.2"
 serde_repr = "0.1"
-http = "1.1"
+http = "1"
 dirs = "5"
-percent-encoding = "2.3"
+percent-encoding = "2"
 reqwest = { version = "0.12", default-features = false, features = [
   "json",
   "stream",
@@ -80,10 +80,10 @@ mime = "0.3"
 data-url = { version = "0.3", optional = true }
 serialize-to-javascript = "=0.1.1"
 image = { version = "0.25", default-features = false, optional = true }
-http-range = { version = "0.1.5", optional = true }
+http-range = { version = "0.1", optional = true }
 tracing = { version = "0.1", optional = true }
 heck = "0.5"
-log = "0.4"
+log = "0.4.21"
 dunce = "1"
 specta = { version = "^2.0.0-rc.20", optional = true, default-features = false, features = [
   "function",
@@ -107,9 +107,9 @@ webkit2gtk = { version = "=2.0.1", features = ["v2_40"] }
 [target.'cfg(target_os = "macos")'.dependencies]
 embed_plist = "1.2"
 plist = "1"
-objc2 = "0.5.2"
-objc2-foundation = { version = "0.2.2", features = ["NSData", "NSThread"] }
-objc2-app-kit = { version = "0.2.2", features = [
+objc2 = "0.5"
+objc2-foundation = { version = "0.2", features = ["NSData", "NSThread"] }
+objc2-app-kit = { version = "0.2", features = [
   "NSApplication",
   "NSColor",
   "NSResponder",
@@ -120,7 +120,7 @@ objc2-app-kit = { version = "0.2.2", features = [
 window-vibrancy = "0.5"
 
 [target."cfg(windows)".dependencies]
-webview2-com = "0.33"
+webview2-com = "0.34"
 window-vibrancy = "0.5"
 
 [target."cfg(windows)".dependencies.windows]
@@ -133,21 +133,21 @@ jni = "0.21"
 # UIKit, i.e. iOS/tvOS/watchOS/visionOS
 [target.'cfg(all(target_vendor = "apple", not(target_os = "macos")))'.dependencies]
 libc = "0.2"
-swift-rs = "1.0.7"
+swift-rs = "1"
 
 [build-dependencies]
 heck = "0.5"
-tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.3" }
-tauri-utils = { path = "../tauri-utils/", version = "2.1.0", features = [
+tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.4" }
+tauri-utils = { path = "../tauri-utils/", version = "2.1.1", features = [
   "build",
 ] }
 
 [dev-dependencies]
-proptest = "1.4.0"
+proptest = "1.6.0"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 tauri = { path = ".", default-features = false, features = ["wry"] }
 tokio = { version = "1", features = ["full"] }
 cargo_toml = "0.17"
@@ -155,7 +155,7 @@ http-range = "0.1.5"
 
 # macOS
 [target.'cfg(target_os = "macos")'.dev-dependencies]
-objc2-web-kit = { version = "0.2.2", features = [
+objc2-web-kit = { version = "0.2", features = [
   "objc2-app-kit",
   "WKWebView",
   "WKUserContentController",

@@ -78,6 +78,9 @@ pub fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
   dev_cmd.arg("--");
   dev_cmd.args(run_args);
 
+  let manually_killed_app = Arc::new(AtomicBool::default());
+  let manually_killed_app_ = manually_killed_app.clone();
+
   let dev_child = match SharedChild::spawn(&mut dev_cmd) {
     Ok(c) => Ok(c),
     Err(e) if e.kind() == ErrorKind::NotFound => Err(anyhow::anyhow!(
@@ -128,15 +131,14 @@ pub fn run_dev<F: Fn(Option<i32>, ExitReason) + Send + Sync + 'static>(
         status.code(),
         if status.code() == Some(101) && is_cargo_compile_error {
           ExitReason::CompilationFailed
+        } else if manually_killed_app_.load(Ordering::Relaxed) {
+          ExitReason::TriggeredKill
         } else {
           ExitReason::NormalExit
         },
       );
     }
   });
-
-  // TODO: remove this and DevChild (requires refactor for code shared between mobile and desktop)
-  let manually_killed_app = Arc::new(AtomicBool::default());
 
   Ok(DevChild {
     manually_killed_app,

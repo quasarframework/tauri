@@ -2723,7 +2723,7 @@ impl<T: UserEvent> Runtime<T> for Wry<T> {
         pending,
       )?;
 
-      #[allow(clippy::manual_inspect)]
+      #[allow(unknown_lints, clippy::manual_inspect)]
       self
         .context
         .main_thread
@@ -3352,7 +3352,7 @@ fn handle_user_message<T: UserEvent>(
             let _ = webview.print();
           }
           WebviewMessage::Close => {
-            #[allow(clippy::manual_inspect)]
+            #[allow(unknown_lints, clippy::manual_inspect)]
             windows.0.borrow_mut().get_mut(&window_id).map(|window| {
               if let Some(i) = window.webviews.iter().position(|w| w.id == webview.id) {
                 window.webviews.remove(i);
@@ -3576,7 +3576,7 @@ fn handle_user_message<T: UserEvent>(
       if let Some(window) = window {
         match handler(&window) {
           Ok(webview) => {
-            #[allow(clippy::manual_inspect)]
+            #[allow(unknown_lints, clippy::manual_inspect)]
             windows.0.borrow_mut().get_mut(&window_id).map(|w| {
               w.webviews.push(webview);
               w.has_children.store(true, Ordering::Relaxed);
@@ -4416,7 +4416,7 @@ fn create_webview<T: UserEvent>(
   ))]
   {
     if let Some(path) = &webview_attributes.extensions_path {
-      webview_builder = webview_builder.with_extension_path(path);
+      webview_builder = webview_builder.with_extensions_path(path);
     }
   }
 

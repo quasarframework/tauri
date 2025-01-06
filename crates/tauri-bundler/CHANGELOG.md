@@ -1,5 +1,20 @@
 # Changelog
 
+## \[2.2.0]
+
+### New Features
+
+- [`cccb308c7`](https://www.github.com/tauri-apps/tauri/commit/cccb308c7b559b0838138d6cea280665f060c925) ([#11562](https://www.github.com/tauri-apps/tauri/pull/11562) by [@jLynx](https://www.github.com/tauri-apps/tauri/../../jLynx)) Generate signature for `.deb` packages when `createUpdaterArtifacts` option is enabled.
+
+### Enhancements
+
+- [`93a3a043d`](https://www.github.com/tauri-apps/tauri/commit/93a3a043d39cc96515d51d98beeb14261d3a246b) ([#11727](https://www.github.com/tauri-apps/tauri/pull/11727) by [@Kiyozz](https://www.github.com/tauri-apps/tauri/../../Kiyozz)) Add support for `Portuguese` language for NSIS windows installer.
+- [`53f808674`](https://www.github.com/tauri-apps/tauri/commit/53f808674b2c0012bc44a41ced90e742afbb41e8) ([#11799](https://www.github.com/tauri-apps/tauri/pull/11799) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) The bundler now reads the `TAURI_BUNDLER_DMG_IGNORE_CI` env var to decide whether to check for `CI: true` when building DMG files.
+
+### Dependencies
+
+- Upgraded to `tauri-utils@2.1.1`
+
 ## \[2.1.0]
 
 ### New Features

@@ -1820,6 +1820,9 @@ impl<R: Runtime> WebviewWindow<R> {
   ///
   /// The closure is executed on the main thread.
   ///
+  /// Note that `webview2-com`, `webkit2gtk`, `objc2_web_kit` and similar crates may be updated in minor releases of Tauri.
+  /// Therefore it's recommended to pin Tauri to at least a minor version when you're using `with_webview`.
+  ///
   /// # Examples
   ///
   /// ```rust,no_run

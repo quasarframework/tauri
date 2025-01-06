@@ -2523,7 +2523,7 @@ impl Default for IosConfig {
   }
 }
 
-/// General configuration for the iOS target.
+/// General configuration for the Android target.
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]

@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.1.1]
+
+### Bug Fixes
+
+- [`46935212b`](https://www.github.com/tauri-apps/tauri/commit/46935212b61da44dc82dfeb803fceebf5659f7b7) ([#11658](https://www.github.com/tauri-apps/tauri/pull/11658) by [@Legend-Master](https://www.github.com/tauri-apps/tauri/../../Legend-Master)) Fix `.json5` capability files not recognized even with `config-json5` feature enabled
+
 ## \[2.1.0]
 
 ### New Features

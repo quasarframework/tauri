@@ -1,5 +1,22 @@
 # Changelog
 
+## \[2.3.0]
+
+### New Features
+
+- [`18bd639f6`](https://www.github.com/tauri-apps/tauri/commit/18bd639f6e22c0188aa219739f367b5bf5ab0398) ([#11798](https://www.github.com/tauri-apps/tauri/pull/11798) by [@lars-berger](https://www.github.com/tauri-apps/tauri/../../lars-berger)) Add `WebviewWindowBuilder/WebviewBuilder::data_store_identifier` on macOS.
+- [`dc4d79477`](https://www.github.com/tauri-apps/tauri/commit/dc4d79477665bc3bfefb4048772414cf5d78e3df) ([#11628](https://www.github.com/tauri-apps/tauri/pull/11628) by [@SpikeHD](https://www.github.com/tauri-apps/tauri/../../SpikeHD)) Add `WebviewWindowBuilder/WebviewBuilder::extensions_path` on Linux and Windows.
+- [`020ea0556`](https://www.github.com/tauri-apps/tauri/commit/020ea05561348dcd6d2a7df358f8a5190f661ba2) ([#11661](https://www.github.com/tauri-apps/tauri/pull/11661) by [@ahqsoftwares](https://www.github.com/tauri-apps/tauri/../../ahqsoftwares)) Add badging APIs:
+
+  - `Window/WebviewWindow::set_badge_count` for Linux, macOS and IOS.
+  - `Window/WebviewWindow::set_overlay_icon` for Windows Only.
+  - `Window/WebviewWindow::set_badge_label`for macOS Only.
+
+### Dependencies
+
+- Upgraded to `tauri-runtime@2.3.0`
+- Upgraded to `tauri-utils@2.1.1`
+
 ## \[2.2.0]
 
 ### New Features
