@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.0.5]
+
+### Dependencies
+
+- Upgraded to `cargo_toml@0.21`
+
 ## \[2.0.4]
 
 ### Dependencies
