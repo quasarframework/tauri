@@ -35,9 +35,6 @@ pub struct Options {
   /// Don't format code with rustfmt
   #[clap(long)]
   pub no_fmt: bool,
-  /// Use npm package tauri-plugin-{name}-api
-  #[clap(short, long)]
-  pub community: bool,
 }
 
 pub fn command(options: Options) -> Result<()> {
@@ -52,12 +49,25 @@ pub fn run(options: Options) -> Result<()> {
     .map(|(p, v)| (p, Some(v)))
     .unwrap_or((&options.plugin, None));
 
+  let mut plugins = crate::helpers::plugins::known_plugins();
+  let (metadata, is_known) = plugins
+    .remove(plugin)
+    .map(|metadata| (metadata, true))
+    .unwrap_or_default();
+
   let plugin_snake_case = plugin.replace('-', "_");
   let crate_name = format!("tauri-plugin-{plugin}");
-  let npm_name = format!("@tauri-apps/plugin-{plugin}");
+  let npm_name = if is_known {
+    format!("tauri-apps/plugin-{plugin}")
+  } else {
+    format!("tauri-plugin-{plugin}-api")
+  };
 
-  let mut plugins = crate::helpers::plugins::known_plugins();
-  let metadata = plugins.remove(plugin).unwrap_or_default();
+  if !is_known && (options.tag.is_some() || options.rev.is_some() || options.branch.is_some()) {
+    anyhow::bail!(
+      "Git options --tag, --rev and --branch can only be used with official Tauri plugins"
+    );
+  }
 
   let frontend_dir = resolve_frontend_dir();
   let tauri_dir = tauri_dir();
@@ -92,27 +102,18 @@ pub fn run(options: Options) -> Result<()> {
           _ => format!("~{v}"),
         }));
 
-      let npm_spec = match (
-        npm_version_req,
-        options.tag,
-        options.rev,
-        options.branch,
-        options.community,
-      ) {
-        (Some(version_req), _, _, _, _) => format!("{npm_name}@{version_req}"),
-        (None, Some(tag), None, None, _) => {
+      let npm_spec = match (npm_version_req, options.tag, options.rev, options.branch) {
+        (Some(version_req), _, _, _) => format!("{npm_name}@{version_req}"),
+        (None, Some(tag), None, None) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{tag}")
         }
-        (None, None, Some(rev), None, _) => {
+        (None, None, Some(rev), None) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{rev}")
         }
-        (None, None, None, Some(branch), _) => {
+        (None, None, None, Some(branch)) => {
           format!("tauri-apps/tauri-plugin-{plugin}#{branch}")
         }
-        (None, None, None, None, true) => {
-          format!("tauri-plugin-{plugin}-api")
-        }
-        (None, None, None, None, false) => npm_name,
+        (None, None, None, None) => npm_name,
         _ => anyhow::bail!("Only one of --tag, --rev and --branch can be specified"),
       };
       manager.install(&[npm_spec], tauri_dir)?;
