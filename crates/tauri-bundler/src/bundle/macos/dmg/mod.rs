@@ -195,7 +195,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 
   // Sign DMG if needed
 
-  if let Some(keychain) = super::sign::keychain(settings.macos().signing_identity.as_deref())? {
+  /* if let Some(keychain) = super::sign::keychain(settings.macos().signing_identity.as_deref())? {
     super::sign::sign(
       &keychain,
       vec![super::sign::SignTarget {
@@ -204,7 +204,7 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
       }],
       settings,
     )?;
-  }
+  } */
 
   Ok(Bundled {
     dmg: vec![dmg_path],
