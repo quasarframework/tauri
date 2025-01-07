@@ -929,12 +929,11 @@ fn get_merge_modules(settings: &Settings) -> crate::Result<Vec<MergeModule>> {
   let mut merge_modules = Vec::new();
   let regex = Regex::new(r"[^\w\d\.]")?;
   for msm in glob::glob(
-    settings
-      .project_out_directory()
-      .join("*.msm")
-      .to_string_lossy()
-      .to_string()
-      .as_str(),
+    &PathBuf::from(glob::Pattern::escape(
+      &settings.project_out_directory().to_string_lossy(),
+    ))
+    .join("*.msm")
+    .to_string_lossy(),
   )? {
     let path = msm?;
     let filename = path
@@ -1042,7 +1041,11 @@ fn generate_resource_data(settings: &Settings) -> crate::Result<ResourceMap> {
   let mut dlls = Vec::new();
 
   let out_dir = settings.project_out_directory();
-  for dll in glob::glob(out_dir.join("*.dll").to_string_lossy().to_string().as_str())? {
+  for dll in glob::glob(
+    &PathBuf::from(glob::Pattern::escape(&out_dir.to_string_lossy()))
+      .join("*.dll")
+      .to_string_lossy(),
+  )? {
     let path = dll?;
     let resource_path = dunce::simplified(&path);
     let relative_path = path
