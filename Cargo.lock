@@ -1561,9 +1561,9 @@ dependencies = [
 
 [[package]]
 name = "cargo_toml"
-version = "0.17.2"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a969e13a7589e9e3e4207e153bae624ade2b5622fb4684a4923b23ec3d57719"
+checksum = "5fbd1fe9db3ebf71b89060adaf7b0504c2d6a425cf061313099547e382c2e472"
 dependencies = [
  "serde",
  "toml 0.8.19",
@@ -9326,7 +9326,9 @@ dependencies = [
  "anyhow",
  "futures",
  "futures-util",
- "hyper 0.14.30",
+ "http-body-util",
+ "hyper 1.4.1",
+ "hyper-util",
  "pico-args",
  "serde",
  "serde_json",
