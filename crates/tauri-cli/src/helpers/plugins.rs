@@ -69,6 +69,7 @@ pub fn known_plugins() -> HashMap<&'static str, PluginMetadata> {
     "shell",
     "upload",
     "websocket",
+    "opener",
   ] {
     plugins.entry(p).or_default();
   }
