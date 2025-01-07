@@ -467,7 +467,7 @@
           "type": "boolean"
         },
         "disableBackgroundThrottling": {
-          "description": "Set whether background throttling should be disabled\n\n Will prevent the browser from suspending the WebView's tab and all its tasks while running in background after ~5 Minutes.\n\n ## Platform-specific\n\n - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.\n - **iOS / macOS**: Supported since version 17.0+.\n\n see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578",
+          "description": "Set whether background throttling should be disabled.\n\n By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when\n a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state\n changes back from hidden to visible by bringing the view back to the foreground.\n\n ## Platform-specific\n\n - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.\n - **iOS**: Supported since version 17.0+.\n - **macOS**: Supported since version 14.0+.\n\n see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578",
           "default": false,
           "type": "boolean"
         }

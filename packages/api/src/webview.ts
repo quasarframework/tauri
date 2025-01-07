@@ -777,7 +777,8 @@ interface WebviewOptions {
    ## Platform-specific
    *
    * - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
-   * - **iOS / macOS**: Supported since version 17.0+.
+   * - **iOS**: Supported since version 17.0+.
+   * - **macOS**: Supported since version 14.0+.
    * 
    * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
    * 
