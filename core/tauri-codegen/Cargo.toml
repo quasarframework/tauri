@@ -26,7 +26,7 @@ brotli = { version = "7", optional = true }
 regex = { version = "1", optional = true }
 uuid = { version = "1", features = [ "v4" ] }
 semver = "1"
-ico = "0.3"
+ico = "0.4"
 png = "0.17"
 json-patch = "2"
 
