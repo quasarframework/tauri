@@ -986,7 +986,8 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   ///
   /// ## Platform-specific
   ///
-  /// - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.
+  /// - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
+  /// - **iOS / macOS**: Supported since version 17.0+.
   ///
   /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
   #[must_use]

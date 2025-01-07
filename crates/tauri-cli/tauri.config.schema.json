@@ -467,7 +467,7 @@
           "type": "boolean"
         },
         "disableBackgroundThrottling": {
-          "description": "Set whether background throttling should be disabled\n\n Will prevent the browser from suspending the WebView's tab and all its tasks while running in background after ~5 Minutes.\n\n ## Platform-specific\n\n - **Linux / Windows / Android**: Unsupported yet. But workarounds like a pending WebLock transaction might suffice.\n\n see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578",
+          "description": "Set whether background throttling should be disabled\n\n Will prevent the browser from suspending the WebView's tab and all its tasks while running in background after ~5 Minutes.\n\n ## Platform-specific\n\n - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.\n - **iOS / macOS**: Supported since version 17.0+.\n\n see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578",
           "default": false,
           "type": "boolean"
         }
