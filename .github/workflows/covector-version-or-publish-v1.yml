@@ -180,6 +180,7 @@ jobs:
           cargo update -p zerofrom --precise 0.1.4
           cargo update -p litemap --precise 0.7.3
           cargo update -p bstr --precise 1.10.0
+          cargo update -p windows-version --precise 0.1.1
 
       - name: test build
         run: cargo check --target ${{ matrix.platform.target }} ${{ matrix.project.flags }}
