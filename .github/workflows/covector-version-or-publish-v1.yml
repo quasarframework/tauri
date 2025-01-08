@@ -152,6 +152,7 @@ jobs:
           cargo update -p phf:0.11.3 --precise 0.11.2
           cargo update -p phf_shared:0.11.3 --precise 0.11.2
           cargo update -p phf_macros:0.11.3 --precise 0.11.2
+          cargo update -p phf_generator:0.11.3 --precise 0.11.2
 
       - name: Downgrade crates with MSRV conflict (bundler)
         # This is for the bundler but since cli depends on the bundler we enable it for the cli too
