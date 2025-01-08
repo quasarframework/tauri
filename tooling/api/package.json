@@ -58,7 +58,7 @@
     "fast-glob": "3.3.3",
     "prettier": "3.4.2",
     "rollup": "3.29.5",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   },
   "engines": {
     "node": ">= 14.6.0",
