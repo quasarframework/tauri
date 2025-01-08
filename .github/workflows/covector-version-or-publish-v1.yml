@@ -149,9 +149,9 @@ jobs:
           cargo update -p tracing-core --precise 0.1.32
           cargo update -p tracing-attributes --precise 0.1.27
           cargo update -p windows-version --precise 0.1.1
-          cargo update -p phf --precise 0.11.2
-          cargo update -p phf_shared --precise 0.11.2
-          cargo update -p phf_macros --precise 0.11.2
+          cargo update -p phf@0.11.3 --precise 0.11.2
+          cargo update -p phf_shared@0.11.3 --precise 0.11.2
+          cargo update -p phf_macros@0.11.3 --precise 0.11.2
 
       - name: Downgrade crates with MSRV conflict (bundler)
         # This is for the bundler but since cli depends on the bundler we enable it for the cli too
