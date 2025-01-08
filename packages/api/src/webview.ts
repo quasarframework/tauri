@@ -30,7 +30,12 @@ import {
   once
 } from './event'
 import { invoke } from './core'
-import { Color, Window, getCurrentWindow } from './window'
+import {
+  BackgroundThrottlingPolicy,
+  Color,
+  Window,
+  getCurrentWindow
+} from './window'
 import { WebviewWindow } from './webviewWindow'
 
 /** The drag and drop event types. */
@@ -768,7 +773,7 @@ interface WebviewOptions {
    */
   backgroundColor?: Color
 
-  /** Set whether background throttling should be disabled.
+  /** Change the default background throttling behaviour.
    *
    * By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
    * a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
@@ -779,13 +784,13 @@ interface WebviewOptions {
    * - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
    * - **iOS**: Supported since version 17.0+.
    * - **macOS**: Supported since version 14.0+.
-   * 
+   *
    * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
-   * 
+   *
    * @since 2.2.0
-   * 
+   *
    */
-  disableBackgroundThrottling?: boolean
+  backgroundThrottling?: BackgroundThrottlingPolicy
 }
 
 export { Webview, getCurrentWebview, getAllWebviews }

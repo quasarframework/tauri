@@ -29,7 +29,7 @@ use crate::{
 };
 use serde::Serialize;
 use tauri_utils::{
-  config::{Color, WebviewUrl, WindowConfig},
+  config::{BackgroundThrottlingPolicy, Color, WebviewUrl, WindowConfig},
   Theme,
 };
 use url::Url;
@@ -978,7 +978,7 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
     self
   }
 
-  /// Set whether background throttling should be disabled.
+  /// Change the default background throttling behaviour.
   ///
   /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
   /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
@@ -992,8 +992,8 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   ///
   /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
   #[must_use]
-  pub fn disable_background_throttling(mut self, disabled: bool) -> Self {
-    self.webview_builder = self.webview_builder.disable_background_throttling(disabled);
+  pub fn background_throttling(mut self, policy: Option<BackgroundThrottlingPolicy>) -> Self {
+    self.webview_builder = self.webview_builder.background_throttling(policy);
     self
   }
 }

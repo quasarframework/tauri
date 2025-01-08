@@ -1533,7 +1533,7 @@ class Window {
     return invoke('plugin:window|set_background_color', { color })
   }
 
-  /** Set whether background throttling should be disabled.
+  /** Change the default background throttling behaviour.
    *
    * By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
    * a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
@@ -1544,16 +1544,18 @@ class Window {
    * - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
    * - **iOS**: Supported since version 17.0+.
    * - **macOS**: Supported since version 14.0+.
-   * 
+   *
    * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
-   * 
+   *
    * @since 2.2.0
-   * 
+   *
    */
-  async setDisableBackgroundThrottling(disable: boolean): Promise<void> {
-    return invoke('plugin:window|set_disable_background_throttling', {
+  async setBackgroundThrottling(
+    policy: BackgroundThrottlingPolicy
+  ): Promise<void> {
+    return invoke('plugin:window|set_background_throttling', {
       label: this.label,
-      value: disable
+      value: policy
     })
   }
 
@@ -2046,6 +2048,17 @@ type Color =
   | string
 
 /**
+ * Background throttling policy
+ *
+ * @since 2.0.0
+ */
+enum BackgroundThrottlingPolicy {
+  Disabled = 'disabled',
+  Throttle = 'throttle',
+  Suspend = 'suspend'
+}
+
+/**
  * Platform-specific window effects
  *
  * @since 2.0.0
@@ -2363,7 +2376,7 @@ interface WindowOptions {
    */
   backgroundColor?: Color
   /**
-   * Set whether background throttling should be disabled
+   * Change the default background throttling behaviour
    *
    * #### Platform-specific
    *
@@ -2375,7 +2388,7 @@ interface WindowOptions {
    *
    * @since 2.2.0
    */
-  disableBackgroundThrottling?: boolean
+  backgroundThrottling?: BackgroundThrottlingPolicy
 }
 
 function mapMonitor(m: Monitor | null): Monitor | null {
@@ -2498,5 +2511,6 @@ export type {
   ScaleFactorChanged,
   WindowOptions,
   Color,
+  BackgroundThrottlingPolicy,
   DragDropEvent
 }

@@ -8,4 +8,4 @@
 '@tauri-apps/cli': 'minor:enhance'
 ---
 
-Add an option to disable background throttling (currently for WebKit only).
+Add an option to change the default background throttling policy (currently for WebKit only).

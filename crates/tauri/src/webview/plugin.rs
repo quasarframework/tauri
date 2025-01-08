@@ -14,7 +14,7 @@ mod desktop_commands {
 
   use serde::{Deserialize, Serialize};
   use tauri_runtime::dpi::{Position, Size};
-  use tauri_utils::config::{WebviewUrl, WindowConfig};
+  use tauri_utils::config::{BackgroundThrottlingPolicy, WebviewUrl, WindowConfig};
 
   use super::*;
   use crate::{
@@ -49,7 +49,7 @@ mod desktop_commands {
     #[serde(default)]
     zoom_hotkeys_enabled: bool,
     #[serde(default)]
-    disable_background_throttling: bool,
+    background_throttling: Option<BackgroundThrottlingPolicy>,
   }
 
   #[cfg(feature = "unstable")]
@@ -65,8 +65,7 @@ mod desktop_commands {
       builder.webview_attributes.window_effects = config.window_effects;
       builder.webview_attributes.incognito = config.incognito;
       builder.webview_attributes.zoom_hotkeys_enabled = config.zoom_hotkeys_enabled;
-      builder.webview_attributes.disable_background_throttling =
-        config.disable_background_throttling;
+      builder.webview_attributes.background_throttling = config.background_throttling;
       builder
     }
   }

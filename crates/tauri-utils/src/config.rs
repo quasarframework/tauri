@@ -1420,6 +1420,29 @@ impl schemars::JsonSchema for Color {
   }
 }
 
+/// Background throttling policy.
+#[derive(Debug, PartialEq, Eq, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub enum BackgroundThrottlingPolicy {
+  /// A policy where background throttling is disabled
+  Disabled,
+  /// A policy where a web view that’s not in a window fully suspends tasks.
+  Suspend,
+  /// A policy where a web view that’s not in a window limits processing, but does not fully suspend tasks.
+  Throttle,
+}
+
+impl From<BackgroundThrottlingPolicy> for wry::BackgroundThrottlingPolicy {
+  fn from(policy: BackgroundThrottlingPolicy) -> Self {
+    match policy {
+      BackgroundThrottlingPolicy::Disabled => Self::Disabled,
+      BackgroundThrottlingPolicy::Throttle => Self::Throttle,
+      BackgroundThrottlingPolicy::Suspend => Self::Suspend,
+    }
+  }
+}
+
 /// The window effects configuration object
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Clone, Deserialize, Serialize, Default)]
@@ -1688,7 +1711,7 @@ pub struct WindowConfig {
   #[serde(alias = "background-color")]
   pub background_color: Option<Color>,
 
-  /// Set whether background throttling should be disabled.
+  /// Change the default background throttling behaviour.
   ///
   /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
   /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
@@ -1701,8 +1724,8 @@ pub struct WindowConfig {
   /// - **macOS**: Supported since version 14.0+.
   ///
   /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
-  #[serde(default, alias = "disable-background-throttling")]
-  pub disable_background_throttling: bool,
+  #[serde(default, alias = "background-throttling")]
+  pub background_throttling: Option<BackgroundThrottlingPolicy>,
 }
 
 impl Default for WindowConfig {
@@ -1755,7 +1778,7 @@ impl Default for WindowConfig {
       use_https_scheme: false,
       devtools: None,
       background_color: None,
-      disable_background_throttling: false,
+      background_throttling: None,
     }
   }
 }
@@ -2875,6 +2898,17 @@ mod build {
     }
   }
 
+  impl ToTokens for BackgroundThrottlingPolicy {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+      let prefix = quote! { ::tauri::utils::config::BackgroundThrottlingPolicy };
+      tokens.append_all(match self {
+        Self::Disabled => quote! { #prefix::Disabled },
+        Self::Throttle => quote! { #prefix::Throttle },
+        Self::Suspend => quote! { #prefix::Suspend },
+      })
+    }
+  }
+
   impl ToTokens for crate::Theme {
     fn to_tokens(&self, tokens: &mut TokenStream) {
       let prefix = quote! { ::tauri::utils::Theme };
@@ -3021,7 +3055,7 @@ mod build {
       let use_https_scheme = self.use_https_scheme;
       let devtools = opt_lit(self.devtools.as_ref());
       let background_color = opt_lit(self.background_color.as_ref());
-      let disable_background_throttling = self.disable_background_throttling;
+      let background_throttling = opt_lit(self.background_throttling.as_ref());
 
       literal_struct!(
         tokens,
@@ -3073,7 +3107,7 @@ mod build {
         use_https_scheme,
         devtools,
         background_color,
-        disable_background_throttling
+        background_throttling
       );
     }
   }
