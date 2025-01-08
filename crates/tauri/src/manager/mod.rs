@@ -225,7 +225,7 @@ pub struct AppManager<R: Runtime> {
   // the value is set to true when the event loop is already exited
   event_loop_exit_mutex: Mutex<bool>,
   event_loop_exit_condvar: std::sync::Condvar,
-  // number of threads that request to NOT exit process 
+  // number of threads that request to NOT exit process
   impede_exit_count: Mutex<usize>,
   impede_exit_condvar: std::sync::Condvar,
 }
@@ -742,7 +742,7 @@ pub struct ImpedeScope<R: Runtime> {
   app_manager: Arc<AppManager<R>>,
 }
 
-impl <R: Runtime> Drop for ImpedeScope<R> {
+impl<R: Runtime> Drop for ImpedeScope<R> {
   fn drop(&mut self) {
     let mut pend_exit_threads = self.app_manager.impede_exit_count.lock().unwrap();
     *pend_exit_threads -= 1;
