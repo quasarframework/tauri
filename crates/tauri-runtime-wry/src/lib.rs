@@ -4180,12 +4180,15 @@ fn create_webview<T: UserEvent>(
     .with_accept_first_mouse(webview_attributes.accept_first_mouse)
     .with_incognito(webview_attributes.incognito)
     .with_clipboard(webview_attributes.clipboard)
-    .with_background_throttling(webview_attributes.background_throttling.map(|p| p.into()))
     .with_hotkeys_zoom(webview_attributes.zoom_hotkeys_enabled);
 
   #[cfg(any(target_os = "windows", target_os = "android"))]
   {
     webview_builder = webview_builder.with_https_scheme(webview_attributes.use_https_scheme);
+  }
+
+  if let Some(background_throttling) = webview_attributes.background_throttling {
+    webview_builder = webview_builder.with_background_throttling(background_throttling.into());
   }
 
   if let Some(color) = webview_attributes.background_color {
