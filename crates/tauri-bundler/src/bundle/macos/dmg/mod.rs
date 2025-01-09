@@ -195,16 +195,19 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
 
   // Sign DMG if needed
 
-  /* if let Some(keychain) = super::sign::keychain(settings.macos().signing_identity.as_deref())? {
-    super::sign::sign(
-      &keychain,
-      vec![super::sign::SignTarget {
-        path: dmg_path.clone(),
-        is_an_executable: false,
-      }],
-      settings,
-    )?;
-  } */
+  if let Some(keychain) = super::sign::keychain(settings.macos().signing_identity.as_deref())? {
+    // Skip self-signing DMGs https://github.com/tauri-apps/tauri/issues/12288
+    if keychain != "-" {
+      super::sign::sign(
+        &keychain,
+        vec![super::sign::SignTarget {
+          path: dmg_path.clone(),
+          is_an_executable: false,
+        }],
+        settings,
+      )?;
+    }
+  }
 
   Ok(Bundled {
     dmg: vec![dmg_path],
