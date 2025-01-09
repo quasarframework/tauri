@@ -237,7 +237,10 @@ impl ResourcePathsIter<'_> {
     self.current_path = None;
 
     let pattern = match &mut self.pattern_iter {
-      PatternIter::Slice(iter) => iter.next()?,
+      PatternIter::Slice(iter) => match iter.next() {
+        Some(pattern) => pattern,
+        None => return None,
+      },
       PatternIter::Map(iter) => match iter.next() {
         Some((pattern, dest)) => {
           self.current_pattern = Some(pattern.clone());
