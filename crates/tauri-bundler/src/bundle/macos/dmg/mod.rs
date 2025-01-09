@@ -194,10 +194,10 @@ pub fn bundle_project(settings: &Settings, bundles: &[Bundle]) -> crate::Result<
   fs::rename(bundle_dir.join(dmg_name), dmg_path.clone())?;
 
   // Sign DMG if needed
-
-  if let Some(keychain) = super::sign::keychain(settings.macos().signing_identity.as_deref())? {
-    // Skip self-signing DMGs https://github.com/tauri-apps/tauri/issues/12288
-    if keychain != "-" {
+  // skipping self-signing DMGs https://github.com/tauri-apps/tauri/issues/12288
+  let identity = settings.macos().signing_identity.as_deref();
+  if identity != Some("-") {
+    if let Some(keychain) = super::sign::keychain(identity)? {
       super::sign::sign(
         &keychain,
         vec![super::sign::SignTarget {
