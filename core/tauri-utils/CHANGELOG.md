@@ -1,5 +1,11 @@
 # Changelog
 
+## \[1.6.2]
+
+### Bug Fixes
+
+- [`a3584c143`](https://www.github.com/tauri-apps/tauri/commit/a3584c143eab10b8fa47b82ecbd9032d839fd9de) ([#11960](https://www.github.com/tauri-apps/tauri/pull/11960) by [@MarielaSassi](https://www.github.com/tauri-apps/tauri/../../MarielaSassi)) Enhance resource directory resolution to support running on distros like NixOS.
+
 ## \[1.6.1]
 
 ### New Features
