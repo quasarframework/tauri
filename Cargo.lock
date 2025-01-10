@@ -9563,12 +9563,12 @@ dependencies = [
 
 [[package]]
 name = "tauri-winres"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5993dc129e544393574288923d1ec447c857f3f644187f4fbf7d9a875fbfc4fb"
+checksum = "ff389a3b73a46a4537e17dfce42061c4f0c31be9fbb4f87e49150b94e3e26377"
 dependencies = [
  "embed-resource",
- "toml 0.7.8",
+ "toml 0.8.19",
 ]
 
 [[package]]
