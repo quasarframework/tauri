@@ -1,5 +1,11 @@
 # Changelog
 
+## \[0.14.6]
+
+### Dependencies
+
+- Upgraded to `tauri-utils@1.6.2`
+
 ## \[0.14.5]
 
 ### What's Changed

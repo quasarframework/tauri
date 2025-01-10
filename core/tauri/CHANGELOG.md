@@ -1,5 +1,14 @@
 # Changelog
 
+## \[1.8.2]
+
+### Dependencies
+
+- Upgraded to `tauri-utils@1.6.2`
+- Upgraded to `tauri-runtime@0.14.6`
+- Upgraded to `tauri-runtime-wry@0.14.11`
+- Upgraded to `tauri-macros@1.4.7`
+
 ## \[1.8.1]
 
 ### Bug Fixes

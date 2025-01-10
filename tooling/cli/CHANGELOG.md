@@ -1,5 +1,12 @@
 # Changelog
 
+## \[1.6.5]
+
+### Dependencies
+
+- Upgraded to `tauri-utils@1.6.2`
+- Upgraded to `tauri-bundler@1.7.3`
+
 ## \[1.6.4]
 
 ### Bug Fixes

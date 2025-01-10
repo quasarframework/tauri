@@ -1,6 +1,6 @@
 [package]
 name = "tauri-runtime"
-version = "0.14.5"
+version = "0.14.6"
 authors = [ "Tauri Programme within The Commons Conservancy" ]
 categories = [ "gui", "web-programming" ]
 license = "Apache-2.0 OR MIT"
@@ -30,7 +30,7 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(doc_cfg)'] }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 thiserror = "1"
-tauri-utils = { version = "1.6.1", path = "../tauri-utils" }
+tauri-utils = { version = "1.6.2", path = "../tauri-utils" }
 uuid = { version = "1", features = [ "v4" ] }
 http = "0.2"
 http-range = "0.1"
