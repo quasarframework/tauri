@@ -90,7 +90,7 @@ specta = { version = "^2.0.0-rc.20", optional = true, default-features = false, 
   "derive",
 ] }
 # TODO: remove when specta releases rc.21
-specta-util = { version = "^0.0.7", optional = true, default-features = false, features = [
+specta-util = { version = "^0.0.8", optional = true, default-features = false, features = [
   "export",
 ] }
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\", target_os = \"windows\", target_os = \"macos\"))".dependencies]
