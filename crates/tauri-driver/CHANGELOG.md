@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.0.2]
+
+### Enhancements
+
+- [`70f96e322`](https://www.github.com/tauri-apps/tauri/commit/70f96e3222871a1931a18d6093d7efcbc59e7fee) ([#12240](https://www.github.com/tauri-apps/tauri/pull/12240) by [@getong](https://www.github.com/tauri-apps/tauri/../../getong)) Updated `hyper` to version 1. This won't affect the user facing API.
+
 ## \[2.0.1]
 
 ### What's Changed

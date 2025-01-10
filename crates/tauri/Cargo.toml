@@ -1,6 +1,6 @@
 [package]
 name = "tauri"
-version = "2.2.0"
+version = "2.2.1"
 description = "Make tiny, secure apps for all desktop platforms with Tauri"
 exclude = ["/test", "/.scripts", "CHANGELOG.md", "/target"]
 readme = "README.md"
@@ -138,7 +138,7 @@ swift-rs = "1"
 [build-dependencies]
 glob = "0.3"
 heck = "0.5"
-tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.4" }
+tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.5" }
 tauri-utils = { path = "../tauri-utils/", version = "2.1.1", features = [
   "build",
 ] }
