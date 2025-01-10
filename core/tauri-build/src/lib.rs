@@ -55,7 +55,7 @@ fn copy_binaries(
       .to_string_lossy()
       .replace(&format!("-{target_triple}"), "");
 
-    if package_name.map_or(false, |n| n == &file_name) {
+    if package_name == Some(&file_name) {
       return Err(anyhow::anyhow!(
         "Cannot define a sidecar with the same name as the Cargo package name `{}`. Please change the sidecar name in the filesystem and the Tauri configuration.",
         file_name

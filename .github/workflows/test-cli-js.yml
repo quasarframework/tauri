@@ -38,7 +38,7 @@ jobs:
       - name: install Rust stable
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: 1.71
           override: true
       - name: setup node
         uses: actions/setup-node@v2

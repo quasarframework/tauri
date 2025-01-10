@@ -153,7 +153,7 @@ fn build_app_v2(cwd: &Path, envs: Vec<(&str, &str)>, config: &ConfigV2, target: 
   #[cfg(target_os = "macos")]
   command.args(["--bundles", target.name()]);
 
-  if config.bundle.create_updater_artifacts.map_or(false, |c| c) {
+  if config.bundle.create_updater_artifacts == Some(true) {
     #[cfg(windows)]
     command.args(["--bundles", "msi", "nsis"]);
 
