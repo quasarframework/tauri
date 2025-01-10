@@ -267,7 +267,7 @@ mod sys {
   }
 
   pub(super) fn error_contended(err: &Error) -> bool {
-    err.raw_os_error().map_or(false, |x| x == libc::EWOULDBLOCK)
+    err.raw_os_error() == Some(libc::EWOULDBLOCK)
   }
 
   pub(super) fn error_unsupported(err: &Error) -> bool {
