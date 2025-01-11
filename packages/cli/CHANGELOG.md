@@ -1,5 +1,15 @@
 # Changelog
 
+## \[2.2.4]
+
+### Bug Fixes
+
+- [`cad550445`](https://www.github.com/tauri-apps/tauri/commit/cad5504455ffa53e297cebff473c113b1afa5d29) ([#12354](https://www.github.com/tauri-apps/tauri/pull/12354) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed and issue that caused `tauri add` to try to install incorrect npm packages.
+
+### Dependencies
+
+- Upgraded to `tauri-cli@2.2.4`
+
 ## \[2.2.3]
 
 ### Enhancements
