@@ -1069,6 +1069,12 @@ impl WindowBuilder for WindowBuilderWrapper {
   }
 
   #[cfg(target_os = "macos")]
+  fn traffic_light_position(mut self, position: Position) -> Self {
+    self.inner = self.inner.with_traffic_light_inset(position);
+    self
+  }
+
+  #[cfg(target_os = "macos")]
   fn hidden_title(mut self, hidden: bool) -> Self {
     self.inner = self.inner.with_title_hidden(hidden);
     self
