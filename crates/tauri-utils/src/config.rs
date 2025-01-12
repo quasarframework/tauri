@@ -1581,6 +1581,7 @@ pub struct WindowConfig {
   #[serde(default, alias = "title-bar-style")]
   pub title_bar_style: TitleBarStyle,
   /// The position of the window controls on macOS.
+  ///
   /// Requires titleBarStyle: Overlay and decorations: true.
   #[serde(default, alias = "traffic-light-position")]
   pub traffic_light_position: Option<LogicalPosition>,
