@@ -192,7 +192,7 @@ config-toml = ["tauri-macros/config-toml"]
 image-ico = ["image/ico"]
 image-png = ["image/png"]
 macos-proxy = ["tauri-runtime-wry/macos-proxy"]
-specta = ["dep:specta", "dep:specta-util"]
+specta = ["dep:specta"]
 
 [[example]]
 name = "commands"
