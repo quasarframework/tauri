@@ -145,9 +145,9 @@ impl Interface for Rust {
       manifest
     };
 
-    let target_ios = target.as_ref().map_or(false, |target| {
-      target.ends_with("ios") || target.ends_with("ios-sim")
-    });
+    let target_ios = target
+      .as_ref()
+      .is_some_and(|target| target.ends_with("ios") || target.ends_with("ios-sim"));
     if target_ios {
       std::env::set_var(
         "IPHONEOS_DEPLOYMENT_TARGET",

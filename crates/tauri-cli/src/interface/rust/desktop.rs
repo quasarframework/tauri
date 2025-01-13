@@ -156,7 +156,7 @@ pub fn build(
   let out_dir = app_settings.out_dir(&options)?;
   let bin_path = app_settings.app_binary_path(&options)?;
 
-  if !std::env::var("STATIC_VCRUNTIME").map_or(false, |v| v == "false") {
+  if !std::env::var("STATIC_VCRUNTIME").is_ok_and(|v| v == "false") {
     std::env::set_var("STATIC_VCRUNTIME", "true");
   }
 
