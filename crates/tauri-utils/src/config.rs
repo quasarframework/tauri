@@ -329,6 +329,8 @@ pub struct AppImageConfig {
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct DebConfig {
+  /// override the debian package name.
+  pub package_name: Option<String>,
   /// The list of deb dependencies your application relies on.
   pub depends: Option<Vec<String>>,
   /// The list of dependencies the package provides.

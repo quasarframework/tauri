@@ -1354,6 +1354,7 @@ fn tauri_config_to_bundle_settings(
     long_description: config.long_description,
     external_bin: config.external_bin,
     deb: DebianSettings {
+      package_name: config.linux.deb.package_name,
       depends: if depends_deb.is_empty() {
         None
       } else {

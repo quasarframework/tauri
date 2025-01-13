@@ -168,6 +168,8 @@ pub struct UpdaterSettings {
 #[derive(Clone, Debug, Default)]
 pub struct DebianSettings {
   // OS-specific settings:
+  /// override the debian package name.
+  pub package_name: Option<String>,
   /// the list of debian dependencies.
   pub depends: Option<Vec<String>>,
   /// the list of dependencies the package provides.
