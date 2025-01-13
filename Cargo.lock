@@ -8616,18 +8616,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "specta-util"
-version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8113d65b58a6de3184b01d6df9e50b6d4bbe7f724251f576d84f23228824456"
-dependencies = [
- "ctor",
- "serde",
- "specta",
- "specta-macros",
-]
-
-[[package]]
 name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9010,7 +8998,7 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 
 [[package]]
 name = "tauri"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "anyhow",
  "bytes",
@@ -9048,7 +9036,6 @@ dependencies = [
  "serde_repr",
  "serialize-to-javascript",
  "specta",
- "specta-util",
  "swift-rs",
  "tauri",
  "tauri-build",

@@ -1,5 +1,11 @@
 # Changelog
 
+## \[2.2.2]
+
+### Bug Fixes
+
+- [`61e69db9e`](https://www.github.com/tauri-apps/tauri/commit/61e69db9e48f6a652ed3ecb05567c648c6e788d0) ([#12376](https://www.github.com/tauri-apps/tauri/pull/12376) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Widen `specta` version range to `^2.0.0-rc.16` again.
+
 ## \[2.2.1]
 
 ### Bug Fixes
