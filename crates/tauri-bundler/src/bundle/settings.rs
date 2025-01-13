@@ -222,6 +222,8 @@ pub struct AppImageSettings {
 /// The RPM bundle settings.
 #[derive(Clone, Debug, Default)]
 pub struct RpmSettings {
+  /// Override the RPM package name.
+  pub package_name: Option<String>,
   /// The list of RPM dependencies your application relies on.
   pub depends: Option<Vec<String>>,
   /// The list of RPM dependencies your application provides.

@@ -1377,6 +1377,7 @@ fn tauri_config_to_bundle_settings(
       files: config.linux.appimage.files,
     },
     rpm: RpmSettings {
+      package_name: config.linux.rpm.package_name,
       depends: if depends_rpm.is_empty() {
         None
       } else {
