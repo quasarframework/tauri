@@ -336,7 +336,7 @@ fn generate_md5sums(control_dir: &Path, data_dir: &Path) -> crate::Result<()> {
 /// `data_dir`.
 fn copy_resource_files(settings: &Settings, data_dir: &Path) -> crate::Result<()> {
   let resource_dir = data_dir.join("usr/lib").join(
-    &settings
+    settings
       .deb()
       .package_name
       .as_ref()

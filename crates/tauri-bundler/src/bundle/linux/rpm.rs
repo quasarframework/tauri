@@ -79,7 +79,7 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
     // This matches .deb compression. On a 240MB source binary the bundle will be 100KB larger than rpm's default while reducing build times by ~25%.
     // TODO: Default to Zstd in v3 to match rpm-rs new default in 0.16
     .unwrap_or(rpm::CompressionWithLevel::Gzip(6));
-  let mut builder = rpm::PackageBuilder::new(&name, version, &license, arch, summary)
+  let mut builder = rpm::PackageBuilder::new(name, version, &license, arch, summary)
     .epoch(epoch)
     .release(release)
     .compression(compression);
@@ -184,12 +184,14 @@ pub fn bundle_project(settings: &Settings) -> crate::Result<Vec<PathBuf>> {
 
   // Add resources
   if settings.resource_files().count() > 0 {
-    let resource_dir = Path::new("/usr/lib").join(&settings
-      .rpm()
-      .package_name
-      .as_ref()
-      .cloned()
-      .unwrap_or_else(|| settings.product_name().to_string()));
+    let resource_dir = Path::new("/usr/lib").join(
+      settings
+        .rpm()
+        .package_name
+        .as_ref()
+        .cloned()
+        .unwrap_or_else(|| settings.product_name().to_string()),
+    );
     // Create an empty file, needed to add a directory to the RPM package
     // (cf https://github.com/rpm-rs/rpm/issues/177)
     let empty_file_path = &package_dir.join("empty");
