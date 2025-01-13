@@ -656,8 +656,7 @@ Section Install
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
   ; Save $INSTDIR in registry for future installations
-  WriteRegStr SHCTX "${MANUPRODUCTKEY}" "InstallDir" $INSTDIR
-
+  WriteRegStr SHCTX "${MANUPRODUCTKEY}" "" $INSTDIR
 
   !if "${INSTALLMODE}" == "both"
     ; Save install mode to be selected by default for the next installation such as updating
