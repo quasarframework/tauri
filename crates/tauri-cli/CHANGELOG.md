@@ -1,5 +1,27 @@
 # Changelog
 
+## \[2.2.4]
+
+### Bug Fixes
+
+- [`cad550445`](https://www.github.com/tauri-apps/tauri/commit/cad5504455ffa53e297cebff473c113b1afa5d29) ([#12354](https://www.github.com/tauri-apps/tauri/pull/12354) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed and issue that caused `tauri add` to try to install incorrect npm packages.
+
+## \[2.2.3]
+
+### Enhancements
+
+- [`a0f2c84d5`](https://www.github.com/tauri-apps/tauri/commit/a0f2c84d51f5086c5055867d6f61ea90c463a26c) ([#12204](https://www.github.com/tauri-apps/tauri/pull/12204) by [@pjf-dev](https://www.github.com/tauri-apps/tauri/../../pjf-dev)) Enhance `tauri icon` command by including 64x64 png size in default icon sizes.
+
+### Bug Fixes
+
+- [`98f62e65a`](https://www.github.com/tauri-apps/tauri/commit/98f62e65a27a375272c6b4d9f34c23e142b9d3a6) ([#12246](https://www.github.com/tauri-apps/tauri/pull/12246) by [@marcomq](https://www.github.com/tauri-apps/tauri/../../marcomq)) Properly add NPM packages for community plugins when using the `tauri add` command.
+- [`b9a99a5c6`](https://www.github.com/tauri-apps/tauri/commit/b9a99a5c69d8a2a1a3ff30e500b46872258dca15) ([#12297](https://www.github.com/tauri-apps/tauri/pull/12297) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed an issue that caused the built-in dev server to constantly refresh on Linux. This only affected users who do not have `devUrl` point to a URL.
+- [`ef21ed9ac`](https://www.github.com/tauri-apps/tauri/commit/ef21ed9ac1c045c38b0c04e3d71a441694abc257) ([#12290](https://www.github.com/tauri-apps/tauri/pull/12290) by [@lucasfernog](https://www.github.com/tauri-apps/tauri/../../lucasfernog)) Fix iOS build failing when the development team contains spaces.
+
+### Dependencies
+
+- Upgraded to `tauri-bundler@2.2.1`
+
 ## \[2.2.2]
 
 ### Bug Fixes
