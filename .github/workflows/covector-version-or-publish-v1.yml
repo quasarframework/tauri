@@ -92,6 +92,8 @@ jobs:
           cargo update -p thread_local --precise 1.1.7
           cargo update -p mac-notification-sys --precise 0.6.1
           cargo update -p ignore --precise 0.4.18
+          cargo update -p tree_magic_mini --precise 3.0.3
+          cargo update -p native-tls --precise 0.2.11
 
           # cargo update -p system-deps:6.2.2 --precise 6.1.1
           # cargo update -p toml:0.7.8 --precise 0.7.3
