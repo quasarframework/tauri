@@ -9511,7 +9511,6 @@ dependencies = [
  "urlpattern",
  "uuid",
  "walkdir",
- "wry",
 ]
 
 [[package]]
@@ -11389,7 +11388,9 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "wry"
-version = "0.49.0"
+version = "0.48.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2e33c08b174442ff80d5c791020696f9f8b4e4a87b8cfc7494aad6167ec44e1"
 dependencies = [
  "base64 0.22.1",
  "block2",

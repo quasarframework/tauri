@@ -1535,11 +1535,12 @@ class Window {
 
   /** Change the default background throttling behaviour.
    *
-   * By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
-   * a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+   * By default, browsers use a suspend policy that will throttle timers and even unload
+   * the whole tab (view) to free resources after roughly 5 minutes when a view became
+   * minimized or hidden. This will pause all tasks until the documents visibility state
    * changes back from hidden to visible by bringing the view back to the foreground.
    *
-   ## Platform-specific
+   * ## Platform-specific
    *
    * - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
    * - **iOS**: Supported since version 17.0+.
@@ -1547,8 +1548,7 @@ class Window {
    *
    * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
    *
-   * @since 2.2.0
-   *
+   * @since 2.3.0
    */
   async setBackgroundThrottling(
     policy: BackgroundThrottlingPolicy
@@ -2375,10 +2375,10 @@ interface WindowOptions {
    * @since 2.1.0
    */
   backgroundColor?: Color
-  /**
-   * Change the default background throttling behaviour
+
+  /** Change the default background throttling behaviour.
    *
-   * #### Platform-specific
+   * ## Platform-specific
    *
    * - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
    * - **iOS**: Supported since version 17.0+.
@@ -2386,7 +2386,7 @@ interface WindowOptions {
    *
    * see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
    *
-   * @since 2.2.0
+   * @since 2.3.0
    */
   backgroundThrottling?: BackgroundThrottlingPolicy
 }

@@ -1427,20 +1427,10 @@ impl schemars::JsonSchema for Color {
 pub enum BackgroundThrottlingPolicy {
   /// A policy where background throttling is disabled
   Disabled,
-  /// A policy where a web view that’s not in a window fully suspends tasks.
+  /// A policy where a web view that’s not in a window fully suspends tasks. This is usually the default behavior in case no policy is set.
   Suspend,
   /// A policy where a web view that’s not in a window limits processing, but does not fully suspend tasks.
   Throttle,
-}
-
-impl From<BackgroundThrottlingPolicy> for wry::BackgroundThrottlingPolicy {
-  fn from(policy: BackgroundThrottlingPolicy) -> Self {
-    match policy {
-      BackgroundThrottlingPolicy::Disabled => Self::Disabled,
-      BackgroundThrottlingPolicy::Throttle => Self::Throttle,
-      BackgroundThrottlingPolicy::Suspend => Self::Suspend,
-    }
-  }
 }
 
 /// The window effects configuration object
@@ -1713,8 +1703,9 @@ pub struct WindowConfig {
 
   /// Change the default background throttling behaviour.
   ///
-  /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
-  /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+  /// By default, browsers use a suspend policy that will throttle timers and even unload
+  /// the whole tab (view) to free resources after roughly 5 minutes when a view became
+  /// minimized or hidden. This will pause all tasks until the documents visibility state
   /// changes back from hidden to visible by bringing the view back to the foreground.
   ///
   /// ## Platform-specific

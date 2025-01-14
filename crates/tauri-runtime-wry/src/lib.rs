@@ -4188,7 +4188,17 @@ fn create_webview<T: UserEvent>(
   }
 
   if let Some(background_throttling) = webview_attributes.background_throttling {
-    webview_builder = webview_builder.with_background_throttling(background_throttling.into());
+    webview_builder = webview_builder.with_background_throttling(match background_throttling {
+      tauri_utils::config::BackgroundThrottlingPolicy::Disabled => {
+        wry::BackgroundThrottlingPolicy::Disabled
+      }
+      tauri_utils::config::BackgroundThrottlingPolicy::Suspend => {
+        wry::BackgroundThrottlingPolicy::Suspend
+      }
+      tauri_utils::config::BackgroundThrottlingPolicy::Throttle => {
+        wry::BackgroundThrottlingPolicy::Throttle
+      }
+    });
   }
 
   if let Some(color) = webview_attributes.background_color {

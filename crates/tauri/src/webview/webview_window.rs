@@ -980,8 +980,9 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
 
   /// Change the default background throttling behaviour.
   ///
-  /// By default, browsers throttle timers and even unload the whole tab (view) to free resources after roughly 5 minutes when
-  /// a view became minimized or hidden. This will permanently suspend all tasks until the documents visibility state
+  /// By default, browsers use a suspend policy that will throttle timers and even unload
+  /// the whole tab (view) to free resources after roughly 5 minutes when a view became
+  /// minimized or hidden. This will pause all tasks until the documents visibility state
   /// changes back from hidden to visible by bringing the view back to the foreground.
   ///
   /// ## Platform-specific
@@ -992,7 +993,7 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   ///
   /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
   #[must_use]
-  pub fn background_throttling(mut self, policy: Option<BackgroundThrottlingPolicy>) -> Self {
+  pub fn background_throttling(mut self, policy: BackgroundThrottlingPolicy) -> Self {
     self.webview_builder = self.webview_builder.background_throttling(policy);
     self
   }
