@@ -74,6 +74,7 @@ jobs:
         env:
           CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
         # The --precise flag can only be used once per invocation.
+        # at least h2 and syn don't need the precise flag here with cargo 1.84
         run: |
           cargo update -p backtrace --precise 0.3.68
           cargo update -p hyper --precise 0.14.28
@@ -83,6 +84,8 @@ jobs:
           cargo update -p tempfile --precise 3.6.0
           cargo update -p regex --precise 1.9.6
           cargo update -p tar --precise 0.4.39
+          cargo update -p serde --precise 1.0.210
+          cargo update -p syn:2 --precise 2.0.67
 
           # cargo update -p system-deps:6.2.2 --precise 6.1.1
           # cargo update -p toml:0.7.8 --precise 0.7.3
