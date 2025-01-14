@@ -79,6 +79,7 @@ jobs:
           cargo update -p hyper --precise 0.14.28
           cargo update -p h2 --precise 0.3.20
           cargo update -p serde_json --precise 1.0.97
+          cargo update -p arboard --precise 3.2.1
 
           # cargo update -p system-deps:6.2.2 --precise 6.1.1
           # cargo update -p toml:0.7.8 --precise 0.7.3
