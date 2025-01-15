@@ -126,7 +126,6 @@ impl From<Options> for BuildOptions {
 }
 
 pub fn command(options: Options, noise_level: NoiseLevel) -> Result<()> {
-  println!("Running command with options: {:#?}", options);
   crate::helpers::app_paths::resolve();
 
   let mut build_options: BuildOptions = options.clone().into();
@@ -244,26 +243,12 @@ pub fn command(options: Options, noise_level: NoiseLevel) -> Result<()> {
     tauri_config,
     &mut config,
     &mut env,
-    noise_level
+    noise_level,
   )?;
 
-
-  // let cli_options = CliOptions {
-  //   dev: false,
-  //   features: options.features.clone(),
-  //   args: build_options.args.clone(),
-  //   noise_level,
-  //   vars: Default::default(),
-  //   config: options.config.clone(),
-  //   target_device: None,
-  // };
-  // let _handle = write_options(
-  //   &tauri_config.lock().unwrap().as_ref().unwrap().identifier,
-  //   cli_options,
-  // )?;
-  open_and_wait(&config, &env);
-
-
+  if open {
+    open_and_wait(&config, &env);
+  }
 
   Ok(())
 }
@@ -308,122 +293,126 @@ fn run_build(
     cli_options,
   )?;
 
-  // let mut out_files = Vec::new();
+  if options.open {
+    return Ok(handle);
+  }
 
-  // call_for_targets_with_fallback(
-  //   options.targets.iter(),
-  //   &detect_target_ok,
-  //   env,
-  //   |target: &Target| -> Result<()> {
-  //     let mut app_version = config.bundle_version().clone();
-  //     if let Some(build_number) = options.build_number {
-  //       app_version.push_extra(build_number);
-  //     }
+  let mut out_files = Vec::new();
 
-  //     let credentials = auth_credentials_from_env()?;
-  //     let skip_signing = credentials.is_some();
+  call_for_targets_with_fallback(
+    options.targets.iter(),
+    &detect_target_ok,
+    env,
+    |target: &Target| -> Result<()> {
+      let mut app_version = config.bundle_version().clone();
+      if let Some(build_number) = options.build_number {
+        app_version.push_extra(build_number);
+      }
 
-  //     let mut build_config = BuildConfig::new().allow_provisioning_updates();
-  //     if let Some(credentials) = &credentials {
-  //       build_config = build_config
-  //         .authentication_credentials(credentials.clone())
-  //         .skip_codesign();
-  //     }
+      let credentials = auth_credentials_from_env()?;
+      let skip_signing = credentials.is_some();
 
-  //     target.build(config, env, noise_level, profile, build_config)?;
+      let mut build_config = BuildConfig::new().allow_provisioning_updates();
+      if let Some(credentials) = &credentials {
+        build_config = build_config
+          .authentication_credentials(credentials.clone())
+          .skip_codesign();
+      }
 
-  //     let mut archive_config = ArchiveConfig::new();
-  //     if skip_signing {
-  //       archive_config = archive_config.skip_codesign();
-  //     }
+      target.build(config, env, noise_level, profile, build_config)?;
 
-  //     target.archive(
-  //       config,
-  //       env,
-  //       noise_level,
-  //       profile,
-  //       Some(app_version),
-  //       archive_config,
-  //     )?;
+      let mut archive_config = ArchiveConfig::new();
+      if skip_signing {
+        archive_config = archive_config.skip_codesign();
+      }
 
-  //     let out_dir = config.export_dir().join(target.arch);
+      target.archive(
+        config,
+        env,
+        noise_level,
+        profile,
+        Some(app_version),
+        archive_config,
+      )?;
 
-  //     if target.sdk == "iphonesimulator" {
-  //       fs::create_dir_all(&out_dir)?;
+      let out_dir = config.export_dir().join(target.arch);
 
-  //       let app_path = config
-  //         .archive_dir()
-  //         .join(format!("{}.xcarchive", config.scheme()))
-  //         .join("Products")
-  //         .join("Applications")
-  //         .join(config.app().stylized_name())
-  //         .with_extension("app");
+      if target.sdk == "iphonesimulator" {
+        fs::create_dir_all(&out_dir)?;
 
-  //       let path = out_dir.join(app_path.file_name().unwrap());
-  //       fs::rename(&app_path, &path)?;
-  //       out_files.push(path);
-  //     } else {
-  //       // if we skipped code signing, we do not have the entitlements applied to our exported IPA
-  //       // we must force sign the app binary with a dummy certificate just to preserve the entitlements
-  //       // target.export() will sign it with an actual certificate for us
-  //       if skip_signing {
-  //         let password = Alphanumeric.sample_string(&mut rand::thread_rng(), 16);
-  //         let certificate = tauri_macos_sign::certificate::generate_self_signed(
-  //           tauri_macos_sign::certificate::SelfSignedCertificateRequest {
-  //             algorithm: "rsa".to_string(),
-  //             profile: tauri_macos_sign::certificate::CertificateProfile::AppleDistribution,
-  //             team_id: "unset".to_string(),
-  //             person_name: "Tauri".to_string(),
-  //             country_name: "NL".to_string(),
-  //             validity_days: 365,
-  //             password: password.clone(),
-  //           },
-  //         )?;
-  //         let tmp_dir = tempfile::tempdir()?;
-  //         let cert_path = tmp_dir.path().join("cert.p12");
-  //         std::fs::write(&cert_path, certificate)?;
-  //         let self_signed_cert_keychain =
-  //           tauri_macos_sign::Keychain::with_certificate_file(&cert_path, &password.into())?;
+        let app_path = config
+          .archive_dir()
+          .join(format!("{}.xcarchive", config.scheme()))
+          .join("Products")
+          .join("Applications")
+          .join(config.app().stylized_name())
+          .with_extension("app");
 
-  //         let app_dir = config
-  //           .export_dir()
-  //           .join(format!("{}.xcarchive", config.scheme()))
-  //           .join("Products/Applications")
-  //           .join(format!("{}.app", config.app().stylized_name()));
+        let path = out_dir.join(app_path.file_name().unwrap());
+        fs::rename(&app_path, &path)?;
+        out_files.push(path);
+      } else {
+        // if we skipped code signing, we do not have the entitlements applied to our exported IPA
+        // we must force sign the app binary with a dummy certificate just to preserve the entitlements
+        // target.export() will sign it with an actual certificate for us
+        if skip_signing {
+          let password = Alphanumeric.sample_string(&mut rand::thread_rng(), 16);
+          let certificate = tauri_macos_sign::certificate::generate_self_signed(
+            tauri_macos_sign::certificate::SelfSignedCertificateRequest {
+              algorithm: "rsa".to_string(),
+              profile: tauri_macos_sign::certificate::CertificateProfile::AppleDistribution,
+              team_id: "unset".to_string(),
+              person_name: "Tauri".to_string(),
+              country_name: "NL".to_string(),
+              validity_days: 365,
+              password: password.clone(),
+            },
+          )?;
+          let tmp_dir = tempfile::tempdir()?;
+          let cert_path = tmp_dir.path().join("cert.p12");
+          std::fs::write(&cert_path, certificate)?;
+          let self_signed_cert_keychain =
+            tauri_macos_sign::Keychain::with_certificate_file(&cert_path, &password.into())?;
 
-  //         self_signed_cert_keychain.sign(
-  //           &app_dir.join(config.app().stylized_name()),
-  //           Some(
-  //             &config
-  //               .project_dir()
-  //               .join(config.scheme())
-  //               .join(format!("{}.entitlements", config.scheme())),
-  //           ),
-  //           false,
-  //         )?;
-  //       }
+          let app_dir = config
+            .export_dir()
+            .join(format!("{}.xcarchive", config.scheme()))
+            .join("Products/Applications")
+            .join(format!("{}.app", config.app().stylized_name()));
 
-  //       let mut export_config = ExportConfig::new().allow_provisioning_updates();
-  //       if let Some(credentials) = &credentials {
-  //         export_config = export_config.authentication_credentials(credentials.clone());
-  //       }
+          self_signed_cert_keychain.sign(
+            &app_dir.join(config.app().stylized_name()),
+            Some(
+              &config
+                .project_dir()
+                .join(config.scheme())
+                .join(format!("{}.entitlements", config.scheme())),
+            ),
+            false,
+          )?;
+        }
 
-  //       target.export(config, env, noise_level, export_config)?;
+        let mut export_config = ExportConfig::new().allow_provisioning_updates();
+        if let Some(credentials) = &credentials {
+          export_config = export_config.authentication_credentials(credentials.clone());
+        }
 
-  //       if let Ok(ipa_path) = config.ipa_path() {
-  //         fs::create_dir_all(&out_dir)?;
-  //         let path = out_dir.join(ipa_path.file_name().unwrap());
-  //         fs::rename(&ipa_path, &path)?;
-  //         out_files.push(path);
-  //       }
-  //     }
+        target.export(config, env, noise_level, export_config)?;
 
-  //     Ok(())
-  //   },
-  // )
-  // .map_err(|e: TargetInvalid| anyhow::anyhow!(e.to_string()))??;
+        if let Ok(ipa_path) = config.ipa_path() {
+          fs::create_dir_all(&out_dir)?;
+          let path = out_dir.join(ipa_path.file_name().unwrap());
+          fs::rename(&ipa_path, &path)?;
+          out_files.push(path);
+        }
+      }
 
-  // log_finished(out_files, "iOS Bundle");
+      Ok(())
+    },
+  )
+  .map_err(|e: TargetInvalid| anyhow::anyhow!(e.to_string()))??;
+
+  log_finished(out_files, "iOS Bundle");
 
   Ok(handle)
 }
