@@ -124,7 +124,7 @@ impl<R: Runtime> WebviewManager<R> {
     let app_manager = manager.manager();
 
     let is_init_global = app_manager.config.app.with_global_tauri;
-    let mut plugin_init_scripts = app_manager
+    let plugin_init_scripts = app_manager
       .plugins
       .lock()
       .expect("poisoned plugin store")
@@ -150,8 +150,9 @@ impl<R: Runtime> WebviewManager<R> {
     }
     .render_default(&Default::default())?;
 
-    let mut all_initialization_scripts = vec![
-      r"
+    let mut all_initialization_scripts: Vec<String> = vec![];
+    all_initialization_scripts.push(
+        r"
         Object.defineProperty(window, 'isTauri', {
           value: true,
         });
@@ -163,9 +164,10 @@ impl<R: Runtime> WebviewManager<R> {
             }
           })
         }
-      ".to_string(),
-      self.invoke_initialization_script.to_string(),
-      format!(
+      ".to_string()
+    );
+    all_initialization_scripts.push(self.invoke_initialization_script.to_string());
+    all_initialization_scripts.push(format!(
         r#"
           Object.defineProperty(window.__TAURI_INTERNALS__, 'metadata', {{
             value: {{
@@ -176,32 +178,37 @@ impl<R: Runtime> WebviewManager<R> {
         "#,
         current_window_label = serde_json::to_string(window_label)?,
         current_webview_label = serde_json::to_string(&label)?,
-      ).to_string(),
-      self.initialization_script(
+      ));
+    all_initialization_scripts.push(self.initialization_script(
         app_manager,
         &ipc_init.into_string(),
         &pattern_init.into_string(),
         is_init_global,
         use_https_scheme,
-      )?.to_string(),
-    ];
+      )?.to_string());
 
-    all_initialization_scripts.append(&mut plugin_init_scripts);
+    for plugin_init_script in plugin_init_scripts {
+      all_initialization_scripts.push(plugin_init_script.to_string());
+    }
 
     #[cfg(feature = "isolation")]
     if let crate::Pattern::Isolation { schema, .. } = &*app_manager.pattern {
-      all_initialization_scripts.push(IsolationJavascript {
-        isolation_src: &crate::pattern::format_real_schema(schema, use_https_scheme),
-        style: tauri_utils::pattern::isolation::IFRAME_STYLE,
-      }
-      .render_default(&Default::default())?
-      .into_string());
+      all_initialization_scripts.push(
+        IsolationJavascript {
+          isolation_src: &crate::pattern::format_real_schema(schema, use_https_scheme),
+          style: tauri_utils::pattern::isolation::IFRAME_STYLE,
+        }
+        .render_default(&Default::default())?
+        .to_string()
+      );
     }
 
     if let Some(plugin_global_api_scripts) = &*app_manager.plugin_global_api_scripts {
-      all_initialization_scripts.append(&mut plugin_global_api_scripts.iter().map(|s| s.to_string()).collect::<Vec<String>>());
+      for script in plugin_global_api_scripts.iter() {
+        all_initialization_scripts.push(script.to_string());
+      }
     }
-    
+
     webview_attributes.initialization_scripts.splice(0..0, all_initialization_scripts);
 
     pending.webview_attributes = webview_attributes;
