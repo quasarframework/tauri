@@ -152,7 +152,7 @@ impl<R: Runtime> WebviewManager<R> {
 
     let mut all_initialization_scripts: Vec<String> = vec![];
     all_initialization_scripts.push(
-        r"
+      r"
         Object.defineProperty(window, 'isTauri', {
           value: true,
         });
@@ -164,11 +164,12 @@ impl<R: Runtime> WebviewManager<R> {
             }
           })
         }
-      ".to_string()
+      "
+      .to_string(),
     );
     all_initialization_scripts.push(self.invoke_initialization_script.to_string());
     all_initialization_scripts.push(format!(
-        r#"
+      r#"
           Object.defineProperty(window.__TAURI_INTERNALS__, 'metadata', {{
             value: {{
               currentWindow: {{ label: {current_window_label} }},
@@ -176,16 +177,20 @@ impl<R: Runtime> WebviewManager<R> {
             }}
           }})
         "#,
-        current_window_label = serde_json::to_string(window_label)?,
-        current_webview_label = serde_json::to_string(&label)?,
-      ));
-    all_initialization_scripts.push(self.initialization_script(
-        app_manager,
-        &ipc_init.into_string(),
-        &pattern_init.into_string(),
-        is_init_global,
-        use_https_scheme,
-      )?.to_string());
+      current_window_label = serde_json::to_string(window_label)?,
+      current_webview_label = serde_json::to_string(&label)?,
+    ));
+    all_initialization_scripts.push(
+      self
+        .initialization_script(
+          app_manager,
+          &ipc_init.into_string(),
+          &pattern_init.into_string(),
+          is_init_global,
+          use_https_scheme,
+        )?
+        .to_string(),
+    );
 
     for plugin_init_script in plugin_init_scripts {
       all_initialization_scripts.push(plugin_init_script.to_string());
@@ -199,7 +204,7 @@ impl<R: Runtime> WebviewManager<R> {
           style: tauri_utils::pattern::isolation::IFRAME_STYLE,
         }
         .render_default(&Default::default())?
-        .to_string()
+        .to_string(),
       );
     }
 
@@ -209,7 +214,9 @@ impl<R: Runtime> WebviewManager<R> {
       }
     }
 
-    webview_attributes.initialization_scripts.splice(0..0, all_initialization_scripts);
+    webview_attributes
+      .initialization_scripts
+      .splice(0..0, all_initialization_scripts);
 
     pending.webview_attributes = webview_attributes;
 
