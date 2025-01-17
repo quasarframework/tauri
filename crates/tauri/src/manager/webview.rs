@@ -150,9 +150,9 @@ impl<R: Runtime> WebviewManager<R> {
     }
     .render_default(&Default::default())?;
 
-    webview_attributes = webview_attributes
-      .initialization_script(
-        r"
+    let mut all_initialization_scripts: Vec<String> = vec![];
+    all_initialization_scripts.push(
+      r"
         Object.defineProperty(window, 'isTauri', {
           value: true,
         });
@@ -164,11 +164,12 @@ impl<R: Runtime> WebviewManager<R> {
             }
           })
         }
-      ",
-      )
-      .initialization_script(&self.invoke_initialization_script)
-      .initialization_script(&format!(
-        r#"
+      "
+      .to_string(),
+    );
+    all_initialization_scripts.push(self.invoke_initialization_script.to_string());
+    all_initialization_scripts.push(format!(
+      r#"
           Object.defineProperty(window.__TAURI_INTERNALS__, 'metadata', {{
             value: {{
               currentWindow: {{ label: {current_window_label} }},
@@ -176,38 +177,46 @@ impl<R: Runtime> WebviewManager<R> {
             }}
           }})
         "#,
-        current_window_label = serde_json::to_string(window_label)?,
-        current_webview_label = serde_json::to_string(&label)?,
-      ))
-      .initialization_script(&self.initialization_script(
-        app_manager,
-        &ipc_init.into_string(),
-        &pattern_init.into_string(),
-        is_init_global,
-        use_https_scheme,
-      )?);
+      current_window_label = serde_json::to_string(window_label)?,
+      current_webview_label = serde_json::to_string(&label)?,
+    ));
+    all_initialization_scripts.push(
+      self
+        .initialization_script(
+          app_manager,
+          &ipc_init.into_string(),
+          &pattern_init.into_string(),
+          is_init_global,
+          use_https_scheme,
+        )?
+        .to_string(),
+    );
 
     for plugin_init_script in plugin_init_scripts {
-      webview_attributes = webview_attributes.initialization_script(&plugin_init_script);
+      all_initialization_scripts.push(plugin_init_script.to_string());
     }
 
     #[cfg(feature = "isolation")]
     if let crate::Pattern::Isolation { schema, .. } = &*app_manager.pattern {
-      webview_attributes = webview_attributes.initialization_script(
-        &IsolationJavascript {
+      all_initialization_scripts.push(
+        IsolationJavascript {
           isolation_src: &crate::pattern::format_real_schema(schema, use_https_scheme),
           style: tauri_utils::pattern::isolation::IFRAME_STYLE,
         }
         .render_default(&Default::default())?
-        .into_string(),
+        .to_string(),
       );
     }
 
     if let Some(plugin_global_api_scripts) = &*app_manager.plugin_global_api_scripts {
       for script in plugin_global_api_scripts.iter() {
-        webview_attributes = webview_attributes.initialization_script(script);
+        all_initialization_scripts.push(script.to_string());
       }
     }
+
+    webview_attributes
+      .initialization_scripts
+      .splice(0..0, all_initialization_scripts);
 
     pending.webview_attributes = webview_attributes;
 
