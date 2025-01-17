@@ -1,6 +1,6 @@
 [package]
 name = "tauri"
-version = "2.2.0"
+version = "2.2.2"
 description = "Make tiny, secure apps for all desktop platforms with Tauri"
 exclude = ["/test", "/.scripts", "CHANGELOG.md", "/target"]
 readme = "README.md"
@@ -85,13 +85,9 @@ tracing = { version = "0.1", optional = true }
 heck = "0.5"
 log = "0.4.21"
 dunce = "1"
-specta = { version = "^2.0.0-rc.20", optional = true, default-features = false, features = [
+specta = { version = "^2.0.0-rc.16", optional = true, default-features = false, features = [
   "function",
   "derive",
-] }
-# TODO: remove when specta releases rc.21
-specta-util = { version = "^0.0.7", optional = true, default-features = false, features = [
-  "export",
 ] }
 [target."cfg(any(target_os = \"linux\", target_os = \"dragonfly\", target_os = \"freebsd\", target_os = \"openbsd\", target_os = \"netbsd\", target_os = \"windows\", target_os = \"macos\"))".dependencies]
 muda = { version = "0.15", default-features = false, features = ["serde"] }
@@ -136,8 +132,9 @@ libc = "0.2"
 swift-rs = "1"
 
 [build-dependencies]
+glob = "0.3"
 heck = "0.5"
-tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.4" }
+tauri-build = { path = "../tauri-build/", default-features = false, version = "2.0.5" }
 tauri-utils = { path = "../tauri-utils/", version = "2.1.1", features = [
   "build",
 ] }
@@ -150,7 +147,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri = { path = ".", default-features = false, features = ["wry"] }
 tokio = { version = "1", features = ["full"] }
-cargo_toml = "0.17"
+cargo_toml = "0.21"
 http-range = "0.1.5"
 
 # macOS
@@ -195,7 +192,7 @@ config-toml = ["tauri-macros/config-toml"]
 image-ico = ["image/ico"]
 image-png = ["image/png"]
 macos-proxy = ["tauri-runtime-wry/macos-proxy"]
-specta = ["dep:specta", "dep:specta-util"]
+specta = ["dep:specta"]
 
 [[example]]
 name = "commands"
