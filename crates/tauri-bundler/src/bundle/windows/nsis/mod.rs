@@ -595,19 +595,22 @@ fn association_description(
 type ResourcesMap = BTreeMap<PathBuf, (PathBuf, PathBuf)>;
 fn generate_resource_data(settings: &Settings) -> crate::Result<ResourcesMap> {
   let mut resources = ResourcesMap::new();
+
   let cwd = std::env::current_dir()?;
 
   let mut added_resources = Vec::new();
 
   // Adding WebViewer2Loader.dll in case windows-gnu toolchain is used
-  let loader_path =
-    dunce::simplified(&settings.project_out_directory().join("WebView2Loader.dll")).to_path_buf();
-  if loader_path.exists() {
-    added_resources.push(loader_path.clone());
-    resources.insert(
-      loader_path,
-      (PathBuf::new(), PathBuf::from("WebView2Loader.dll")),
-    );
+  if settings.target().ends_with("-gnu") {
+    let loader_path =
+      dunce::simplified(&settings.project_out_directory().join("WebView2Loader.dll")).to_path_buf();
+    if loader_path.exists() {
+      added_resources.push(loader_path.clone());
+      resources.insert(
+        loader_path,
+        (PathBuf::new(), PathBuf::from("WebView2Loader.dll")),
+      );
+    }
   }
 
   for resource in settings.resource_files().iter() {
