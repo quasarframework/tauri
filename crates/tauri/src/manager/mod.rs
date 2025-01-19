@@ -24,7 +24,7 @@ use crate::{
     AppHandle, ChannelInterceptor, GlobalWebviewEventListener, GlobalWindowEventListener,
     OnPageLoad,
   },
-  event::{assert_event_name_is_valid, Event, EventId, EventTarget, Listeners},
+  event::{is_event_name_valid, Event, EventId, EventTarget, Listeners},
   ipc::{Invoke, InvokeHandler, RuntimeAuthority},
   plugin::PluginStore,
   utils::{config::Config, PackageInfo},
@@ -38,6 +38,15 @@ mod menu;
 mod tray;
 pub mod webview;
 pub mod window;
+
+macro_rules! assert_event_name_is_valid {
+  {$event:expr} => {
+    assert!(
+      is_event_name_valid($event),
+      "Event name must include only alphanumeric characters, `-`, `/`, `:` and `_`."
+    );
+  }
+}
 
 #[derive(Default)]
 /// Spaced and quoted Content-Security-Policy hash values.
@@ -507,23 +516,27 @@ impl<R: Runtime> AppManager<R> {
     &self.package_info
   }
 
+  /// # Panics
+  /// Will panic if `event` contains other characters than alphanumeric, `-`, `/`, `:` and `_`
   pub fn listen<F: Fn(Event) + Send + 'static>(
     &self,
     event: String,
     target: EventTarget,
     handler: F,
   ) -> EventId {
-    assert_event_name_is_valid(&event);
+    assert_event_name_is_valid!(&event);
     self.listeners().listen(event, target, handler)
   }
 
+  /// # Panics
+  /// Will panic if `event` contains other characters than alphanumeric, `-`, `/`, `:` and `_`
   pub fn once<F: FnOnce(Event) + Send + 'static>(
     &self,
     event: String,
     target: EventTarget,
     handler: F,
   ) -> EventId {
-    assert_event_name_is_valid(&event);
+    assert_event_name_is_valid!(&event);
     self.listeners().once(event, target, handler)
   }
 
@@ -535,8 +548,10 @@ impl<R: Runtime> AppManager<R> {
     feature = "tracing",
     tracing::instrument("app::emit", skip(self, payload))
   )]
+  /// # Panics
+  /// Will panic if `event` contains other characters than alphanumeric, `-`, `/`, `:` and `_`
   pub fn emit<S: Serialize + Clone>(&self, event: &str, payload: S) -> crate::Result<()> {
-    assert_event_name_is_valid(event);
+    assert_event_name_is_valid!(event);
 
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("emit::run").entered();
@@ -560,12 +575,14 @@ impl<R: Runtime> AppManager<R> {
     feature = "tracing",
     tracing::instrument("app::emit::filter", skip(self, payload, filter))
   )]
+  /// # Panics
+  /// Will panic if `event` contains other characters than alphanumeric, `-`, `/`, `:` and `_`
   pub fn emit_filter<S, F>(&self, event: &str, payload: S, filter: F) -> crate::Result<()>
   where
     S: Serialize + Clone,
     F: Fn(&EventTarget) -> bool,
   {
-    assert_event_name_is_valid(event);
+    assert_event_name_is_valid!(event);
 
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("emit::run").entered();
@@ -589,6 +606,8 @@ impl<R: Runtime> AppManager<R> {
     feature = "tracing",
     tracing::instrument("app::emit::to", skip(self, target, payload), fields(target))
   )]
+  /// # Panics
+  /// Will panic if `event` contains other characters than alphanumeric, `-`, `/`, `:` and `_`
   pub fn emit_to<I, S>(&self, target: I, event: &str, payload: S) -> crate::Result<()>
   where
     I: Into<EventTarget>,
