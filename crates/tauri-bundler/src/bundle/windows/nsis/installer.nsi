@@ -56,7 +56,8 @@ ${StrLoc}
 !define WEBVIEW2INSTALLERPATH "{{webview2_installer_path}}"
 !define MINIMUMWEBVIEW2VERSION "{{minimum_webview2_version}}"
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCTNAME}"
-!define MANUPRODUCTKEY "Software\${MANUFACTURER}\${PRODUCTNAME}"
+!define MANUKEY "Software\${MANUFACTURER}"
+!define MANUPRODUCTKEY "${MANUKEY}\${PRODUCTNAME}"
 !define UNINSTALLERSIGNCOMMAND "{{uninstaller_sign_cmd}}"
 !define ESTIMATEDSIZE "{{estimated_size}}"
 !define STARTMENUFOLDER "{{start_menu_folder}}"
@@ -834,7 +835,14 @@ Section Uninstall
     DeleteRegKey HKCU "${UNINSTKEY}"
   !endif
 
+  ; Clear the install location $INSTDIR from registry
+  DeleteRegKey SHCTX "${MANUPRODUCTKEY}"
+  DeleteRegKey /ifempty SHCTX "${MANUKEY}"
+
+  ; Clear the install language from registry
   DeleteRegValue HKCU "${MANUPRODUCTKEY}" "Installer Language"
+  DeleteRegKey /ifempty HKCU "${MANUPRODUCTKEY}"
+  DeleteRegKey /ifempty HKCU "${MANUKEY}"
 
   ; Delete app data if the checkbox is selected
   ; and if not updating
