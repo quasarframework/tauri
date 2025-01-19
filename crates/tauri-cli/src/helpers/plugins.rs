@@ -70,7 +70,7 @@ pub fn known_plugins() -> HashMap<&'static str, PluginMetadata> {
     "upload",
     "websocket",
     "opener",
-    "clipboard-manager"
+    "clipboard-manager",
   ] {
     plugins.entry(p).or_default();
   }
