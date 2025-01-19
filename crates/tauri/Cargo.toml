@@ -116,7 +116,7 @@ objc2-app-kit = { version = "0.2", features = [
 window-vibrancy = "0.5"
 
 [target."cfg(windows)".dependencies]
-webview2-com = "0.34"
+webview2-com = "0.35"
 window-vibrancy = "0.5"
 
 [target."cfg(windows)".dependencies.windows]
