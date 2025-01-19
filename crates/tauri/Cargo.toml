@@ -120,7 +120,7 @@ webview2-com = "0.34"
 window-vibrancy = "0.5"
 
 [target."cfg(windows)".dependencies.windows]
-version = "0.58"
+version = "0.59"
 features = ["Win32_Foundation"]
 
 [target."cfg(target_os = \"android\")".dependencies]
