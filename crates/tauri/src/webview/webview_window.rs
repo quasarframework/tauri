@@ -29,7 +29,7 @@ use crate::{
 };
 use serde::Serialize;
 use tauri_utils::{
-  config::{Color, WebviewUrl, WindowConfig},
+  config::{BackgroundThrottlingPolicy, Color, WebviewUrl, WindowConfig},
   Theme,
 };
 use url::Url;
@@ -975,6 +975,26 @@ impl<R: Runtime, M: Manager<R>> WebviewWindowBuilder<'_, R, M> {
   pub fn background_color(mut self, color: Color) -> Self {
     self.window_builder = self.window_builder.background_color(color);
     self.webview_builder = self.webview_builder.background_color(color);
+    self
+  }
+
+  /// Change the default background throttling behaviour.
+  ///
+  /// By default, browsers use a suspend policy that will throttle timers and even unload
+  /// the whole tab (view) to free resources after roughly 5 minutes when a view became
+  /// minimized or hidden. This will pause all tasks until the documents visibility state
+  /// changes back from hidden to visible by bringing the view back to the foreground.
+  ///
+  /// ## Platform-specific
+  ///
+  /// - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.
+  /// - **iOS**: Supported since version 17.0+.
+  /// - **macOS**: Supported since version 14.0+.
+  ///
+  /// see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578
+  #[must_use]
+  pub fn background_throttling(mut self, policy: BackgroundThrottlingPolicy) -> Self {
+    self.webview_builder = self.webview_builder.background_throttling(policy);
     self
   }
 }

@@ -516,6 +516,17 @@
               "type": "null"
             }
           ]
+        },
+        "backgroundThrottling": {
+          "description": "Change the default background throttling behaviour.\n\n By default, browsers use a suspend policy that will throttle timers and even unload\n the whole tab (view) to free resources after roughly 5 minutes when a view became\n minimized or hidden. This will pause all tasks until the documents visibility state\n changes back from hidden to visible by bringing the view back to the foreground.\n\n ## Platform-specific\n\n - **Linux / Windows / Android**: Unsupported. Workarounds like a pending WebLock transaction might suffice.\n - **iOS**: Supported since version 17.0+.\n - **macOS**: Supported since version 14.0+.\n\n see https://github.com/tauri-apps/tauri/issues/5250#issuecomment-2569380578",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/BackgroundThrottlingPolicy"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -945,6 +956,32 @@
               "minimum": 0.0
             }
           }
+        }
+      ]
+    },
+    "BackgroundThrottlingPolicy": {
+      "description": "Background throttling policy.",
+      "oneOf": [
+        {
+          "description": "A policy where background throttling is disabled",
+          "type": "string",
+          "enum": [
+            "disabled"
+          ]
+        },
+        {
+          "description": "A policy where a web view that’s not in a window fully suspends tasks. This is usually the default behavior in case no policy is set.",
+          "type": "string",
+          "enum": [
+            "suspend"
+          ]
+        },
+        {
+          "description": "A policy where a web view that’s not in a window limits processing, but does not fully suspend tasks.",
+          "type": "string",
+          "enum": [
+            "throttle"
+          ]
         }
       ]
     },
