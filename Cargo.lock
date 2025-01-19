@@ -9124,7 +9124,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-cli"
-version = "2.2.5"
+version = "2.2.6"
 dependencies = [
  "anyhow",
  "ar",

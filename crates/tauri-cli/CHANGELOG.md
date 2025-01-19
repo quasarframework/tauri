@@ -1,5 +1,15 @@
 # Changelog
 
+## \[2.2.6]
+
+### Enhancements
+
+- [`0b79af711`](https://www.github.com/tauri-apps/tauri/commit/0b79af711430934362602fb950c3e4cb5b59cf9c) ([#12438](https://www.github.com/tauri-apps/tauri/pull/12438) by [@3lpsy](https://www.github.com/tauri-apps/tauri/../../3lpsy)) Log the command used to start the rust app in development.
+
+### Bug Fixes
+
+- [`bc43c738b`](https://www.github.com/tauri-apps/tauri/commit/bc43c738baf686353690d3d9259b4976881718c8) ([#12442](https://www.github.com/tauri-apps/tauri/pull/12442) by [@FabianLars](https://www.github.com/tauri-apps/tauri/../../FabianLars)) Fixed an issue that prevented `tauri add` to work for the `clipboard-manager` plugin.
+
 ## \[2.2.5]
 
 ### Dependencies
