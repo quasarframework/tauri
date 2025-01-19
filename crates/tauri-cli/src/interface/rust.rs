@@ -1375,6 +1375,7 @@ fn tauri_config_to_bundle_settings(
     long_description: config.long_description,
     external_bin: config.external_bin,
     deb: DebianSettings {
+      package_name: config.linux.deb.package_name,
       depends: if depends_deb.is_empty() {
         None
       } else {
@@ -1400,6 +1401,7 @@ fn tauri_config_to_bundle_settings(
       bundle_xdg_open: false,
     },
     rpm: RpmSettings {
+      package_name: config.linux.rpm.package_name,
       depends: if depends_rpm.is_empty() {
         None
       } else {
